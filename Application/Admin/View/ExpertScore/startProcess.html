@@ -1,0 +1,202 @@
+﻿<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+
+    <script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+    <script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+    <script src="__PUBLIC__/vendor/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+    <script src="__PUBLIC__/vendor/chosen-ajax-addition/chosen.ajaxaddition.jquery.js"></script>
+    <!--[if lte IE 9]>
+    <script src="__PUBLIC__/vendor/ie8/respond.min.js"></script>
+    <script src="__PUBLIC__/vendor/ie8/html5shiv.js"></script>
+    <![endif]-->
+    <title>定性分析</title>
+    <style>
+        .chosen-container {
+            height: 24px;
+            top: 0px;
+
+        }
+        .control-label{
+            width:150px;
+        }
+        .row{
+            margin-left: 0;
+            margin-right: 0;
+        }
+        textarea{
+            border-top: 1px solid #ccc;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+        .must_filter{
+            color:red
+        }
+    </style>
+</head>
+<body>
+<div class="row">
+    <div class="container">
+        <form id="processForm" class="form-horizontal" enctype="multipart/form-data">
+            <div class="form-group" style="text-align: center">
+            <?php if(!empty($process)){ ?><h2>状态：<span style="color:red"><?php echo $process['esp_status']; ?></h2><?php } ?></span>
+            </div>
+            <div class="form-group">
+                <div style="width: 43%;;float: left">
+                    <label class="control-label col-sm-2">成&emsp;&emsp;本：</label>
+                    <div class="col-sm-3"  style="position: relative">
+                        <input type="text" name="es_cost" value="{$process.es_cost}"  class="form-control"  style="width:248px;"><span style="position: absolute;top: 6px;right: -206px">(万元)</span>
+                    </div>
+                </div>
+                <div style="width: 48%;float: left">
+                    <label class=" control-label col-sm-1" style="margin-left: 20px">工&emsp;&emsp;期：</label>
+                    <div class="col-sm-3" style="position: relative">
+                        <input  name="es_worktime" type="text"  value="{$process.es_worktime}"   style="width:248px;display: inline-block" class="form-control"><span style="position: absolute;top: 6px;right: -187px">（天）</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div style="width: 43%;;float: left">
+                    <label class="control-label col-sm-2">开始时间 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3">
+                        <input  name="esp_starttime" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"  value="{$process.esp_starttime}"   style="width:300px;display: inline-block" class="form-control">
+                    </div>
+                </div>
+
+                <div style="width: 48%;float: left">
+                    <label class="control-label col-sm-1" style="margin-left: 20px">截止时间 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3">
+                        <input  name="esp_endtime" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"  value="{$process.esp_endtime}"   style="width:280px;display: inline-block" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" >
+                <label class="control-label col-sm-2">选择专家 <span class="must_filter">*</span>：</label>
+                <div class="col-sm-3">
+                    <select name="es_export" id="expert" data-placeholder="请输入用户账号或姓名进行检索"  class="chosen-select2" multiple >
+                        <option value="">&nbsp;</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" >
+                <label class="control-label col-sm-2">趋势分析 <span class="must_filter">*</span>：</label>
+                <div class="col-sm-9">
+                    <textarea name="esp_tend" id="" cols="30" rows="10" style="height: 80px;width:720px;">{$process.esp_tend}</textarea>
+                </div>
+            </div>
+
+            <div style="text-align: center">
+                <?php if(empty($process)){ ?>
+                <input type="submit"  class="btn btn-success" value="保存" style="width:120px;margin-top:10px"  id="sys_dlg_submit">
+                <?php } ?>
+            </div>
+            <input type="hidden" name="risk_id" value="{$riskId}" id='risk_id'>
+        </form>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/validate/jquery.validate.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<script>
+    $(function () {
+
+        $(".chosen-select2").chosen({disable_search_threshold: 0, search_contains: true, width: '720px'});
+        var userInfo = '<?php  if(!empty($userInfo)){echo json_encode($userInfo);}else{echo "";} ?>';
+        if(userInfo){
+            userInfo = eval('('+userInfo+')');
+            for(var i=0;i<userInfo.length;i++) {
+                $('#expert').append('<option value="'+userInfo[i].id+'" selected  >'+userInfo[i].text+'</option>');
+            }
+            $('#expert').trigger("chosen:updated");
+        }
+        $(".js-switch").each(function(){
+            new Switchery(this, {color: '#1AB394'});
+        });
+
+        $('#expert').ajaxChosen({
+
+            dataType: 'json',
+            type: 'POST',
+            url:'__MODULE__/User/getUserLists'
+        },{
+        });
+
+
+
+        $.validator.setDefaults({
+            highlight:function(element){
+                $(element).parent().remove('has-success').addClass('has-error');
+            },
+            errorPlacement:function(error,element){
+                if(element.is(":radio") || element.is(":checkbox")){
+                    error.appendTo(element.parent());
+                }else{
+                    error.appendTo(element.parent());
+                }
+            },
+            errorClass:"help-block m-b-none",
+            validClass:"help-block m-b-none"
+        });
+
+        $('#processForm').validate({
+            onclick:false,
+            onfocusout:false,
+            onkeyup:false,
+            rules:{
+                es_export:'required',
+                esp_tend:'required',
+                esp_starttime:'required',
+                esp_endtime:'required'
+            },
+            messages:{
+                es_export:'必填项',
+                esp_tend:'必填项',
+                esp_starttime:'必填项',
+                esp_endtime:'必填项'
+            },submitHandler:function(){
+                layui.use('layer', function() {
+                    layer = layui.layer;
+                })
+                var formbody = $("#processForm");
+                var es_export = $('#expert').val();
+                if(es_export == null || !es_export){
+                    layer.msg('请选择专家');
+                    return false;
+                }
+                formbody.append("<input type='hidden' name='es_export'  value="+es_export+">");
+                var risk_id = $('#risk_id').val();
+                $.ajax({
+                    type:'post',
+                    url:'__CONTROLLER__/startProcessData',
+                    data:formbody.serialize(),
+                    dataType :'json',
+                    success:function(data){
+                        if(data.code > 0){
+                            layer.msg('操作成功');
+                            window.parent.location.href = '__MODULE__/ProjRisk/riskDetail?show_div=3&risk_id='+risk_id;
+                            parent.layer.close(layer.index);
+                        }else{
+                            layer.alert(data.message);
+                        }
+                    }
+                })
+            }
+        })
+    });
+</script>

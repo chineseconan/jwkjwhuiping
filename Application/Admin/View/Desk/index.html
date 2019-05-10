@@ -1,0 +1,593 @@
+﻿<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.css">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+    <title>风险详情</title>
+    <style>
+        html,body{
+            height: 100%;
+        }
+        .control-label{
+            width:110px;
+        }
+         .form-group >div{
+             margin-top: 3px;
+             margin-bottom: 3px;
+         }
+        .panel-heading {
+            text-align: center;
+            border-radius: 5px;
+        }
+        .panel-heading a{
+            display: block;
+            text-decoration: none;
+        }
+        .name{
+            font-size: 20px;
+            background-color:#FDF0D4;
+            letter-spacing: 2px;
+            border-radius: 5px;
+            color: #999999;
+            font-family: 微软雅黑;
+        }
+        .modal-body{
+            padding: 0!important;
+            height: 100%;
+            width: 100%;
+            overflow: hidden!important;
+        }
+        .if_container{
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+        }
+        .content{
+            position: absolute;
+            top:60px;
+            bottom:0;
+            width: 100%;
+            height: auto;
+        }
+        iframe{
+            width: 99.5%;
+            height: 100%;
+            overflow: auto;
+        }
+        .layui-tab-content{
+            padding: 0!important;
+        }
+    </style>
+</head>
+<body>
+    <div class="modal-body">
+        <div class="layui-tab layui-tab-brief" lay-filter="demo" style="height: 100%;">
+            <ul class="layui-tab-title" id="layui-title" style="margin-left: 10px;">
+                <li class="layui-tab-item tab">流程(<span id="process">0</span>)</li>
+                <li class="layui-tab-item tab">风险</li>
+                <li class="layui-tab-item tab">应对措施</li>
+            </ul>
+            <div class="layui-tab-content" id="layui-content" style="height: 100%">
+                <div lay-id="1" class=" layui-tab-item ">
+                    <div class="panel" id="content">
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <a href="#sec1" class="name" data-toggle='collapse' data-parent="#content" >风险关闭流程 (<span style="color: darkorange" id="riskclosenum"></span>)
+                                    <i class="fa fa-chevron-up chevronUp"></i>
+                                </a>
+                            </div>
+                            <div class="collapse panel-collapse" id="sec1">
+                                <div class="panel-body">
+                                    <input type="button"  style="display: none" value="查询" id="sys_refresh_riskClose">
+                                    <table id="riskClose"></table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-heading" style="">
+                                <a href="#sec2" class="name" data-toggle='collapse' data-parent="#content" >风险应对措施关闭 (<span style="color: darkorange" id="measureclosenum"></span>)
+                                    <i class="fa fa-chevron-up chevronUp"></i>
+                                </a>
+                            </div>
+                            <div class="collapse panel-collapse" id="sec2">
+                                <div class="panel-body">
+                                    <input type="button"  style="display:none " value="查询" id="measureClose_refresh">
+                                    <table id="measureClose" ></table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <a href="#sec3" class="name" data-toggle='collapse' data-parent="#content">专家打分流程 (<span style="color: darkorange" id="expertscorenum"></span>)
+                                    <i class="fa fa-chevron-up chevronUp"></i>
+                                </a>
+                            </div>
+                            <div class="collapse panel-collapse" id="sec3">
+                                <div class="panel-body">
+                                    <input type="button"  style="display:none " value="查询" id="expertScore_refresh">
+                                    <table id="expertScore"></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div lay-id="2" class="layui-tab-item content" >
+                    <div class="if_container">
+                        <iframe src="" id="box1"  frameborder="0"></iframe>
+                    </div>
+                </div>
+                <div lay-id="3" class="layui-tab-item content">
+                    <div class="if_container">
+                        <iframe src="" id="box2"  frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+<script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/locale/bootstrap-table-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+    <script>
+    $(function () {
+    measureNum = 0;
+    riskNum  = 0;
+    expertScoreNum  = 0;
+    //判断先展示那个div
+    var show_div = "<?php echo I('get.show_div',0,'intval'); ?>";
+    var content_obj = $('#layui-content').children();
+    var title_obj = $('#layui-title').children();
+    if(show_div != 0){
+        content_obj.eq(show_div -1 ).addClass('layui-show').siblings().removeClass('layui-show');
+        title_obj.eq(show_div - 1).addClass('layui-this').siblings().removeClass('layui-this');
+    }else{
+        content_obj.eq(0).addClass('layui-show');
+        title_obj.eq(0).addClass('layui-this');
+    }
+    $('.tab').click(function () {
+        var index = $(this).index();
+        switch(index){
+            case 0:
+                $('#measureClose_refresh').click();
+                $('#sys_refresh_riskClose').click();
+                $('#expertScore_refresh').click();
+                break;
+            case 1:
+                $('#box1').attr('src', '__MODULE__/ProjRisk/myRisk');
+                break;
+            case 2:
+                $('#box2').attr('src', '__MODULE__/Measure/deskMeasure');
+                break;
+        }
+
+    })
+//    手风琴特效
+    $('.name').click(function(){
+        var child = $(this).children().eq(1);
+        if(child.hasClass("fa-chevron-up")){
+            $('.chevronUp').not(child).removeClass("fa-chevron-down").addClass("fa-chevron-up");
+            child.removeClass("fa-chevron-up").addClass("fa-chevron-down");
+        }else if(child.hasClass("fa-chevron-down")){
+            child.removeClass("fa-chevron-down").addClass("fa-chevron-up");
+            $('.chevronUp').not(child).removeClass("fa-chevron-down").addClass("fa-chevron-up");
+        }
+    })
+
+    layui.use('layer', function() {
+        layer = layui.layer;
+    })
+    layui.use('element', function() {
+        var element = layui.element();
+        element.on('tab(demo)',function(data){});
+    })
+    $(".chosen-select2").chosen({disable_search_threshold: 0, search_contains: true, width: '300px'});
+    //应对措施js
+    var measureClose = {
+        oTableInit:function(){
+            $('#measureClose').bootstrapTable({
+                url: '__MODULE__/Desk/getCloseMeasureProcess',         //请求后台的URL（*）
+                method: 'post',                      //请求方式（*）
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: false,                   //是否显示分页（*）
+                iconSize: 'outline',
+                sortable: true,                     //是否启用排序
+                sortName:"msr_planfinishtime",
+                sortOrder: "asc",                   //排序方式
+                queryParams:queryParams_measureClose,
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 5,                       //每页的记录行数（*）
+                pageList: [5,10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+//            strictSearch: true,
+                showColumns: false,                  //是否显示所有的列
+                showRefresh: false,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "msr_id",                     //每一行的唯一标识，一般为主键列
+                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                   //是否显示父子表
+                detailFormatter: "detailFormatter",
+                columns: [
+                    [
+                        {checkbox: true},
+                        {title: '序号', width: 40,
+                            formatter: function (value, row, index)
+                            {
+                                var option =  $('#measureClose').bootstrapTable("getOptions");
+                                return option.pageSize * (option.pageNumber - 1) + index + 1;
+                            }
+                        },
+                        {field: 'msr_name', title: '应对措施名称',sortable:true,formatter:function(value,row){
+                            var msr_id = "'"+  row['msr_id'] +"'";
+                            return '<a style="color:blue" onclick="measureDetail('+msr_id+')" >'+value+'</a>';
+                        }},
+                        {field: 'risk_name', title: '所属风险',sortable:true,formatter:function(value,row){
+                            var risk_id = "'"+  row['risk_id'] +"'";
+                            return '<a style="color:blue" onclick="riskDetail('+risk_id+')" >'+value+'</a>';
+                        }},
+                        {field: 'msr_status', title: '风险状态',sortable:true},
+                        {field: 'mcp_starttime', title: '流程发起时间',sortable:true},
+                        {field: 'user_realusername', title: '流程发起人',sortable:true},
+                        {field: 'mcp_dutyconfirmtime', title: '责任人确认时间',sortable:true},
+                        {field: 'mcp_mngconfirmtime', title: '管理员确认时间',sortable:true},
+                        {field: 'mcp_id', title: '操作', sortable: false,
+                            formatter: function (value, row, index) {
+                                var inp = "'"+  value +"'";
+                                var a = '';
+                                if(row['mcp_dutyconfirmuser']){
+                                    if(!row['mcp_mngconfirmuser']){
+                                        a += '<a style="height:30px;line-height:30px;"   class="layui-btn layui-btn-normal " onclick="measureClose('+ inp +', 1 )">管理员确认</a><br>';
+                                    }
+                                }else{
+                                    a += '<a style="height:30px;line-height:30px;margin-bottom:8px;"   class="layui-btn " onclick="measureClose('+ inp +')">责任人确认</a><br>';
+                                }
+//                                a = '<a style="width:60px;height:30px;line-height:30px;"   class="layui-btn " onclick="measureClose('+ inp +', 1 )">确认</a>';
+                                a += '<a style="width:60px;height:30px;line-height:30px;"   class="layui-btn layui-btn-warm " onclick="measureRollback('+ inp +',0)">退回</a>';
+                                return a;
+                            }
+                        }
+                    ]
+                ], onDblClickRow: function (row) {
+                    var risk_id = row['risk_id'];
+                    layer.open({
+                        title: '应对措施编辑',
+                        type: 2,
+                        content: '__MODULE__/Measure/processInfo?measure_id='+row['msr_id']+'&risk_id='+risk_id,
+                        closeBtn:1,
+                        shadeClose:true,
+                        area: ['1000px', '600px']
+                    });
+                },onLoadSuccess:function(data){
+                    measureNum = data.total;
+                    $('#measureclosenum').text(data.total);
+                    var processNum = parseInt($('#process').text());
+                    $('#process').text(processNum + parseInt(data.total))
+
+                    if(parseInt(data.total)>0){
+                        var data = data.rows;
+                        var tr = $('#measureClose tbody tr');
+                        var len = tr.length;
+                        for(var i=0;i<len;i++){
+                            tr.eq(i).children().eq(2).addClass('td-hover');
+                            tr.eq(i).children().eq(2).attr('fullName', data[i].msr_fullname);
+                            tr.eq(i).children().eq(2).attr('shortName', data[i].msr_name);
+
+                        }
+                    }
+                }
+            });
+        }
+    }
+    measureClose.oTableInit();
+    function queryParams_measureClose(params){
+        return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            limit: params.limit,   //页面大小
+            offset: params.offset,  //页码
+            sort: params.sort,  //排序列名
+            order: params.order,//排位命令（desc，asc）
+            risk_id:$('#risk_id').val(),
+            measure_name :$('#measure_search_name').val()
+        };
+        return temp;
+    };
+    $('#measureClose_refresh').click(function(){
+        var processNum = parseInt($('#process').text());
+        $('#process').text(processNum - measureNum)
+        $('#measureClose').bootstrapTable('destroy');
+        measureClose.oTableInit();
+    })
+
+    //风险关闭流程js
+    var riskClose = {
+        oTableInit:function(){
+            $('#riskClose').bootstrapTable({
+                url: '__MODULE__/Desk/getCloseRiskProcess',         //请求后台的URL（*）
+                method: 'post',                      //请求方式（*）
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: false,                   //是否显示分页（*）
+                iconSize: 'outline',
+                sortable: true,                     //是否启用排序
+                sortName:"rcp_starttime",
+                sortOrder: "asc",                   //排序方式
+                queryParams:queryParams_riskClose,
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 5,                       //每页的记录行数（*）
+                pageList: [5,10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+//            strictSearch: true,
+                showColumns: false,                  //是否显示所有的列
+                showRefresh: false,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "risk_id",                     //每一行的唯一标识，一般为主键列
+                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                   //是否显示父子表
+                detailFormatter: "detailFormatter",
+                columns: [
+                    [
+                        {checkbox: true},
+                        {title: '序号', width: 40,
+                            formatter: function (value, row, index)
+                            {
+                                var option =  $('#riskClose').bootstrapTable("getOptions");
+                                return option.pageSize * (option.pageNumber - 1) + index + 1;
+                            }
+                        },
+                        {field: 'risk_name', title: '风险名称',sortable:true,formatter:function(value,row){
+                            var risk_id = "'"+  row['risk_id'] +"'";
+                            return '<a style="color:blue" onclick="riskDetail('+risk_id+')" >'+value+'</a>';
+                        }},
+                        {field: 'risk_status', title: '风险状态',sortable:true},
+                        {field: 'rcp_starttime', title: '更新日期',sortable:true},
+                        {field: 'user_realusername', title: '更新人',sortable:true},
+                        {field: 'rcp_id', title: '操作', sortable: false,
+                            formatter: function (value,row) {
+                                var inp = "'"+  value +"'";
+                                var risk_id = "'"+  row['risk_id'] +"'";
+                                var a = '';
+                                a += '<a style="width:60px;height:30px;line-height:30px;"   class="layui-btn " onclick="confirmClose('+ inp +')">确认</a>';
+                                a += '<a style="width:60px;height:30px;line-height:30px;"   class="layui-btn layui-btn-warm " onclick="rollbackRisk('+ risk_id +')">退回</a>';
+                                return a;
+                            }
+                        }
+                    ]
+                ], onDblClickRow: function (row) {
+                    layer.open({
+                        title: '风险详情',
+                        type: 2,
+                        content: '__MODULE__/ProjRisk/riskDetailNoPower?risk_id='+row['risk_id'],
+                        maxmin: true,
+                        closeBtn:1,
+                        shadeClose:true,
+                        area: ['1000px', '630px']
+                    });
+                },onLoadSuccess:function(data){
+                    riskNum = data.total;
+                    $('#riskclosenum').text(data.total);
+                    var processNum = parseInt($('#process').text());
+                    $('#process').text(processNum * 1 + data.total *1)
+                }
+            });
+        }
+    }
+    riskClose.oTableInit();
+    function queryParams_riskClose(params){
+        return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            limit: params.limit,   //页面大小
+            offset: params.offset,  //页码
+            sort: params.sort,  //排序列名
+            order: params.order,//排位命令（desc，asc）
+            risk_id:$('#risk_id').val()
+        };
+        return temp;
+    };
+    $('#sys_refresh_riskClose').click(function(){
+        var processNum = parseInt($('#process').text());
+        $('#process').text(processNum - riskNum)
+        $('#riskClose').bootstrapTable('destroy');
+        riskClose.oTableInit();
+    })
+    //专家打分流程
+    var TableObj_expertScore = {
+        oTableInit:function(){
+            $('#expertScore').bootstrapTable({
+                url: '__MODULE__/Desk/getExpertScores',         //请求后台的URL（*）
+                method: 'post',                      //请求方式（*）
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: false,                   //是否显示分页（*）
+                iconSize: 'outline',
+                sortable: true,                     //是否启用排序
+                sortName:"esp_starttime",
+                sortOrder: "asc",                   //排序方式
+                queryParams:queryParams_zhuanjiadafen,
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 5,                       //每页的记录行数（*）
+                pageList: [5,10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+//            strictSearch: true,
+                showColumns: false,                  //是否显示所有的列
+                showRefresh: false,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "esp_id",                     //每一行的唯一标识，一般为主键列
+                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                   //是否显示父子表
+                columns: [
+                    [
+                        {checkbox:true},
+                        {field: 'risk_name', title: '风险名称',sortable:true,formatter:function(value,row){
+                            var risk_id = "'"+  row['risk_id'] +"'";
+                            return '<a style="color:blue" onclick="riskDetail('+risk_id+')" >'+value+'</a>';
+                        }},
+                        {field: 'user_realusername', title: '开启人',sortable:true},
+                        {field: 'esp_starttime', title: '开启时间',sortable:true},
+                        {field: 'es_status', title: '状态',sortable:true},
+                        {field: 'esp_tend', title: '趋势分析',sortable:true},
+                        {field: 'es_worktime', title: '工期',sortable:true},
+                        {field: 'es_cost', title: '成本',sortable:true},
+                        {field: 'esp_id', title: '操作', sortable: false,
+                            formatter: function (value, row, index) {
+                                var inp = "'"+  value +"'";
+                                var risk_id = "'"+  row['esp_riskid'] +"'";
+                                a = '<a style="width:60px;height:30px;line-height:30px;"   class="layui-btn " onclick="addExpertScore('+ inp +','+risk_id+')">打分</a>';
+                                return a;
+                            }
+                        }
+                    ]
+                ],onLoadSuccess:function(data){
+                    expertScoreNum = data.total
+                    $('#expertscorenum').text(data.total);
+                    var processNum = parseInt($('#process').text());
+                    $('#process').text(processNum * 1 + data.total *1)
+                }
+            });
+        }
+    }
+    TableObj_expertScore.oTableInit();
+    function queryParams_zhuanjiadafen(params){
+        return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            limit: params.limit,   //页面大小
+            offset: params.offset,  //页码
+            sort: params.sort,  //排序列名
+            order: params.order,//排位命令（desc，asc）
+            risk_id:$('#risk_id').val()
+        };
+        return temp;
+    };
+
+    $('#expertScore_refresh').click(function(){
+        var processNum = parseInt($('#process').text());
+        $('#process').text(processNum - expertScoreNum)
+        $('#expertScore').bootstrapTable('destroy');
+        TableObj_expertScore.oTableInit();
+    })
+});
+    function riskDetail(risk_id) {
+        layer.open({
+            title: '风险详情',
+    //            maxmin: false,
+            type: 2,
+            content: '__MODULE__/ProjRisk/riskDetailNoPower?risk_id='+risk_id,
+            closeBtn:1,
+            shadeClose:true,
+            area: ['1000px', '636px']
+        });
+    }
+    function measureDetail( msr_id){
+        layer.open({
+            title: '应对措施详情',
+            type: 2,
+            content: '__MODULE__/Measure/processInfoNoPower?measure_id='+msr_id,
+            closeBtn:1,
+            shadeClose:true,
+            area: ['1000px', '600px']
+        });
+    }
+    function addExpertScore(esp_id, risk_id){
+        layer.open({
+            title: '专家打分',
+            type: 2,
+            content: '__MODULE__/ExpertScore/addExpertScore?esp_id='+esp_id+'&risk_id='+risk_id,
+            closeBtn:1,
+            shadeClose:true,
+            area: ['1000px', '580px']
+        });
+    }
+    function measureClose(id){
+        $.ajax({
+            type:'post',
+            url:'__MODULE__/Measure/confirmMeasureClose',
+            data:{id:id},
+            dataType :'json',
+            success:function(data){
+                if(data.code > 0){
+                    layer.alert('操作成功');
+                }else{
+                    layer.alert(data.message);
+                }
+                $('#measureClose_refresh').click();
+            }
+        })
+    }
+    function confirmClose(id){
+        layer.confirm('确认关闭风险?' ,
+        {btn:['确定','取消']}
+        ,function(){
+            $.ajax({
+                type:'post',
+                url:'__MODULE__/ProjRisk/confirmCloseRisk',
+                data:{id:id},
+                dataType :'json',
+                success:function(data){
+                    if(data.code > 0){
+                        layer.msg('操作成功');
+                    }else{
+                        layer.msg(data.message);
+                    }
+                    $('#sys_refresh_riskClose').click();
+                }
+            })
+        })
+    }
+    function measureRollback(id){
+        layer.open({
+            title: '应对措施退回',
+            type: 2,
+            content: '__MODULE__/Measure/rollback?id='+id+'&table=measureClose',
+            closeBtn:1,
+            shadeClose:true,
+            area: ['800px', '300px']
+        });
+    }
+    function rollbackRisk(id){
+        layer.open({
+            title: '风险退回',
+            type: 2,
+            content: '__MODULE__/ProjRisk/rollback?id='+id+'&table=measureClose',
+            closeBtn:1,
+            shadeClose:true,
+            area: ['800px', '300px']
+        });
+    }
+    $('body').on('mouseover','.td-hover',function(){
+        var fullname = $(this).attr('fullName');
+        var width = parseInt($(this).css('width'))+300;
+        $(this).css('width', width+'px');
+        $(this).children(':first').text(fullname);
+
+    })
+    $('body').on('mouseout','.td-hover',function(){
+        var shortName = $(this).attr('shortName');
+        var width = parseInt($(this).css('width'))-300;
+        $(this).css('width', width+'px')
+        $(this).children(':first').text(shortName);
+    })
+
+    </script>
+</body>
+</html>

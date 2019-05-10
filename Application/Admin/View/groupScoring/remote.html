@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="__PUBLIC__/css/tablepublic.css">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="__PUBLIC__/css/public.css">
+    <link href="__PUBLIC__/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.css" rel="stylesheet" >
+    <link href="__PUBLIC__/vendor/bootstrap-table/bootstrap/css/bootstrap.min.css" rel="stylesheet" >
+    <title>分组打分创建任务</title>
+    <style>
+        .content select{
+            width: 130px;
+            height: 26px;
+            font-size: 16px;
+            border-radius: 2px;
+            margin-right: 30px;
+        }
+        .content select option{
+            height: 26px;
+            line-height: 26px;
+            font-size: 17px;
+        }
+        .chosen-select{
+            width: 280px!important;
+        }
+        .confirm{
+            margin-right: 50px;
+        }
+        #confirm,#cancel{
+            padding: 6px 36px;
+        }
+        .alternative,.selected{
+            width: 50%;
+        }
+        #participants .chosen-container-single{
+            width: 175px!important;
+        }
+        #judges .chosen-container-single{
+            width: 150px!important;
+        }
+        .alternative>div{
+            margin-bottom: 20px;
+        }
+        .personneltype {
+            margin-bottom: 8px;
+            color:blue;
+            font-weight: bold;
+        }
+        #alternativeTable,#selectedTable{
+            table-layout: fixed;
+            width: 500px;
+        }
+        #alterjudges,#seljudges{
+            table-layout: fixed;
+            width: 420px;
+        }
+        span i{
+            font-size: 20px;
+        }
+        .form{
+            margin-top: 30px;
+        }
+        .tab-content{
+            padding-top: 10px;
+            margin-left: 10px;
+            box-sizing: border-box;
+        }
+        .tab-content span{
+            display: block;
+            margin-bottom: 10px;
+        }
+        .personnel{
+            margin: 10px 0 0 0;
+        }
+    </style>
+</head>
+<body>
+<input type="hidden" value="{$taskId}" id="taskId">
+<div class="dialog">
+    <div class="content">
+        <div class="body">
+            <div>
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#basicInfo" data-toggle="tab">基本信息</a></li>
+                    <if condition="$taskId neq ''">
+                        <li><a href="#participants" data-toggle="tab">参评人员</a></li>
+                        <li><a href="#judges" data-toggle="tab">评委</a></li>
+                    </if>
+                </ul>
+                <div class="tab-content">
+                    <div id="basicInfo" class="tab-pane fade active in">
+                        <form class="form">
+                            <div class="cb">
+                                <div class="fl" style="width: 400px">
+                                    <label style="margin-left: 30px">申报级别：</label>
+                                    <select name="level" id="level" class="chosen-select">
+                                        <option value=""></option>
+                                        <foreach name="level" item="levelItem">
+                                            <if condition="$levelItem['val'] neq '中级'">
+                                                <option value="{$levelItem.val}" <if condition="$taskData['st_sblevel'] eq $levelItem['val']">selected</if> >{$levelItem.val}</option>
+                                            </if>
+                                        </foreach>
+                                    </select>
+                                </div>
+                                <div class="fl" style="margin-left: 60px;width: 400px">
+                                    <label style="margin-left: 20px">汇总方式：</label>
+                                    <select name="avgType" id="avgType" class="chosen-select">
+                                        <option value=""></option>
+                                        <foreach name="avgType" item="avgTypeItem">
+                                            <option value="{$avgTypeItem.val}" <if condition="$taskData['st_caltype'] eq $avgTypeItem['val']">selected</if> >{$avgTypeItem.val}</option>
+                                        </foreach>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="margin: 30px 0">
+                                <label style="margin-left: 30px">任务名称：</label>
+                                <input type="text" id="taskname" name="taskname" style="width: 730px;height: 32px;border-radius: 4px" value="{$taskData.st_taskname}">
+                            </div>
+                        </form>
+                    </div>
+                    <!--participants start-->
+                    <div id="participants" class="tab-pane fade">
+                        <div class="personnel cb">
+                            <div class="alternative fl">
+                                <span class="db personneltype" style="margin-top: -8px">备选人员</span>
+                                <div>
+                                    <label>分&emsp;&emsp;组:</label>
+                                    <select name="" class="chosen-select alternative">
+                                        <option value=""></option>
+                                        <foreach name="type" item="typeItem">
+                                            <option value="{$typeItem.val}">{$typeItem.val}</option>
+                                        </foreach>
+                                    </select>
+                                    <label>申报专业:</label>
+                                    <select name="major" id="major" class="chosen-select alternative">
+                                        <option value="" selected></option>
+                                        <foreach name="major" item="majorItem">
+                                            <option value="{$majorItem.val}">{$majorItem.val}</option>
+                                        </foreach>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label>姓&emsp;&emsp;名:</label>
+                                    <input type="text"  id="alternative_name" class='sbInfoName' style="height: 30px;width:175px;border-radius: 3px">
+                                    <label class="">所在部门:</label>
+                                    <select name="title" id="alternative_title" class="chosen-select alternative" >
+                                        <option value="" selected></option>
+                                        <foreach name="org" item="orgItem">
+                                            <option value="{$orgItem.org_name}">{$orgItem.org_name}</option>
+                                        </foreach>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="selected fl">
+                                <span class="db personneltype">已选人员</span>
+                                <label>姓&emsp;&emsp;名:</label>
+                                <input type="text"  id="selected_name"  class='sbInfoName' style="height: 30px;width:175px!important;border-radius: 3px">
+                                <label class="">所在部门:</label>
+                                <select name="title" id="selected_title" class="chosen-select selected" >
+                                    <option value="" selected></option>
+                                    <foreach name="org" item="orgItem">
+                                        <option value="{$orgItem.org_name}">{$orgItem.org_name}</option>
+                                    </foreach>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="cb" style="">
+                            <div class="alterBox fl" >
+                                <table id="alternativeTable" data-height="360"></table>
+                            </div>
+                            <div class="fl" style="width: 60px">
+                                <div class="tc">
+                                    <button class="btn btn-warning" id="addAlternative">添加</button><br>
+                                    <i class="fa fa-long-arrow-right"></i>
+                                </div>
+                                <div class="tc">
+                                    <button class="btn btn-danger" id="removeSelected">移除</button><br>
+                                    <i class="fa fa-long-arrow-left"></i>
+                                </div>
+                            </div>
+                            <div class="selBox fl" >
+                                <table id="selectedTable" data-height="360"></table>
+                            </div>
+                        </div>
+                    </div>
+                    <!--judges start-->
+                    <div id="judges" class="tab-pane fade">
+                        <div class="personnel cb">
+                            <div class="alternative fl">
+                                <span class="db personneltype">备选评委</span>
+                                <div>
+                                    <label>姓&emsp;&emsp;名:</label>
+                                    <input type="text"  id="alterjudges_name" class='sbInfoName' style="height: 30px;width:150px;border-radius: 3px">
+                                    <label class="">所在部门:</label>
+                                    <select name="title" id="alterjudges_title" class="chosen-select alterjudges" >
+                                        <option value="" selected></option>
+                                        <foreach name="org" item="orgItem">
+                                            <option value="{$orgItem.org_name}">{$orgItem.org_name}</option>
+                                        </foreach>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="selected fl">
+                                <span class="db personneltype">已选评委</span>
+                                <label>姓&emsp;&emsp;名:</label>
+                                <input type="text" id="seljudges_name" class='sbInfoName'  style="height: 30px;width:150px;border-radius: 3px">
+                                <label class="">所在部门:</label>
+                                <select name="title" id="seljudges_title" class="chosen-select seljudges" style="width: 120px">
+                                    <option value="" selected></option>
+                                    <foreach name="org" item="orgItem">
+                                        <option value="{$orgItem.org_name}">{$orgItem.org_name}</option>
+                                    </foreach>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="cb" >
+                            <div class="alterBox fl" style="margin-left: 2px">
+                                <table id="alterjudges" data-height="360"></table>
+                            </div>
+                            <div class="fl" style="width: 160px">
+                                <div class="tc">
+                                    <button class="btn btn-warning" id="addAlterjudges" >添加</button><br>
+                                    <i class="fa fa-long-arrow-right"></i>
+                                </div>
+                                <div class="tc">
+                                    <button class="btn btn-danger" id="removeSeljudges" >移除</button><br>
+                                    <i class="fa fa-long-arrow-left"></i>
+                                </div>
+                            </div>
+                            <div class="selBox fl" >
+                                <table id="seljudges" data-height="360"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tc" style="height:50px;margin-top: 60px">
+                    <a class="btn btn-success confirm" id="confirm">确定</a>
+                    <a class="btn btn-primary" id="cancel">取消</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/locale/bootstrap-table-zh-CN.js"></script>
+<script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+<script src="__PUBLIC__/vendor/chosen-ajax-addition/chosen.ajaxaddition.jquery.js"></script>
+<script>
+    $(function(){
+//        下拉菜单
+        $(".chosen-select").chosen({disable_search_threshold: 0, search_contains: true});
+//        备选人员
+        var TableObj_alternative = {
+            oTableInit:function(){
+                $('#alternativeTable').bootstrapTable({
+                    url: '__CONTROLLER__/getAlternativeData',         //请求后台的URL（*）
+                    method: 'post',                      //请求方式（*）
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: false,                   //是否显示分页（*）
+                    iconSize: 'outline',
+                    sortable: true,                     //是否启用排序
+                    queryParams:queryParams_alternative,
+                    search:false ,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                    showColumns: false,                  //是否显示所有的列
+                    showRefresh: false,                  //是否显示刷新按钮
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+                    uniqueId: "i_id",                     //每一行的唯一标识，一般为主键列
+                    showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    showExport:true,
+                    exportDataType:'all',
+                    columns: [
+                        [
+                            {checkbox: true},
+                            {title: '序号', width: 50,
+                                formatter:function(value,row,index){
+                                    return row.numrow;
+                                }
+                            },
+                            {field: 'i_group', title: '分组',width: 80},
+                            {field: 'i_sbmajor', title: '申报专业',width: 80},
+                            {field: 'i_name', title: '姓名',width: 80},
+                            {field: 'i_deptname', title: '所在部门',width: 100},
+                        ]
+                    ],
+                    onDblClickRow:function(row){
+                        var selectedLen = $('#selectedTable').bootstrapTable("getData").length;
+                        row['numrow'] = selectedLen + 1;
+                        if(row['stp_id']==""){
+                            row['stp_id'] = "";
+                        }
+                        var data = {
+                            index: selectedLen + 1,
+                            row: row
+                        }
+                        $('#selectedTable').bootstrapTable("insertRow", data);
+                        $('#alternativeTable').bootstrapTable("removeByUniqueId", row['i_id']);
+                    }
+                });
+            }
+        }
+        $(".chosen-select").on("change",function(){
+            if($(this).hasClass("alternative")){
+                $('#alternativeTable').bootstrapTable("refresh");
+            }else if($(this).hasClass("selected")){
+                $('#selected').bootstrapTable("refresh");
+            }else if($(this).hasClass("alterjudges")){
+                $('#alterjudges').bootstrapTable("refresh");
+            }else{
+                $('#seljudges').bootstrapTable("refresh");
+            }
+        });
+        $(".sbInfoName").on("keydown",function(){
+            if($(this).attr("id")=="alternative_name"){
+                $('#alternativeTable').bootstrapTable("refresh");
+            }else if($(this).attr("id")=="selected_name"){
+                $('#selected').bootstrapTable("refresh");
+            }else if($(this).attr("id")=="alterjudges_name"){
+                $('#alterjudges').bootstrapTable("refresh");
+            }else{
+                $('#seljudges').bootstrapTable("refresh");
+            }
+        });
+        TableObj_alternative.oTableInit();
+        function queryParams_alternative(params){
+            return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                group: $("#group").val(),
+                name: $("#alternative_name").val(),
+                major: $("#major").val(),
+                title:$("#alternative_title").val(),
+                taskId:$("#taskId").val()
+            };
+        };
+//        已选人员
+        var TableObj_selected = {
+            oTableInit:function(){
+                $('#selectedTable').bootstrapTable({
+                    url: '__CONTROLLER__/selectedData',         //请求后台的URL（*）
+                    method: 'post',                      //请求方式（*）
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: false,                   //是否显示分页（*）
+                    iconSize: 'outline',
+                    sortable: true,                     //是否启用排序
+                    queryParams:queryParams_selected,
+                    search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                    showColumns: false,                  //是否显示所有的列
+                    showRefresh: false,                  //是否显示刷新按钮
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+                    uniqueId: "i_id",                     //每一行的唯一标识，一般为主键列
+                    showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    showExport:true,
+                    exportDataType:'all',
+                    columns: [
+                        [
+                            {checkbox: true},
+                            {title: '序号', width: 50,
+                                formatter:function(value,row,index){
+                                    return row.numrow;
+                                }
+                            },
+                            {field: 'i_group', title: '分组',width: 80},
+                            {field: 'i_sbmajor', title: '申报专业',width: 80},
+                            {field: 'i_name', title: '姓名',width: 80},
+                            {field: 'i_deptname', title: '所在部门',width: 100},
+                        ]
+                    ],
+                    onDblClickRow:function(row){
+                        var alternativeLen = $('#alternativeTable').bootstrapTable("getData").length;
+                        row['numrow'] = alternativeLen + 1;
+                        var data = {
+                            index: alternativeLen + 1,
+                            row: row
+                        }
+                        $('#alternativeTable').bootstrapTable("insertRow", data);
+                        $('#selectedTable').bootstrapTable("removeByUniqueId", row['i_id']);
+                    }
+                });
+            }
+        }
+        TableObj_selected.oTableInit();
+        $(".selected").on("change",function(){
+            $('#selectedTable').bootstrapTable("refresh");
+        });
+        function queryParams_selected(params){
+            return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                name: $("#selected_name").val(),
+                title: $("#selected_title").val(),
+                taskId:$("#taskId").val()
+            };
+        };
+//        备选评委
+        var TableObj_alterjudges = {
+            oTableInit:function(){
+                $('#alterjudges ').bootstrapTable({
+                    url: '__CONTROLLER__/getAlterjudgesData',         //请求后台的URL（*）
+                    method: 'post',                      //请求方式（*）
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: false,                   //是否显示分页（*）
+                    iconSize: 'outline',
+                    sortable: true,                     //是否启用排序
+                    queryParams:queryParams_alterjudges,
+                    search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                    showColumns: false,                  //是否显示所有的列
+                    showRefresh: false,                  //是否显示刷新按钮
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+                    uniqueId: "user_id",                     //每一行的唯一标识，一般为主键列
+                    showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    showExport:true,
+                    exportDataType:'all',
+                    columns: [
+                        [
+                            {checkbox: true},
+                            {title: '序号', width: 50,
+                                formatter:function(value,row,index){
+                                    return row.numrow;
+                                }
+                            },
+                            {field: 'user_realusername', title: '账号',width: 80},
+                            {field: 'user_username', title: '姓名',width: 80},
+                        ]
+                    ],
+                    onDblClickRow:function(row){
+                        var seljudgesLen = $('#seljudges').bootstrapTable("getData").length;
+                        row['numrow'] = seljudgesLen + 1;
+                        if(row['ste_id']==""){
+                            row['ste_id'] = "";
+                        }
+                        var data = {
+                            index: seljudgesLen + 1,
+                            row: row
+                        }
+                        $('#seljudges').bootstrapTable("insertRow", data);
+                        $('#alterjudges').bootstrapTable("removeByUniqueId", row['user_id']);
+                    }
+                });
+            }
+        }
+        TableObj_alterjudges.oTableInit();
+        $(".alterjudges").on("change",function(){
+            $('#alterjudges').bootstrapTable("refresh");
+        });
+        function queryParams_alterjudges(params){
+            return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                user_name: $("#alterjudges_name").val(),
+                user_orgid: $("#alterjudges_title").val(),
+                taskId:$("#taskId").val()
+            };
+        };
+//        已选评委
+        var TableObj_seljudges = {
+            oTableInit:function(){
+                $('#seljudges').bootstrapTable({
+                    url: '__CONTROLLER__/seljudgesData',         //请求后台的URL（*）
+                    method: 'post',                      //请求方式（*）
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: false,                   //是否显示分页（*）
+                    iconSize: 'outline',
+                    sortable: true,                     //是否启用排序
+                    queryParams:queryParams_seljudges,
+                    search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                    showColumns: false,                  //是否显示所有的列
+                    showRefresh: false,                  //是否显示刷新按钮
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+                    uniqueId: "user_id",                     //每一行的唯一标识，一般为主键列
+                    showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    showExport:true,
+                    exportDataType:'all',
+                    columns: [
+                        [
+                            {checkbox: true},
+                            {title: '序号', width: 50},
+                            {field: 'user_realusername', title: '账号',width: 80},
+                            {field: 'user_username', title: '姓名',width: 80},
+                        ]
+                    ],
+                    onDblClickRow:function(row){
+                        var alterjudgesLen = $('#alterjudges').bootstrapTable("getData").length;
+                        row['numrow'] = alterjudgesLen + 1;
+                        var data = {
+                            index: alterjudgesLen + 1,
+                            row: row
+                        }
+                        $('#alterjudges').bootstrapTable("insertRow", data);
+                        $('#seljudges').bootstrapTable("removeByUniqueId", row['user_id']);
+                    }
+                });
+            }
+        }
+        TableObj_seljudges.oTableInit();
+        $(".seljudges").on("change",function(){
+            $('#seljudges').bootstrapTable("refresh");
+        });
+        function queryParams_seljudges(params){
+            return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                user_name: $("#alterjudges_name").val(),
+                user_orgid: $("#alterjudges_title").val(),
+                taskId:$("#taskId").val()
+            };
+        };
+
+        $("#addAlternative").on("click",function(){
+            var alternativeData = $('#alternativeTable').bootstrapTable("getAllSelections");
+            var len = alternativeData.length;
+            var selectedLen = $('#selectedTable').bootstrapTable("getData").length;
+            for (var i = 0; i < len; i++) {
+                alternativeData[i]['numrow'] = selectedLen + 1;
+                alternativeData[i]['stp_id'] =  "";
+                var data = {
+                    index: selectedLen + 1,
+                    row: alternativeData[i]
+                }
+                $('#selectedTable').bootstrapTable("insertRow", data);
+                $('#alternativeTable').bootstrapTable("removeByUniqueId", alternativeData[i]['i_id']);
+                selectedLen++;
+            }
+            return false;
+        });
+
+        $("#removeSelected").on("click",function(){
+            var selectedData = $('#selectedTable').bootstrapTable("getAllSelections");
+            var len = selectedData.length;
+            var alternativeLen = $('#alternativeTable').bootstrapTable("getData").length;
+            for (var i = 0; i < len; i++) {
+                selectedData[i]['numrow'] = alternativeLen + 1;
+                var data = {
+                    index: alternativeLen + 1,
+                    row: selectedData[i]
+                }
+                $('#alternativeTable').bootstrapTable("insertRow", data);
+                $('#selectedTable').bootstrapTable("removeByUniqueId", selectedData[i]['i_id']);
+                alternativeLen++;
+            }
+            return false;
+        });
+        //添加评委
+        $("#addAlterjudges").on("click",function(){
+            var alterjudgesData = $('#alterjudges').bootstrapTable("getAllSelections");
+            var len = alterjudgesData.length;
+            var seljudgesLen = $('#seljudges').bootstrapTable("getData").length;
+            for (var i = 0; i < len; i++) {
+                alterjudgesData[i]['numrow'] = seljudgesLen + 1;
+                alterjudgesData[i]['ste_id'] = "";
+                var data = {
+                    index: seljudgesLen + 1,
+                    row: alterjudgesData[i]
+                }
+                $('#seljudges').bootstrapTable("insertRow", data);
+                $('#alterjudges').bootstrapTable("removeByUniqueId", alterjudgesData[i]['user_id']);
+                seljudgesLen++;
+            }
+            return false;
+        });
+        //移除评委
+        $("#removeSeljudges").on("click",function(){
+            var seljudgesData = $('#seljudges').bootstrapTable("getAllSelections");
+            var len = seljudgesData.length;
+            var alterjudgesLen = $('#alterjudges').bootstrapTable("getData").length;
+            for (var i = 0; i < len; i++) {
+                seljudgesData[i]['numrow'] = alterjudgesLen + 1;
+                var data = {
+                    index: alterjudgesLen + 1,
+                    row: seljudgesData[i]
+                }
+                $('#alterjudges').bootstrapTable("insertRow", data);
+                $('#seljudges').bootstrapTable("removeByUniqueId", seljudgesData[i]['user_id']);
+                alterjudgesLen++;
+            }
+            return false;
+        });
+    })
+
+    $("#confirm").on("click",saveData);
+    function saveData(){
+        var level = $("#level").val();
+        var calType =  $("#avgType").val();
+        var taskName =  $("#taskname").val();
+        var taskId = $("#taskId").val();
+        if(level==""){
+            alert("请选择申报级别");
+            return false;
+        }
+        if(calType==""){
+            alert("请选择汇总方式");
+            return false;
+        }
+        if(taskName==""){
+            alert("请填写任务名称");
+            return false;
+        }
+        var data = {
+            id:taskId,
+            level :level,
+            calType:calType,
+            taskName:taskName
+        };
+        if(taskId!=""){
+            var seljudgesData = $('#seljudges').bootstrapTable("getData");
+            data['seljudgesData'] = seljudgesData;
+            var selectedData = $('#selectedTable').bootstrapTable("getData");
+            data['selectedData'] = selectedData;
+        }
+
+        $.post("__CONTROLLER__/saveTaskData",data,function(rep){
+            if(rep.code==0){
+                alert("保存失败，请关闭重试");
+            }else{
+                var index = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(index);
+            }
+        });
+    }
+    $('#confirm').click(function(){
+        parent.$('#refresh').click();
+        parent.$('#information').bootstrapTable('refresh');
+    });
+
+//    取消按钮点击退出
+    $('#cancel').on('click',function(){
+        var index = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(index);
+    })
+</script>
+</body>
+</html>

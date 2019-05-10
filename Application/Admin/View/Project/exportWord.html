@@ -1,0 +1,227 @@
+<html xmlns:w='urn:schemas-microsoft-com:office:word'>
+<head>
+    <meta http-equiv=Content-Type content="text/html; charset=utf-8">
+    <meta name=ProgId content=Word.Document>
+
+    <!--[if gte mso 9]>
+    <xml>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+
+            <w:DoNotOptimizeForBrowser/>
+            <w:Compatibility>
+                <w:DontGrowAutofit/>
+            </w:Compatibility>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <meta http-equiv=Content-Type content=\"text/html; charset=gb2312\">
+    <meta name=Generator content=\"Microsoft Word 14 (filtered)\">
+    <style>
+        .bg_td{
+            background:rgb(222,231,247);
+            font-size:14px;
+            font-weight: bolder;
+        }
+        td{
+            text-align: center;
+            vertical-align: middle;
+            font-size: 11px;
+            border: 1px solid black;
+        }
+        table{
+            border-collapse: collapse;
+        }
+
+    </style>
+</head>
+<body  lang=ZH-CN style='tab-interval:21.0pt;text-justify-trim:punctuation;text-align: center'>
+<div  style='layout-grid:15.6pt'>
+    <?php foreach($data as $key=>$value){ ?>
+    <div style="margin-bottom: 100px;">
+        <table cellspacing=0 cellpadding=0 width=643 >
+        <tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes;height:40.25pt'>
+            <td width=113 class="bg_td" style=''>
+               风险名称
+            </td>
+            <td width=529 colspan=12 style=''>
+               <?php echo $value['risk_name']; ?>
+            </td>
+        </tr>
+        <tr style='mso-yfti-irow:1;height:40.25pt'>
+            <td width=113 style='' class="bg_td">
+                TOP10编码
+            </td>
+            <td width=217 colspan=6 style=''>
+                <?php echo $projectInfo['proj_code']; ?>-<?php echo str_pad($key+1, 3, '0', STR_PAD_LEFT  ); ?>
+            </td>
+            <td width=113 colspan=2 style='' class="bg_td">
+                风险领域
+            </td>
+            <td width=198 colspan=4 style=''>
+                <?php echo $value['risk_domain']; ?>
+            </td>
+        </tr>
+        <tr style='mso-yfti-irow:2;height:21.6pt'>
+            <td width=113 rowspan=2 style='' class="bg_td">
+                公司牵头负责人
+            </td>
+            <td width=132 colspan=4 rowspan=2 style=''>
+                张东辉
+            </td>
+            <td width=85 colspan=2 rowspan=2 style='' class="bg_td">
+                责任处室
+            </td>
+            <td width=113 colspan=2 rowspan=2 style=''>
+              反应堆工程设计研究部
+            </td>
+            <td width=94 colspan=2 style=''class="bg_td">
+                处室负责人
+            </td>
+            <td width=104 colspan=2 style=''>
+                <?php echo $projectInfo['proj_duty']; ?>
+            </td>
+        </tr>
+        <tr style='mso-yfti-irow:3;height:24.6pt'>
+            <td width=94 colspan=2 style='' class="bg_td">
+                具体责任人
+            </td>
+            <td width=104 colspan=2 style=''>
+                <?php echo $projectInfo['proj_specialduty']; ?>
+            </td>
+        </tr>
+        <tr style='mso-yfti-irow:4;height:63.0pt'>
+            <td width=113 style='' class="bg_td">
+                风险描述
+            </td>
+            <td width=529 colspan=12 style=''>
+                <?php echo $value['risk_description']; ?>
+            </td>
+        </tr>
+        <tr style='mso-yfti-irow:5;height:21.0pt'>
+            <td width=113 style='' class="bg_td">
+              计划名称
+            </td>
+            <td width=217 colspan=6 style=''>
+                <?php echo $value['plan_name']; ?>
+            </td>
+            <td width=113 colspan=2 style='' class="bg_td">
+                风险填报时间
+            </td>
+            <td width=198 colspan=4 style=''>
+                <?php echo $value['risk_tianbaotime']; ?>
+            </td>
+        </tr>
+        <tr style='mso-yfti-irow:6;height:21.0pt'>
+            <td width=113 style='' class="bg_td">
+                滞后计划时间
+            </td>
+            <td width=217 colspan=6 style=''>
+               <?php echo $value['plan_zhihoutime']; ?>
+            </td>
+            <td width=113 colspan=2 style='' class="bg_td">
+                预计关闭时间
+            </td>
+            <td width=198 colspan=4 style=''>
+                <?php echo $value['risk_planclosetime']; ?>
+            </td>
+        </tr>
+        <tr style='mso-yfti-irow:7;height:38.4pt'>
+            <td width=113 rowspan=3 style='' class="bg_td">
+                风险趋势及评估
+            </td>
+            <td width=120 colspan=2 style='' class="bg_td">
+                发生可能性
+            </td>
+            <td width=47 colspan=2 style='' >
+                <?php if(!empty($value['risk_propability'])) {if($value['risk_propability']< 0.2){echo 1;}else if($value['risk_propability']< 0.4){echo 2;}else if($value['risk_propability']< 0.6){echo 3;}else if($value['risk_propability']< 0.8){echo 4;}else  {echo 5;}} ?>
+            </td>
+            <td width=397 colspan=8 rowspan=3 style='' >
+                <?php echo $value['risk_tend']; ?>
+            </td>
+        </tr>
+        <tr style='mso-yfti-irow:8;height:26.4pt'>
+            <td width=120 colspan=2 style='' class="bg_td">
+                影响程度
+            </td>
+            <td width=47 colspan=2 style=''>
+                <?php if(!empty($value['risk_affection'])) {if($value['risk_affection']< 0.2){echo 1;}else if($value['risk_affection']< 0.4){echo 2;}else if($value['risk_affection']< 0.6){echo 3;}else if($value['risk_affection']< 0.8){echo 4;}else {echo 5;} }?>
+            </td>
+        </tr>
+        <tr style='mso-yfti-irow:9;height:26.4pt'>
+            <td width=120 colspan=2 style='' class="bg_td">
+               风险等级
+            </td>
+            <td width=47 colspan=2 style=''>
+                <?php if(!empty($value['risk_value'])) {if($value['risk_value']< 0.08){echo 1;}else if($value['risk_value']< 0.2){echo 2;}else if($value['risk_value']< 0.6){echo 3;}else if ($value['risk_value']< 1){echo 4;}} ?>
+            </td>
+        </tr>
+        <tr style='mso-yfti-irow:10;height:34.9pt'>
+            <td width=281 colspan=6 style='' class="bg_td">
+               TOP10管控方案
+            </td>
+            <td width=362 colspan=7 style='' class="bg_td">
+               TOP10管控方案监控
+            </td>
+        </tr>
+        <tr style='mso-yfti-irow:11;height:34.85pt'>
+            <td width=170 colspan=2 style='' class="bg_td">
+                计划采取的管控措施
+            </td>
+            <td width=66 colspan=2 style='' class="bg_td">
+              管控措施计划完成时间
+            </td>
+            <td width=45 colspan=2 style=''class="bg_td">
+                责任单位
+            </td>
+            <td width=50 style='' class="bg_td">
+                措施是否有效
+            </td>
+            <td width=98 style='' class="bg_td">
+              管控措施目前完成情况
+            </td>
+            <td width=71 colspan=2 style='' class="bg_td">
+                管控措施实际完成时间
+            </td>
+            <td width=71 colspan=2 style='' class="bg_td">
+                措施完成情况（按时滞后取消）
+            </td>
+            <td width=71 style='' class="bg_td">
+                管控措施变更新增
+            </td>
+        </tr>
+
+        <?php foreach($value['measures'] as $k=>$v) {?>
+        <tr style='mso-yfti-irow:12;height:34.85pt'>
+            <td width=170 colspan=2 style=''>
+                <?php echo $v['msr_name']; ?>
+            </td>
+            <td width=66 colspan=2 style=''>
+                <?php echo $v['msr_planfinishtime']; ?>
+            </td>
+            <td width=45 colspan=2 style=''>
+                <?php echo $v['org_name']; ?>
+            </td>
+            <td width=50 style=''>
+                <?php echo $v['msr_realreducevalue']; ?>
+            </td>
+            <td width=98 style=''>
+                <?php echo $v['msr_curdescription']; ?>
+            </td>
+            <td width=71 colspan=2 style=''>
+                <?php echo $v['msr_realfinishtime']; ?>
+            </td>
+            <td width=71 colspan=2 style=''>
+                <?php echo $v['msr_execution']; ?>
+            </td>
+            <td width=71 style=''>
+                <?php echo $v['msr_changesituation']; ?>
+            </td>
+        </tr>
+        <?php } ?>
+    </table>
+    </div>
+    <?php } ?>
+    </div>
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="__PUBLIC__/css/tablepublic.css">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="__PUBLIC__/css/public.css">
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.css" rel="stylesheet" >
+    <link href="__PUBLIC__/vendor/bootstrap-table/bootstrap/css/bootstrap.min.css" rel="stylesheet" >
+    <link href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" >
+    <title>专家工作台专家打分</title>
+    <style>
+        .btns{
+            padding: 10px;
+        }
+        .btns .btn{
+            margin: 0 6px;
+            padding: 8px 20px;
+            box-sizing: border-box;
+        }
+        .title{
+            margin-left: 15px;
+        }
+        .table{
+            padding: 3px 10px;
+        }
+        #marking thead th{
+            vertical-align: middle!important;
+        }
+        table th{
+            font-size: 16px;
+            font-family: '微软雅黑';
+        }
+        table th{
+            border-left: 1px solid #dddddd!important;
+        }
+        table thead{
+            /*background: #009688;*/
+            background: #0b97c4;
+            opacity: .6;
+            /*background: linear-gradient(0deg,#009688,#006699);*/
+            /*filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0,startColorstr = #006699,endColorstr = #009688);*/
+            font-size: 16px;
+            color: #fff;
+        }
+        table thead:hover{
+            /*background: #b4dbed;*/
+            /*color: #000;*/
+            /*background: linear-gradient(90deg,#006699,#009688);*/
+            /*filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0,startColorstr = #009688,endColorstr = #006699);*/
+        }
+        table td{
+            height:55px;
+            vertical-align: middle!important;
+        }
+        .editable-input .input-sm{
+            margin-top: 3px!important;
+        }
+    </style>
+</head>
+<body>
+    <div class="btns bb dib">
+        <!--<a class="btn btn-warning"  id="back" href="javascript:history.go(-1)">返回</a>-->
+        <a class="btn btn-warning"  id="back" >返回</a>
+    </div>
+    <p class="title dib">任务名称：{$taskData.st_taskname}</p>
+    <div class="table bb">
+        <table id="marking" data-toggle="table" data-height="600">
+            <thead>
+                <!--<tr>-->
+                    <!--<th data-rowspan="3" style="vertical-align: middle">人员编号</th>-->
+                    <!--<th data-rowspan="3" style="vertical-align: middle">姓名</th>-->
+                    <!--<th data-rowspan="3" style="vertical-align: middle;">部门及岗位</th>-->
+                    <!--<th data-colspan="6" style="">评分项</th>-->
+                    <!--<th data-rowspan="3" style="vertical-align: middle">客观分</th>-->
+                    <!--<th data-rowspan="3" style="vertical-align: middle">主观分</th>-->
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<th data-colspan="2">III<br>专业理论水平<br>(10分)</th>-->
+                    <!--<th data-rowspan="2">Iv<br>工作经历<br>与能力<br>(20分)</th>-->
+                    <!--<th data-rowspan="2">V<br>技术水平<br>(40分)</th>-->
+                    <!--<th data-colspan="2">VII<br>论文情况<br>(12分)</th>-->
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<th>1(5分)</th>-->
+                    <!--<th>2(5分)</th>-->
+                    <!--<th>2(3分)</th>-->
+                    <!--<th>2(3分)</th>-->
+                <!--</tr>-->
+            </thead>
+        </table>
+    </div>
+    <script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/locale/bootstrap-table-zh-CN.js"></script>
+    <script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+    <script src="__PUBLIC__/vendor/chosen-ajax-addition/chosen.ajaxaddition.jquery.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-editable/js/bootstrap-editable.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/extensions/editable/bootstrap-table-editable.js"></script>
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+    <!--[if lte IE 9]>
+    <script src="__PUBLIC__/vendor/ie8/respond.min.js"></script>
+    <script src="__PUBLIC__/vendor/ie8/html5shiv.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+    <script>
+        layui.use('layer', function () {
+            layer = layui.layer;
+        })
+        var TableObj_marking = {
+            oTableInit:function(){
+                $('#marking').bootstrapTable({
+//                    url: '__CONTROLLER__/getData',         //请求后台的URL（*）
+//                    method: 'post',                      //请求方式（*）
+                    data: $.parseJSON('{$data}'),
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: false,                   //是否显示分页（*）
+                    iconSize: 'outline',
+                    sortable: true,                     //是否启用排序
+                    queryParams:queryParams_marking,
+                    search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                    showColumns: false,                  //是否显示所有的列
+                    showRefresh: false,                  //是否显示刷新按钮
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+                    uniqueId: "estd_id",                     //每一行的唯一标识，一般为主键列
+                    showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    showExport:true,
+                    exportDataType:'all',
+                    columns:tableColumn(),
+                });
+            }
+        }
+        TableObj_marking.oTableInit();
+        function queryParams_marking(params){
+            return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                name: $("#selected_name").val(),
+                title: $("#selected_title").val(),
+            };
+        };
+//        表格内部文字垂直居中
+        $('#marking th').css('vertical-align','middle');
+//        提交
+//        返回
+        $("#back").on("click",function(){
+            layer.confirm('您确定要返回吗？' ,
+                    {btn:['确定','取消']},function(){
+                            location.href="__CONTROLLER__/index";
+                    })
+        });
+
+        function tableColumn(){
+            var level = "{$taskData['st_sblevel']}";
+            if(level=="副高"){
+                var column = [
+                                [
+                                    {
+                                        title:'人员编号',
+                                        rowspan:3,
+                                        formatter: function (value, row, index) {
+                                            return row.numrow;
+                                        }
+                                    },
+                                    {
+                                        field:"i_name",
+                                        title:'姓名',
+                                        rowspan:3,
+                                    },
+                                    {
+                                        field:"i_deptname",
+                                        title:'部门及岗位',
+                                        rowspan:3,
+                                    },
+                                    {
+                                        title:'评分项(100分)',
+                                        valign:'middle',
+                                        align:'center',
+                                        colspan:6
+                                    },
+                                    {
+                                        title: '客观分合计<br>(24分)',
+                                        rowspan:3
+                                    },
+                                    {
+                                        title: '主观分合计<br>(76分)',
+                                        rowspan:3,
+                                        field:"estd_sum",
+                                        formatter: function (value, row, index) {
+                                            return sum(row);
+                                        }
+                                    }
+                                ],
+                                [
+                                    {
+                                        title: 'III专业<br>理论水平<br>(12分)',
+                                    },
+                                    {
+                                        title: 'Iv工作经历与能力<br>(23分)',
+                                        colspan:2
+                                    },
+                                    {
+                                        title:'V技术水平<br>(40分)',
+                                        rowspan:2,
+                                        field:"estd_score4",
+                                    },
+                                    {
+                                        title:'VII论文情况<br>(12分)',
+                                        colspan:2
+                                    }
+                                ],
+                                [
+                                    {
+                                        field:'estd_score1',
+                                        title:'3(6分)',
+                                    },
+                                    {
+                                        field:'estd_score2',
+                                        title:'1(18分)',
+                                    },
+                                    {
+                                        field:'estd_score3',
+                                        title:'2(5分)',
+                                    },
+                                    {
+                                        field:'estd_score5',
+                                        title:'2(3分)',
+                                    },
+                                    {
+                                        field:'estd_score6',
+                                        title:'3(3分)',
+                                    }
+                                ]
+                        ];
+            }else{
+                var column =  [
+                        [
+                            {
+                                title:'人员编号',
+                                rowspan:3,
+                                formatter: function (value, row, index) {
+                                    return row.numrow;
+                                }
+                            },
+                            {
+                                field:"i_name",
+                                title:'姓名',
+                                rowspan:3,
+                            },
+                            {
+                                field:"i_deptname",
+                                title:'部门及岗位',
+                                rowspan:3,
+                            },
+                            {
+                                title:'评分项(100分)',
+                                valign:'middle',
+                                align:'center',
+                                colspan:6
+                            },
+                            {
+                                title: '客观分合计<br>(24分)',
+                                rowspan:3
+                            },
+                            {
+                                title: '主观分合计<br>(76分)',
+                                rowspan:3,
+                                field:"estd_sum",
+                                formatter: function (value, row, index) {
+                                    return sum(row);
+                                }
+                            }
+                        ],
+                        [
+                            {
+                                title: 'III专业理论水平<br>(10分)',
+                                colspan:2
+                            },
+                            {
+                                title: 'Iv工作经历<br>与能力<br>(20分)',
+                                rowspan:2,
+                                field:"estd_score3",
+                            },
+                            {
+                                title:'V技术水平<br>(40分)',
+                                rowspan:2,
+                                field:"estd_score4",
+                            },
+                            {
+                                title:'VII论文情况<br>(12分)',
+                                colspan:2
+                            }
+                        ],
+                        [
+                            {
+                                field: 'estd_score1',
+                                title: '1(5分)',
+                            },
+                            {
+                                field: 'estd_score2',
+                                title: '2(5分)',
+                            },
+                            {
+                                field: 'estd_score5',
+                                title: '2(3分)',
+                            },
+                            {
+                                field: 'estd_score6',
+                                title: '3(3分)',
+                            }
+                        ]
+                ];
+            }
+            return column;
+        }
+//        加分
+        function sum(row){
+            var sum = 0;
+            for(var i=1;i<7;i++){
+                var num = parseFloat(row['estd_score'+i]);
+                if(num=="" || isNaN(num)){
+                    num = 0.00;
+                }
+                sum+=num;
+            }
+            return sum.toFixed(2);
+        }
+
+//        $('body').on('keydown','#marking .editable-input input',function() {
+//            //保留两位小数
+//            var val = Math.floor(parseFloat($(this).val())*100)/100;
+//            var xsd = val.toString().split('.');
+//            if(xsd.length == 1){
+//                $(this).val(val.toString()+'.00');
+//            }
+//            if(xsd.length > 1){
+//                if(xsd[1].length<2){
+//                    $(this).val(val.toString()+'0');
+//                }
+//            }
+//            //输入验证
+//            var val = $(this).val();
+//            var reg2 = /^[0-9]+(.[0-9]{2})?$/ ; //有两位小数的正实数
+//            if(val.match(reg2) == null){
+//                $(this).val('');
+//            }
+//        })
+
+        $('body').on('click','#marking .editable-input input',function() {
+            $(this).focus(function(){
+                if($(this).is(':visible')){
+                    $('.input-sm').select();
+                }
+            })
+        })
+
+        $('body').on('keyup','#marking .editable-input input',function() {
+            var val = $(this).val()
+            $(this).val($(this).val().replace(/[^\d{1,}\.\d{1,}|\d{1,}]/g,''));
+//            value = value.replace(/\.\d{2,}$/,value.substr(value.indexOf('.'),3))
+            $(this).val(val.replace(/\.\d{2,}$/,val.substr(val.indexOf('.'),3)))
+        })
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

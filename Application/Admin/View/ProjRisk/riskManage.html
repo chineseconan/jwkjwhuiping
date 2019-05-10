@@ -1,0 +1,403 @@
+<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.css">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/zTree_v3/css/zTreeStyle/zTreeStyle.css" type="text/css">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+    <title>风险管理</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        html,body{
+            width: 100%;
+            height: 100%;
+            *overflow: hidden;
+            font-family: 微软雅黑;
+        }
+        #main{
+            width:100%;
+            height:100%;
+            position:relative;
+            min-width: 1270px;
+            margin:0 auto;
+        }
+        .form-group >div{
+            margin-top: 3px;
+            margin-bottom: 3px;
+        }
+        .control-label:nth-of-type(even){
+            margin-left: 0 !important;
+        }
+        .z-tab button{
+            margin: 10px;
+            display: inline-block;
+        }
+        #search {
+            width: 50px;
+            border: 0;
+            height: 30px;
+            background-color: #009688;
+            line-height: 24px;
+            color: #fff;
+        }
+        .row{
+            margin: 0;
+        }
+        #treearea{
+            position: absolute;
+            left:5px;
+            top:5px;
+            bottom:0;
+            width:300px;
+            height:auto;
+            overflow:auto;
+            border: 1px solid #E2E2E2;
+        }
+        #atp_wrapper{
+            position: absolute;
+            top:5px;
+            left: 310px;
+            right: 5px;
+            bottom:0;
+            width: auto;
+            height:auto;
+            overflow: hidden;
+            border: 1px solid #E2E2E2;
+        }
+        #atp_wrapper #top_nav{
+            position: absolute;
+            top:5px;
+            left:5px;
+            right:5px;
+            width:auto;
+            height:50px;
+        }
+        #atp_wrapper .content{
+            position: absolute;
+            top:60px;
+            left:5px;
+            right: 5px;
+            bottom: 5px;
+            height: auto;
+            width: auto;
+            overflow: auto;
+        }
+        .show_div{
+            display: none;
+            height:100%;
+            overflow-y: auto
+        }
+        #atpbiztable td{
+            vertical-align:middle;
+        }
+        iframe{
+            width: 100%;
+            height:100%;
+            overflow-y:hidden;
+            border: none;
+        }
+        ::-webkit-scrollbar{
+            display: none;
+        }
+        #top_nav .z-tab{
+            display: inline-block;
+        }
+        #top_nav .z-tab button{
+            width: 150px;
+            margin-left: -4px;
+            color: black;
+        }
+        #search_project_name{
+            border-top: 1px solid #a9a9a9!important;
+            border-bottom: 1px solid #a9a9a9;
+            border-left: 1px solid #a9a9a9!important;
+            border-right: 1px solid #a9a9a9;
+        }
+        .arrow{
+            position: absolute;
+            top: 50%;
+            left: 292px;
+            margin-top: -15px;
+            display: block;
+            width: 18px;
+            height: 30px;
+            background: #009cd6;
+            z-index: 6666666;
+            text-align: center;
+        }
+        .arrow:hover{
+            background: #009688;
+        }
+        .arrow i{
+            display: inline-block;
+            line-height: 30px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div id="main">
+    <!--treearea start-->
+    <div id="treearea" style="">
+        <div class="content_wrap" style="overflow-x: hidden;">
+            <div class="zTreeDemoBackground left" style="float: left;">
+                <p  style="font-size: 15px;height: 30px;line-height: 30px;margin-bottom: 0;margin-top: 10px;text-align: left;">&nbsp;&nbsp;项目列表</p>
+                <hr style="height: 1px;border: none;border-top: 3px solid #18a594;margin-top: 0;margin-bottom: 0;margin-left: 10px;">
+                <div style="margin-top: 4px;*margin-top:4px;width: 100%;">
+                    <input  id="search_project_name" value=""  style="width: 190px;height: 30px;margin-left: 9px;"/>
+                    <input type="button" id="search" value="搜索" style=""/>
+                </div>
+                <ul id="treeDemo"  class="ztree" style="width: 290px;border:0;"></ul>
+            </div>
+        </div>
+    </div>
+    <!--treearea end-->
+
+    <!--arrow start-->
+    <span class="arrow">
+        <i class="fa fa-angle-double-left" ></i>
+    </span>
+    <!--arrow end-->
+
+    <!--atp_wrapper start-->
+    <div id="atp_wrapper">
+        <!--top_nav start-->
+        <div id="top_nav">
+            <span class="z-tab" style="display: inline-block;">
+                <button class="btn btn-info tab" style=";width: 150px;margin-left: 10px;color: #fff;background: #2e63c2" type="button"  >&nbsp;项目概览</button>
+                <button class="btn btn-info tab" style=";width: 150px;margin-left: -4px;color: black;background: #fff" type="button" >&nbsp;风险管理</button>
+                <button class="btn btn-info tab" style="width: 150px;margin-left: -4px;color: black;background: #fff" type="button">&nbsp;风险统计</button>
+                <button class="btn btn-info tab" style="width: 150px;margin-left: -4px;color: black;background: #fff" type="button">&nbsp;应对措施管理</button>
+            </span>
+        </div>
+        <!--top_nav end-->
+
+        <!--content start-->
+        <div class="content">
+            <div class="show_div" id="project_detail">
+                <iframe src="" id="project_box"  frameborder="0"></iframe>
+            </div>
+            <div  id="risk" class="show_div ">
+                <iframe src="" id="risk_box" frameborder="0"></iframe>
+            </div>
+            <div class="show_div">
+                <iframe src="" id="matrix_box" frameborder="0"></iframe>
+            </div>
+            <div class="show_div">
+                <iframe src="" id="measure_box" frameborder="0"></iframe>
+            </div>
+        </div>
+        <!--content end-->
+    </div>
+</div>
+<div class="modal fade" id="loading" role="dialog" data-backdrop='static'>
+    <div class="modal-dialog" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">处理中</h4>
+            </div>
+            <div class="modal-body">
+                <img src="__PUBLIC__/img/loading/loading9.gif" style='display: block;margin: 0 auto'>
+                <div id="loadingText" style="text-align: center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" name="choosemenu" id="choosemenu" value=""/>
+<input type="hidden" id="sort" >
+<input type="hidden" id="sortOrder" >
+</body>
+<script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/locale/bootstrap-table-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/zTree_v3/js/jquery.ztree.core.js"></script>
+<script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/vendor/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+<script src="__PUBLIC__/vendor/chosen-ajax-addition/chosen.ajaxaddition.jquery.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/flex.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<script type="text/javascript">
+    layui.use('layer', function() {
+        layer = layui.layer;
+        $(".chosen-select").chosen({disable_search_threshold: 0, search_contains: true, width: '300px'});
+        $(".chosen-select2").chosen({disable_search_threshold: 0, search_contains: true, width: '250px'});
+        $('.show_div').eq(0).show();
+        var openNodes = [];
+        var setting = {
+            view: {
+                selectedMulti: false
+            },
+            data: {
+                simpleData: {
+                    enable: true,
+                    idKey: "id",
+                    pIdKey: "pid",
+                    rootPId: 0
+                }
+            },
+            callback: {
+                beforeClick:beforeClick,
+                onClick:onClick
+            }
+        };
+        var table = null;
+        var zNodes = null;
+        var departmentId = '0';
+
+        function beforeClick(event, treeId, treeNode, clickFlag) {
+        }
+
+        function onClick(event, treeId, treeNode, clickFlag) {
+            var resultZtree = $.fn.zTree.getZTreeObj("treeDemo");
+            var node =  resultZtree.getSelectedNodes()[0];
+            $('#choosemenu').val(node.id);
+            $('#atpbiztable').bootstrapTable('refresh');
+            var len = $('.show_div').length;
+            for(var i=0;i<len;i++){
+                var is_show = $('.show_div').eq(i).css('display');
+                if(is_show == 'block'){
+                    switch(i){
+                        case 0:
+                            $('#project_box').attr('src', '__MODULE__/Project/projectDetail?proj_id='+node.id);
+                            break;
+                        case 1:
+                            var risk_name = $('#risk_box').contents().find('#risk_name').val();  //获取iframe子页面元素的值，当做条件传入下个页面
+                            var risk_field = $('#risk_box').contents().find('#risk_field').val();
+                            var risk_stage = $('#risk_box').contents().find('#risk_stage').val();
+                            var risk_status = $('#risk_box').contents().find('#risk_status').val();
+                            if(measure_name == undefined || !measure_name) measure_name = '';
+                            $('#risk_box').attr('src', '__MODULE__/ProjRisk/risk?proj_id='+node.id+'&risk_status='+risk_status+'&risk_stage='+risk_stage+'&risk_field='+risk_field+'&risk_name='+risk_name);
+                            break;
+                        case 2:
+                            $('#matrix_box').attr('src', '__MODULE__/ProjRisk/riskPieChart?proj_id='+node.id);
+                            break;
+                        case 3:
+                            var measure_name = $('#measure_box').contents().find('#measure_search_name').val();  //获取iframe子页面元素的值，当做条件传入下个页面
+                            if(measure_name == undefined || !measure_name) measure_name = '';
+                            $('#measure_box').attr('src', '__MODULE__/Measure/getMeasuresByProject?proj_id='+node.id+'&measure_name='+measure_name);
+                            break;
+                    }
+                }
+            }
+        }
+
+        $('#search_project_name').bind('keypress', function (event) {
+            if(event.keyCode == "13"){
+                refreshZTree();
+            }
+        })
+        $('#search').click(function(){
+            refreshZTree();
+        })
+
+        $(document).ready(function() {
+            $.ajax({
+                url: "__MODULE__/Project/getProjectTree",
+                type: "post",
+                async: false,
+                data :{openNodes:openNodes.join(',')},
+                dataType: "json",
+                success: function (data) {
+                    if(data.code == -1001){
+                        layer.alert('请先登录');
+                        location.href='__MODULE__/Index/index';
+                    }else{
+                        zNodes = data;
+                        $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+                        var resultZtree = $.fn.zTree.getZTreeObj("treeDemo");
+                        var node =  resultZtree.getNodes();
+                        var defaultId = node[0].id;
+                        $('#choosemenu').val(node[0].id);
+                        $('#treeDemo_1_a').click();
+                        $('#project_box').attr('src', '__MODULE__/Project/projectDetail?proj_id='+defaultId);
+                    }
+                },
+                error: function () {
+                    layer.alert('没有与您相关的项目');
+                }
+            });
+
+        });
+        $('.tab').on('click',function(){
+            $(this).css('background', '#2e63c2');
+            $(this).css('color', '#fff');
+            $(this).siblings().css('background', '#fff');
+            $(this).siblings().css('color', 'black');
+            var index = $(this).index();
+            var chooseMenu = $('#choosemenu').val();
+            if(!chooseMenu){
+                chooseMenu = '1';
+            }
+            $('.show_div').eq(index).show();
+            $('.show_div').eq(index).siblings().hide();
+            if(index ==1){
+                $('#risk_box').attr('src', '__MODULE__/ProjRisk/risk?proj_id='+chooseMenu);
+            }
+            if(index == 2){
+                $('#matrix_box').attr('src', '__MODULE__/ProjRisk/riskPieChart?proj_id='+chooseMenu);
+            }
+            if(index == 3){
+                $('#measure_box').attr('src', '__MODULE__/Measure/getMeasuresByProject?proj_id='+chooseMenu);
+            }
+            if(index == 0){
+                $('#project_box').attr('src', '__MODULE__/Project/projectDetail?proj_id='+chooseMenu);
+            }
+        });
+
+        function refreshZTree() {
+            openNodes = getOpenNode();
+            $.ajax({
+                url: "__MODULE__/Project/getProjectTree",
+                type: "post",
+                async: false,
+                data :{openNodes:openNodes.join(','),search_name:$('#search_project_name').val()},
+                dataType: "json",
+                success: function (data) {
+                    if(data.code == -1001){
+                        layer.msg('请先登录');
+                        location.href='__MODULE__/Index/index';
+                    }else{
+                        zNodes = data;
+                    }
+                },
+                error: function () {
+                    layer.msg('获取数据失败');
+                }
+            });
+            $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+        }
+        function getOpenNode(){
+            var resultZtree = $.fn.zTree.getZTreeObj("treeDemo");
+            var node =  resultZtree.getNodes();
+            var nodes = resultZtree.transformToArray(node);
+            var openNodes = [];
+            for(var i=1;i<nodes.length;i++){
+                if(nodes[i].open == true){
+                    openNodes.push(nodes[i].id);
+                }
+            }
+            return openNodes;
+        }
+
+    })
+
+</script>
+</html>

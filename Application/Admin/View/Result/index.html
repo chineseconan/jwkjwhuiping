@@ -1,0 +1,278 @@
+﻿<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link href="__PUBLIC__/vendor/bootstrap-table/bootstrap/css/bootstrap.min.css" rel="stylesheet" >
+    <link href="__PUBLIC__/vendor/switchery/switchery.css" rel="stylesheet">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+
+    <link href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.css" rel="stylesheet" >
+    <link href="__PUBLIC__/css/style.css?v=4.0.0" rel="stylesheet">
+
+    <script src="__PUBLIC__/vendor/bootstrap-table/jquery.min.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap-table/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="__PUBLIC__/vendor/switchery/switchery.js"></script>
+    <script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+    <script src="__PUBLIC__/vendor/chosen/chosen.order.jquery.js"></script>
+    <script src="__PUBLIC__/vendor/chosen-ajax-addition/chosen.ajaxaddition.jquery.js"></script>
+
+    <script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/locale/bootstrap-table-zh-CN.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+    <link href="__PUBLIC__/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <style>
+        th{
+            text-align: center;
+        }
+        .form-control{
+            display: inline-block;
+            width: 250px;
+        }
+        .wrapper .wrapper-content{
+            padding-bottom: 0;
+        }
+        #sys_zqexport{
+            background-color:#68941e;
+            border-color: #68941e;
+        }
+    </style>
+</head>
+<body class="gray-bg" style="font-family: 微软雅黑;">
+<div class="wrapper wrapper-content " style="overflow: hidden">
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="row">
+                <br class="col-sm-12">
+                    <div>
+                        <p class="name" style="text-align: left;font-size:  22px;background-color:;border-left:5px solid green;padding-left: 10px;font-family: 微软雅黑;">投票统计</p>
+                    </div>
+                    <div class="_box" style="margin-top: -5px;">
+
+                        <label class="control-label" style="margin-left:15px;">项目编号：</label>
+                        <select id="xm_code" class="chosen-select" >
+                            <option value="">&nbsp;</option>
+                            <foreach name="xmdata" item="val" >
+                                <option value="{$val.xm_code}" >{$val.xm_code}</option>
+                            </foreach>
+                        </select>
+
+                        <label class="control-label" style="margin-left:15px;">项目名称：</label>
+                        <select id="xm_id" class="chosen-select" >
+                            <option value="">&nbsp;</option>
+                            <foreach name="xmdata" item="val" >
+                                <option value="{$val.xm_id}" >{$val.xm_name}</option>
+                            </foreach>
+                        </select>
+
+                        <label class="control-label" style="margin-left:15px;">分&nbsp;&nbsp;组：</label>
+                        <input class="form-control"  type="text" id="xm_class" name="xm_class" style="margin-left:10px;width: 150px;display: inline-block" >
+                        <label class="control-label" style="margin-left:15px;">类别:</label>
+                        <select class="chosen-select" id="xm_type" style="width: 120px;height: 32px;display: inline-block">
+                            <option></option>
+                            <option>军队</option>
+                            <option>地方</option>
+                        </select>
+                        <label class="control-label" style="margin-left:15px;">技术方向:</label>
+                        <input  class="form-control" type="text" id="xm_group" style="width: 120px;height: 32px;display: inline-block">
+                        <!--<label class="control-label" style="margin-left:15px;">项目名称：</label>-->
+                        <!--<select id="分组" class="chosen-select" >-->
+                            <!--<option value=""></option>-->
+                            <!--<foreach name="xmname" item="val" key="key">-->
+                                <!--<option value="{$key}" >{$val}</option>-->
+                            <!--</foreach>-->
+                        <!--</select>-->
+                        <button class="btn btn-info" style="margin-left: 10px;" type="button" id="sys_refresh"><i class="fa fa-search"></i>查询</button>
+                        <!--<button class="btn btn-danger" style="margin-left: 10px;" type="button" id="sys_export"><i class="fa fa-download"></i>导出</button>-->
+                        <button class="btn btn-danger" style="margin-left: 10px;" type="button" id="sys_resultexport"><i class="fa fa-download"></i>结果表导出</button>
+                        <!--<button class="btn btn-danger" style="margin-left: 10px;" type="button" id="sys_zqexport"><i class="fa fa-sign-out"></i>差额轮结果导出</button></div>-->
+                    <table id="atpbiztable" ></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="sys_dlg" role="dialog" class="modal fade "></div>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+<script>
+    layui.use('layer', function() {
+        layer = layui.layer;
+    })
+    $(".chosen-select").chosen({disable_search_threshold: 0, search_contains: true, width: '180px'});
+    $("#xm_type").chosen({disable_search_threshold: 0, search_contains: true, width: '100px'});
+    $('#atpbiztable').bootstrapTable({
+            url: '__CONTROLLER__/getData',         //请求后台的URL（*）
+            method: 'post',                      //请求方式（*）
+            toolbar: '#atpbiztoolbar',                //工具按钮用哪个容器
+            striped: true,                      //是否显示行间隔色
+            cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+            pagination: true,                   //是否显示分页（*）
+            iconSize: 'outline',
+            sortable: true,                     //是否启用排序
+            sortName:"xm_code",
+            sortOrder: "asc",                   //排序方式
+            queryParams: queryParams,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber: 1,                       //初始化加载第一页，默认第一页
+            pageSize: 15,                       //每页的记录行数（*）
+            pageList: [5,15, 25, 50, 100],        //可供选择的每页的行数（*）
+//            strictSearch: true,
+//            showColumns: true,                  //是否显示所有的列
+//            showRefresh: true,                  //是否显示刷新按钮
+            minimumCountColumns: 2,             //最少允许的列数
+            clickToSelect: true,                //是否启用点击选中行
+//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+            uniqueId: "xr_id",                     //每一行的唯一标识，一般为主键列
+//            showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+//            cardView: true,                    //是否显示详细视图
+            detailView: false,                   //是否显示父子表
+            rowStyle:function(row,index){
+                return style = {
+                    css:{
+                        'font-size':'15px'
+                    }
+                }
+            },
+            columns: [
+                    {title: '序号', width: 40,
+                        formatter: function (value, row, index)
+                        {
+                            var option =  $('#atpbiztable').bootstrapTable("getOptions");
+                            return option.pageSize * (option.pageNumber - 1) + index + 1;
+                        }
+                    },
+                    {field: 'xm_code', title: '项目编号', sortable: true,width:100,align:'center'},
+                    {field: 'xm_name', title: '项目名称', sortable: true,width:180},
+                    {field: 'xm_company', title: '依托单位', sortable: true,width:220},
+                    {field: 'xm_createuser', title: '申请人', sortable: true,width:80,align:'center'},
+                    {field: 'xm_class', title: '分组', sortable: true,width:40,align:'center'},
+                    {field: 'xm_type', title: '类别', sortable: true,width:40,align:'center'},
+                    {field: 'xm_group', title: '技术方向', sortable: true,width:40,align:'center'},
+//                    {field: 'xm_tmfs', title: '推荐方式', sortable: true,width:80,align:'center'},
+                    {field: 'vote1rate', title: '第一轮<br/>得票率', sortable: true, width:50,align:'center',formatter:function(value,row){
+                        if((value != null) && (parseInt(value) != '0') && (value != '')){
+                            var xmcode = row['xm_code'];
+                            var a = '<a onclick="openDetail(\''+xmcode+'\')">'+value+'%</a>';
+                            return a;
+                        }else{
+                            return value;
+                        }
+                    }},
+                    {field: 'vote2rate', title: '第二轮<br/>得票率', sortable: true, width:50,align:'center',formatter:function(value,row){
+                        if((value != null) && (parseInt(value) != '0') && (value != '')){
+                           var xmcode = row['xm_code'];
+                            var a = '<a onclick="openDetail(\''+xmcode+'\')">'+value+'%</a>';
+                            return a;
+                        }else{
+                            return value;
+                        }
+                    }},
+                    {field: 'vote3rate', title: '第三轮<br/>得票率', sortable: true, width:50,align:'center',formatter:function(value,row){
+                        if((value != null) && (parseInt(value) != '0') && (value != '')){
+                            var xmcode = row['xm_code'];
+                            var a = '<a onclick="openDetail(\''+xmcode+'\')">'+value+'%</a>';
+                            return a;
+                        }else{
+                            return value;
+                        }
+                    }}
+                ]
+        });
+    $('#sys_refresh').on('click',function() {
+        $('#atpbiztable').bootstrapTable('refresh')
+    });
+    //        表格内部文字垂直居中
+    $('#atpbiztable th').css('vertical-align','middle');
+    function queryParams(params) {  //配置参数
+        var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            limit: params.limit,   //页面大小
+            offset: params.offset,  //页码
+            sort: params.sort,  //排序列名
+            sortOrder: params.order,//排位命令（desc，asc）
+            xm_id: $("#xm_id").val(),//排位命令（desc，asc）
+            xm_class:$("#xm_class").val(),
+            xm_type:$("#xm_type option:selected").val(),
+            xm_group:$("#xm_group").val(),
+            xm_code:$("#xm_code").val()
+        };
+        return temp;
+    }
+    function getpingshen(id,status) {
+        layer.open({
+            title: '信息',
+            closeBtn: 1,
+            type: 2,
+            shadeClose: false,
+            content: '__CONTROLLER__/getpingshen?xm_id=' + id+'&status='+status,
+            area: ['800px', '375px']
+        });
+    }
+    $('#sys_export').on('click',function() {
+        $('#loading').modal('show');
+        var data= {
+            xm_id: $('#xm_id').val(),
+            xm_class:$("#xm_class").val()
+        }
+        var t = "__CONTROLLER__/export";
+        t = encodeURI(t);
+        $.ajax({
+            type:'post',
+            url: t,
+            data:data,
+            dataType:'json',
+            success:function(data){
+                console.log(data);
+                $('#loading').modal('hide');
+                if(data.code > 0){
+                    location.href = data.message;
+                }else{
+                    layer.msg(data.message);
+                }
+            }
+        })
+    });
+    $('#sys_resultexport').on('click',function() {
+        layer.open({
+            title:'选择要导出的数据',
+            closeBtn:1,
+            type: 2,
+            shadeClose:false,
+            content:'__CONTROLLER__/checkclass',
+            area: ['500px', '350px']
+        });
+    });
+    $('#sys_zqexport').on('click',function() {
+        layer.open({
+            title:'选择要导出的数据',
+            closeBtn:1,
+            type: 2,
+            shadeClose:false,
+            content:'__CONTROLLER__/checkzq',
+            area: ['500px', '350px']
+        });
+    });
+    function openDetail(xmcode){
+       layer.open({
+            title:'详细信息',
+            closeBtn:1,
+            type: 2,
+            shadeClose:false,
+            content:'__MODULE__/MxQuery/index?xmcode='+xmcode,
+            area: ['90%', '600px']
+        });
+    }
+
+</script>
+</body>
+
+</html>
+
+
+
+

@@ -1,0 +1,267 @@
+﻿<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+
+    <script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+    <script src="__PUBLIC__/vendor/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+    <script src="__PUBLIC__/vendor/chosen-ajax-addition/chosen.ajaxaddition.jquery.js"></script>
+    <!--[if lte IE 9]>
+    <script src="__PUBLIC__/vendor/ie8/respond.min.js"></script>
+    <script src="__PUBLIC__/vendor/ie8/html5shiv.js"></script>
+    <![endif]-->
+    <title>定性分析</title>
+    <style>
+        .col-sm-2{
+            width:16.66666667%;
+        }
+        .col-sm-4{
+            width:33.33333333%;
+        }
+        .form-group{
+            margin-bottom: 5px;
+        }
+        .form-control{
+            display: inline-block;
+        }
+        .col-sm-7 {
+            width: 58.33333333%;
+        }
+        .col-sm-9{
+            width:72%
+        }
+        .form-group{
+            padding-top: 15px;
+            box-sizing: border-box;
+        }
+
+        #es_propability,#es_affection{
+            width: 115px!important;
+        }
+        .form-control{
+            border-radius: 2px;
+        }
+        /*.chosen-single{*/
+        /*解决ie8中select框变高，然而没用*/
+            /*padding:3px 12px 0px;*/
+            /**padding:3px 12px 0px!important;*/
+        /*}*/
+        textarea{
+            border-top: 1px solid #ccc;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+        .must_filter{
+            color:red;
+        }
+    </style>
+</head>
+<body>
+    <div class="">
+        <div class="container">
+            <form id="sys_dlg_form1" class="form-horizontal" enctype="multipart/form-data">
+                <div class="form-group" style="">
+                    <label class="control-label col-sm-2">风险名称 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-9">
+                        <input type="text" name=""   value="{$riskName}" class="form-control"  disabled>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div style="width: 50%;float: left">
+                        <label class=" control-label col-sm-4">成本：</label>
+                        <div class="col-sm-7" style="position: relative">
+                            <input type="text"  name="es_cost" value="{$data.qa_cost}"  class="form-control" style="width: 206px;display: inline-block"><span style="position: absolute;top:5px;right: 7px">（万元）</span>
+                        </div>
+                    </div>
+                    <div style="width: 50%;;float: left">
+                        <label class="control-label col-sm-3" style="width: 93px">工期：</label>
+                        <div class="col-sm-7" style="position: relative">
+                            <input  name="es_worktime" type="text"   value="{$data.qa_worktime}" class="form-control" style="width: 214px"><span style="position: absolute;top:5px;right: 12px">（天）</span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <div style="width: 50%;;float: left">
+                        <label class="control-label col-sm-4">概率 <span class="must_filter">*</span>：</label>
+                        <div class="col-sm-7">
+                            <select name="" id="propability" class="chosen-select2-short" >
+                                <option value="">选择概率</option>
+                                <?php foreach($riskProbably as $key=>$value){ ?>
+                                <option value="{$value.val}" >{$value.dic_name}</option>
+                                <?php } ?>
+                            </select>
+                            <input id="es_propability" style="width:118px;"    name="es_propability" type="text"  value="<?php if(isset($data['qa_propability'])){echo $data['qa_propability'];}else{echo '0';} ?>"   class="form-control">
+                        </div>
+                    </div>
+
+                    <div style="width: 50%;;;float: left">
+                        <label class="control-label col-sm-3" style="width: 93px;">影响 <span class="must_filter">*</span>：</label>
+                        <div class="col-sm-7">
+                            <select name="" id='affect' class="chosen-select2-short" >
+                                <option value="">选择影响</option>
+                                <?php foreach($riskAffect as $key=>$value){ ?>
+                                <option value="{$value.val}" >{$value.dic_name}</option>
+                                <?php } ?>
+                            </select>
+                            <input id="es_affection" style="width:118px"   name="es_affection" type="text"  value="<?php if(isset($data['qa_affection'])){echo $data['qa_affection'];}else{echo '0';} ?>"   class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" >
+                    <label class="control-label col-sm-2">风险值 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-9">
+                        <input  id="es_riskvalue"   name="es_riskvalue" type="text"  value="<?php if(isset($data['qa_riskvalue'])){echo $data['qa_riskvalue'];}else{echo '0';} ?>"   class="form-control">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 20px">
+                    <label class="control-label col-sm-2">趋势分析 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-9">
+                        <textarea name="qa_tend" id="trend" cols="30" rows="10" style="height: 80px;width:100%;">{$data.qa_tend}</textarea>
+                    </div>
+                </div>
+
+                <div style="text-align: center" >
+                    <input type="submit" class="btn btn-success" value="保存" style="width:120px;"  id="sys_dlg_submit">
+                </div>
+                <input type="hidden" value="{$riskId}" id="risk_id" name='risk_id'>
+                <input type="hidden" value="{$qaId}" id="qa_id" name='qa_id'>
+            </form>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/validate/jquery.validate.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<script>
+    $(function () {
+    layui.use('layer', function() {
+        layer = layui.layer;
+    })
+    $(".chosen-select2-short").chosen({disable_search_threshold: 0, search_contains: true, width: '130px'});
+    $('#es_propability').keyup(function(){
+        $('#propability option:selected').attr('selected', false);
+        var probability = parseFloat($(this).val());
+        var propabilityObj = $('#propability option');
+        var len = propabilityObj.length;
+        for(var i=1;i<len;i++){
+            var val =  parseFloat(propabilityObj.eq(i).val());
+            if(probability < val){
+                $('#propability').find('option:eq('+i+')').attr('selected', 'selected');
+                $('#propability').trigger("chosen:updated");
+                break;
+            }
+        }
+        var affect =  $('#es_affection').val();
+        var probility =   $('#es_propability').val();
+        $('#es_riskvalue').val(parseFloat((probility*affect).toFixed(4)));
+    })
+
+    $('#es_affection').keyup(function(){
+        $('#affect option:selected').attr('selected', false);
+        var affect = parseFloat($(this).val());
+        var affectObj = $('#affect option');
+        var len = affectObj.length;
+        for(var i=1;i<len;i++){
+            var val =  parseFloat(affectObj.eq(i).val());
+            if(affect < val){
+                $('#affect').find('option:eq('+i+')').attr('selected', 'selected');
+                $('#affect').trigger("chosen:updated");
+                break;
+            }
+        }
+        var affect =  $('#es_affection').val();
+        var probility =   $('#es_propability').val();
+        $('#es_riskvalue').val(parseFloat((probility*affect).toFixed(4)));
+    })
+
+    $('#propability').change(function(){
+        var val = $(this).val();
+        $('#es_propability').val(val);
+        var affect =  $('#es_affection').val();
+        $('#es_riskvalue').val(parseFloat((val*affect).toFixed(4)));
+    })
+    $('#affect').change(function(){
+        var val = $(this).val();
+        $('#es_affection').val(val);
+        var probility =   $('#es_propability').val();
+        $('#es_riskvalue').val(parseFloat((val*probility).toFixed(4)));
+    })
+
+    $('#expert').ajaxChosen({
+        dataType: 'json',
+        type: 'POST',
+        url:'__MODULE__/User/getUserLists'
+    },{
+    });
+        $.validator.setDefaults({
+            highlight:function(element){
+                $(element).parent().remove('has-success').addClass('has-error');
+            },
+            errorPlacement:function(error,element){
+                if(element.is(":radio") || element.is(":checkbox")){
+                    error.appendTo(element.parent());
+                }else{
+                    error.appendTo(element.parent());
+                }
+            },
+            errorClass:"help-block m-b-none",
+            validClass:"help-block m-b-none"
+        });
+
+        $('#sys_dlg_form1').validate({
+            onclick:false,
+            onfocusout:false,
+            onkeyup:false,
+            rules:{
+                es_propability:'required',
+                es_affection:'required',
+                es_riskvalue:'required',
+            },
+            messages:{
+                es_propability:'请输入概率',
+                es_affection:'请输入影响',
+                es_riskvalue:'请输入风险值'
+            },submitHandler:function(){
+                var formbody = $("#sys_dlg_form1");
+                var risk_id = $('#risk_id').val();
+                $.ajax({
+                    type:'post',
+                    url:'__CONTROLLER__/addAnalysisData',
+                    data:formbody.serialize(),
+                    dataType :'json',
+                    success:function(data){
+                        if(data.code > 0){
+                            layer.msg('操作成功');
+                            window.parent.location.href = '__MODULE__/ProjRisk/riskDetail?show_div=2&risk_id='+risk_id;
+                            parent.layer.close(layer.index);
+                        }else{
+                            if(data.code == -1001){
+                                layer.alert('请先登录');
+                                location.href='__MODULE__/Index/index';
+                            }else{
+                                layer.alert(data.message);
+                            }
+                        }
+                    }
+                })
+            }
+        })
+});
+</script>

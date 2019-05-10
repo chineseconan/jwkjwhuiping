@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="__PUBLIC__/css/tablepublic.css">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="__PUBLIC__/css/public.css">
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.css" rel="stylesheet" >
+    <link href="__PUBLIC__/vendor/bootstrap-table/bootstrap/css/bootstrap.min.css" rel="stylesheet" >
+    <link href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" >
+    <title>职称评审分组打分管理</title>
+    <style>
+        *{
+            font-family: "微软雅黑;
+        }
+        .content{
+            padding: 10px;
+        }
+        .content .position{
+            font-size: 18px;
+            color: blue;
+        }
+        .content form{
+            margin-top: 15px;
+        }
+        .content label{
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        .content .btn-groups{
+            margin-top: 16px;
+        }
+        .content .btn-groups a{
+            margin-right: 16px;
+            border-radius: 3px;
+        }
+        .content .btn-default{
+            background: #eeeeee;
+        }
+        .content .tips{
+            font-size: 14px;
+            display: inline-block;
+            margin: 10px 0 20px;
+        }
+        .content .btn-info{
+            margin-left: 0;
+        }
+        .content #information{
+            height: 100%;
+        }
+        .content #information select{
+            font-size: 12px;
+        }
+        .content .tableBox{
+            height: 100%;
+        }
+        .btn-groups{
+            margin-left: 30px;
+            *margin-left: 30px;
+        }
+        .form_warp>div{
+            width: 24%;
+            display: inline-block;
+        }
+        .chosen-select{
+            width: 180px!important;
+        }
+    </style>
+</head>
+<body>
+<div class="content bb">
+    <p class="position">当前位置：分组打分管理</p>
+    <!--form start-->
+    <form action="" class="form-group">
+        <div class="form_warp">
+            <div>
+                <label class="control-label">年&emsp;&emsp;度:</label>
+                <select name="year"  id="year" class="chosen-select">
+                    <foreach name="year" item="yearItem">
+                        <option value="{$yearItem.val}">{$yearItem.val}</option>
+                    </foreach>
+                </select>
+            </div>
+            <div>
+                <label>申报类型:</label>
+                <select name="" id="type" name="type" class="chosen-select">
+                    <foreach name="type" item="typeItem">
+                        <option value="{$typeItem.val}">{$typeItem.val}</option>
+                    </foreach>
+                </select>
+            </div>
+            <div>
+                <label>申报级别:</label>
+                <select name="level" id="level" class="chosen-select">
+                    <foreach name="level" item="levelItem">
+                        <option value="{$levelItem.val}" <if condition="$levelItem['val'] eq '副高'">selected</if>>{$levelItem.val}</option>
+                    </foreach>
+                </select>
+            </div>
+            <div>
+                <label>申报专业:</label>
+                <select name="major" id="major" class="chosen-select">
+                    <option value="" selected></option>
+                    <foreach name="major" item="majorItem">
+                        <option value="{$majorItem.val}">{$majorItem.val}</option>
+                    </foreach>
+                </select>
+            </div>
+        </div>
+        <div class="cb">
+            <div class="fl cb" style="margin-top: 20px;width: 280px">
+                <label class="fl">所在部门:</label>
+                <select name="title" id="title" class="chosen-select fl" >
+                    <option value="" selected></option>
+                    <foreach name="org" item="orgItem">
+                        <option value="{$orgItem.org_name}">{$orgItem.org_name}</option>
+                    </foreach>
+                </select>
+            </div>
+            <div class="btn-groups fl">
+                <a class="btn btn-primary" id="synchro">同步人员</a>
+                <a class="btn btn-default" id="locking">锁定</a>
+                <a class="btn btn-info" id="export" >导出Excel</a>
+                <a class="btn btn-warning" id="entering">录入客观分</a>
+            </div>
+        </div>
+    </form>
+    <p class="tips">按当前条件检索后共 <a id="count" ischeck="0"></a> 人，<a id="sortCount" ischeck="0"></a> 人未录入部门及排序信息，<a id="groupCount" ischeck="0"></a>人未录入分组及排序信息</p>
+    <div class="tableBox">
+        <table id="information"  data-height="620" ></table>
+    </div>
+</div>
+
+<script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/locale/bootstrap-table-zh-CN.js"></script>
+<script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+<!--<script src="__PUBLIC__/vendor/My97DatePicker/WdatePicker.js"></script>-->
+<script type="text/javascript" src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+<script src="__PUBLIC__/vendor/chosen-ajax-addition/chosen.ajaxaddition.jquery.js"></script>
+<!--<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/extensions/filter-control/bootstrap-table-filter-control.js"></script>-->
+<!--[if lte IE 8]>
+<script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+<![endif]-->
+<!--[if lte IE 8]>
+<script src="__PUBLIC__/vendor/ie8/respond.min.js"></script>
+<script src="__PUBLIC__/vendor/ie8/html5shiv.js"></script>
+<![endif]-->
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/extensions/editable/bootstrap-table-editable.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-editable/js/bootstrap-editable.js"></script>
+
+<script>
+    $(function(){
+        $(".chosen-select").chosen({disable_search_threshold: 0, search_contains: true});
+        //信息管理
+        var TableObj_information = {
+            oTableInit:function(){
+                $('#information').bootstrapTable({
+                    url: '__CONTROLLER__/getData',         //请求后台的URL（*）
+                    method: 'post',                      //请求方式（*）
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: false,                   //是否显示分页（*）
+                    iconSize: 'outline',
+                    sortable: true,                     //是否启用排序
+                    queryParams:queryParams_information,
+                    search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                    showColumns: false,                  //是否显示所有的列
+                    showRefresh: false,                  //是否显示刷新按钮
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+                    uniqueId: "i_id",                     //每一行的唯一标识，一般为主键列
+                    showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    showExport:true,
+                    exportDataType:'all',
+                    columns: [
+                        [
+                            {title: '序号', width: 50,
+                                formatter:function(value,row,index){
+                                    return row.numrow;
+                                }
+                            },
+                            {
+                                field: 'i_group', title: '分组',width: 90,
+                                editable: {
+                                    type:'select',
+                                    title:'分组',
+                                    mode:'inline',
+                                    showbuttons:false,
+                                    onblur:"submit",
+                                    emptytext:'请输入',
+                                    source:function(){
+                                        var result = [];
+                                        var data = $.parseJSON('{$group}');
+                                        $.each(data,function(key,value){
+                                            result.push(
+                                                    {
+                                                        value:value.val,
+                                                        text:value.val
+                                                    }
+                                            )
+                                        });
+                                        return result;
+                                    }
+                                }
+                            },
+                            {field: 'i_groupsort', title: '分组答辩序号',width: 110,
+                                editable: {
+                                    type:'text',
+                                    title:'分组答辩序号',
+                                    mode:'inline',
+                                    showbuttons:false,
+                                    onblur:"submit",
+                                    emptytext:'请输入'
+                                }
+                            },
+                            {field: 'i_sbmajor', title: '申报专业',width: 120},
+                            {field: 'i_name', title: '姓名',width: 60},
+                            {field: 'i_sex', title: '性别',width: 50},
+                            {field: 'i_birth', title: '出生年月',width: 80},
+                            {field: 'i_deptname', title: '所在部门',width: 120,
+                                editable: {
+                                    type:'text',
+                                    title:'所在部门',
+                                    mode:'inline',
+                                    showbuttons:false,
+                                    onblur:"submit",
+                                    emptytext:'请输入',
+                                }
+                            },
+                            {field: 'i_deptsortorder', title: '部门排序',width: 90,
+                                editable: {
+                                    type:'text',
+                                    title:'部门排序',
+                                    mode:'inline',
+                                    showbuttons:false,
+                                    onblur:"submit",
+                                    emptytext:'请输入',
+                                }
+                            },
+                            {field: 'i_title', title: '所在部门及岗位',width: 160},
+                            {field: 'i_worktime', title: '参加工作时间',width: 110},
+                            {field: 'i_topeduinfo', title: '最高学历、毕业时间及专业',width: 218},
+                            {field: 'i_topeduschool', title: '最高学历毕业学校',width: 150,},
+                            {field: 'i_yearscore', title: '考核情况',width: 180,},
+                            {field: 'i_degreeinfo', title: '原资格及评定时间',width: 140,},
+                            {field: 'i_sbdegree', title: '拟评资格',width: 90,}
+                        ]
+                    ],
+                    onEditableSave:function(field,row,oldValue,$el){
+                        var newValue = row[field];
+                        $.post("__CONTROLLER__/saveData",{id:row.i_id,field:field,value:newValue},function(rep){
+                            if(rep.code=="0"){
+                                alert("保存失败");
+                            }
+                        });
+                    }
+                });
+            }
+        }
+        TableObj_information.oTableInit();
+        function queryParams_information(params){
+            return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                year: $("#year").val(),
+                type: $("#type").val(),
+                level: $("#level").val(),
+                major: $("#major").val(),
+                title:$("#title").val(),
+            };
+        };
+        getCount();
+        function getCount(){
+            var data = {
+                year: $("#year").val(),
+                type: $("#type").val(),
+                level: $("#level").val(),
+                major: $("#major").val(),
+                title:$("#title").val(),
+            };
+            $.post("__CONTROLLER__/getCount",{data:data},function(rep){
+                $("#count").text(rep.count);
+                $("#sortCount").text(rep.sortCount);
+                $("#groupCount").text(rep.groupCount);
+
+            });
+        }
+        $("#count").on("click",function(){
+            $('#information').bootstrapTable("refresh");
+            $("#sortCount").attr("ischeck","0");
+            $("#groupCount").attr("ischeck","0");
+        });
+        $("#sortCount").on("click",function(){
+            var data = {
+                year: $("#year").val(),
+                type: $("#type").val(),
+                level: $("#level").val(),
+                major: $("#major").val(),
+                title:$("#title").val(),
+                sortCount:1,
+            };
+            $("#sortCount").attr("ischeck","1");
+            $('#information').bootstrapTable("refresh",{query:data});
+        });
+        $("#groupCount").on("click",function(){
+            var data = {
+                year: $("#year").val(),
+                type: $("#type").val(),
+                level: $("#level").val(),
+                major: $("#major").val(),
+                title:$("#title").val(),
+                groupCount:1
+            };
+            $("#groupCount").attr("ischeck","1");
+            $('#information').bootstrapTable("refresh",{query:data});
+        });
+
+        $('#locking').click(function(){
+            $.post("__CONTROLLER__/lockTable",{year:$("#year").val()},function(rep,status){
+                window.location.reload();
+            });
+            return false;
+        });
+        $("#entering").on("click",function(){
+            window.open("__CONTROLLER__/entryScore");
+            return false;
+        });
+        $(".chosen-select").on("change",function(){
+            $('#information').bootstrapTable("refresh");
+            $("#sortCount").attr("ischeck","0");
+            $("#groupCount").attr("ischeck","0");
+            getCount();
+        });
+        $("#export").on("click",function(){
+            var data = {
+                year: $("#year").val(),
+                type: $("#type").val(),
+                level: $("#level").val(),
+                major: $("#major").val(),
+                title:$("#title").val(),
+                groupCount:$("#groupCount").attr("ischeck"),
+                sortCount:$("#sortCount").attr("ischeck"),
+            };
+            $.ajax({
+                type:'post',
+                url: '__CONTROLLER__/export',
+                dataType:'json',
+                data:{param:data},
+                success:function(data){
+                    $('#loading').modal('hide');
+                    if(data.code > 0){
+                        location.href = data.message;
+                    }else{
+                        layer.msg(data.message);
+                    }
+                }
+            })
+        });
+        $("#synchro").on("click",function(){
+            $.post("__CONTROLLER__/getDataForSqlsrv",{year:$("#year").val()},function(){
+                $('#information').bootstrapTable("refresh");
+                getCount();
+            })
+        });
+
+
+
+    })
+</script>
+</body>
+</html>

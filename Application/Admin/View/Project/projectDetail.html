@@ -1,0 +1,479 @@
+<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.css">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+
+    <script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+    <script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+    <script src="__PUBLIC__/vendor/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+    <script src="__PUBLIC__/vendor/chosen-ajax-addition/chosen.ajaxaddition.jquery.js"></script>
+
+    <title>风险管理</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        html,body{
+            width: 100%;
+            height: 100%;
+        }
+        #main{
+            width: 100%;
+            height: 100%;
+        }
+        .chosen-container {
+            height: 24px;
+            top: 0px;
+        }
+        .control-label{
+            width:144px!important;
+            margin-right:-8px;
+        }
+        ::-webkit-scrollbar{
+            /*display: none;*/
+        }
+        .must_filter{
+            color:red;
+        }
+        .form-horizontal .form-group{
+            margin-left: 0;
+            margin-right: 0;
+        }
+        #risk_manager>.chosen-container, .chosen-container-multi{
+            max-height:60px;
+            height:100%
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="row" id="main">
+    <div class="" style="margin-left: 10px;margin-right: 10px">
+        <form id="sys_dlg_form1" role="form" class="form-horizontal" enctype="multipart/form-data">
+            <div class="form-group" style='margin: 5px 0;'>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">项目编码 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3" >
+                        <input name="code" id="code" type="text"  value="{$data.proj_code}" style="width:300px;display: inline-block" class="form-control">
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">项目名称 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3" >
+                        <input name="name" id="name" type="text"  value="{$data.proj_name}" style="width:300px;display: inline-block" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">领域 ：</label>
+                    <div class="col-sm-3" >
+                        <select name="domain" id="domain" class="chosen-select" >
+                            <option value="">&nbsp;</option>
+                            <?php foreach($field as $key=>$value){ ?>
+                            <option value="{$value.val}" <?php if(!empty($data['proj_domain']) && $data['proj_domain'] == $value['val'])echo 'selected'; ?> >{$value.val}</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">项目重要级 ：</label>
+                    <div class="col-sm-3" >
+                        <select name="level" id="level" class="chosen-select">
+                            <option value="">&nbsp;</option>
+                            <?php foreach($importantLevel as $key=>$value){ ?>
+                            <option value="{$value.val}" <?php if(!empty($data['proj_level']) && $data['proj_level'] == $value['val'])echo 'selected'; ?> >{$value.val}</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div  class="form-group">
+
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">父节点：</label>
+                    <div class="col-sm-3" >
+                        <select name="pid" id="pid" class="chosen-select">
+                            <option value="0">&nbsp;</option>
+                            <?php foreach($project as $key=>$value){ ?>
+                            <option value="{$value.id}"  <?php if((!empty($data['proj_pid']) && $data['proj_pid'] == $value['id']) || ($parentProject == $value['id']))echo 'selected'; ?>>{$value.proj_name}</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">管理方式 ：</label>
+                    <div class="col-sm-3" >
+                        <select name="mngmode" id="mngmode" class="chosen-select" >
+                            <option value="">&nbsp;</option>
+                            <?php foreach($manageWay as $key=>$value){ ?>
+                            <option value="{$value.val}" <?php if(!empty($data['proj_mngmode']) && $data['proj_mngmode'] == $value['val'])echo 'selected'; ?> >{$value.val}</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div  class="form-group">
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">立项日期 ：</label>
+                    <div class="col-sm-3" >
+                        <input name="starttime" id="starttime"  class="form-control" value="{$data.proj_starttime}" style="display: inline-block;width: 300px;" type="text"  onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" >
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label" style="width: 144px">计划完成时间 ：</label>
+                    <div class="col-sm-3" >
+                        <input  name="planfinishtime" id="planfinishtime" class="form-control" value="{$data.proj_planfinishtime}" style="display: inline-block;width: 300px;" type="text"  onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" >
+                    </div>
+                </div>
+            </div>
+            <div  class="form-group">
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">实际完成时间：</label>
+                    <div class="col-sm-3" >
+                        <input name="realfinishtime" id="realfinishtime" class="form-control" value="{$data.proj_realfinishtime}" style="display: inline-block;width: 300px;" type="text"  onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" >
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">项目依托室 ：</label>
+                    <div class="col-sm-3" >
+                        <select name="org" id="org" class="chosen-select" >
+                            <option value="">&nbsp;</option>
+                            <?php foreach($org as $key=>$value){ ?>
+                            <option value="{$value.id}" <?php if(!empty($data['proj_org']) && $data['proj_org'] == $value['id'])echo 'selected'; ?>  >{$value.org_name}</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div  class="form-group ">
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">项目负责人：</label>
+                    <div class="col-sm-3" >
+                        <select name="duty" data-placeholder="请输入用户账号或姓名进行检索" id="duty" class="chosen-select search_user" >
+                            <option value="">&nbsp;</option>
+                            <option value="{$data.duty_info.user_id}" selected>{$data.duty_info.text}</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">项目主审人：</label>
+                    <div class="col-sm-3" >
+                        <select name="zhushen" data-placeholder="请输入用户账号或姓名进行检索" id="zhushen" class="chosen-select search_user" >
+                            <option value="">&nbsp;</option>
+                            <option value="{$data.zhushen_info.user_id}" selected>{$data.zhushen_info.text}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div  class="form-group">
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">专项负责人：</label>
+                    <div class="col-sm-3" >
+                        <select name="proj_specialduty" data-placeholder="请输入用户账号或姓名进行检索" id="proj_specialduty" class="chosen-select search_user " >
+                            <option value="">&nbsp;</option>
+                            <option value="{$data.specialduty_info.user_id}" selected>{$data.specialduty_info.text}</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">主管领导：</label>
+                    <div class="col-sm-3" >
+                        <select name="leader" data-placeholder="请输入用户账号或姓名进行检索" id="leader" class="chosen-select search_user" >
+                            <option value="">&nbsp;</option>
+                            <option value="{$data.leader_info.user_id}" selected>{$data.leader_info.text}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div  class="form-group">
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">任务负责人 ：</label>
+                    <div class="col-sm-3" >
+                        <select name="taskduty" data-placeholder="请输入用户账号或姓名进行检索" class=" chosen-select search_user" id="taskduty"  >
+                            <option value="">&nbsp;</option>
+                            <option value="{$data.taskduty_info.user_id}" selected>{$data.taskduty_info.text}</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">项目密级 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3" >
+                        <select name="secretlevel" class=" chosen-select" id="secretlevel"  >
+                            <option value="">&nbsp;</option>
+                            <?php foreach($secretLevel as $key=>$value){ ?>
+                            <option value="{$value.dic_name}" <?php  if(!empty($data['proj_secretlevel']) && $data['proj_secretlevel'] == $value['dic_name'])echo 'selected'; ?> <?php if(empty($data)){ if(!systemIsSecret()) { if($value['dic_name'] == '非密'){echo 'selected';} } } ?>  > {$value.dic_name}</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div  class="form-group">
+                <div style="width: 100%;float: left">
+                    <label class=" col-sm-2 control-label">风险管理员 ：</label>
+                    <div class="col-sm-9" >
+                        <select name="risk_manager " style="" data-placeholder="请输入用户账号或姓名进行检索" class="search_user" id="risk_manager" multiple >
+                            <option value="">&nbsp;</option>
+                            <?php foreach($data['managers_info'] as $key=>$value){ ?>
+                            <option value="{$value.user_id}" selected>{$value.text}</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div  class="form-group">
+                <div style="width: 100%;float: left">
+                    <label class=" col-sm-2 control-label">项目简介 ：</label>
+                    <div class="col-sm-9" style="" >
+                        <textarea name="description" id="description"  cols="20" rows="5" style="width: 705px;" class="form-control">{$data.proj_description}</textarea>
+                    </div>
+                </div>
+            </div>
+            <?php if(!empty($data['proj_image'])){ ?>
+            <div  class="form-group">
+                <label class=" col-sm-2 control-label">目前项目图片：</label>
+                <div class="col-sm-3" >
+                    <img src="__PUBLIC__/{$data.proj_image}" alt="" width="500px;" height="200px;" style=";">
+                </div>
+            </div>
+            <?php } ?>
+            <div  class="form-group">
+
+                <div  class="form-group">
+                    <div style="width: 50%;float: left">
+                        <label class=" col-sm-2 control-label">项目图片：</label>
+                        <div class="col-sm-3" >
+                            <input name="image" id="file" type="file" value="" style="width: 300px;display: inline-block" class="form-control">
+                        </div>
+                    </div>
+                    <?php if(!empty($data['proj_image'])){ ?>
+                    <div style="width: 50%;float: left">
+                        <div style="margin-top: 9px;color:red">  项目图片已存在，上传图片会覆盖原图</div>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+
+            <div style="text-align: center">
+                <?php if((isset($data['proj_status']) && $data['proj_status'] != '关闭') || empty($data)) {?>
+                    <?php if($canUpdateProject === true){ ?>
+                        <input type="submit" class="layui-btn" value="保存"   id="sys_submit">
+                    <?php } ?>
+                <?php } ?>
+                <?php if(!empty($data['proj_id'])) {?>
+                    <?php if($canUpdateProject === true){ ?>
+                        <input type="submit" class="layui-btn layui-btn-danger" value="结束项目"  id="sys_close">
+                    <?php } ?>
+                <?php } ?>
+                <input type="button" class="layui-btn layui-btn-warm" style=""  value="生成项目报告"  id="sys_report">
+            </div>
+            <input type="hidden" value="{$data.proj_id}" id="proj_id" name='proj_id'>
+        </form>
+    </div>
+</div>
+<div class="modal fade" id="loading" role="dialog" data-backdrop='static'>
+    <div class="modal-dialog" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">处理中</h4>
+            </div>
+            <div class="modal-body">
+                <img src="__PUBLIC__/img/loading/loading9.gif" style='display: block;margin: 0 auto'>
+                <div id="loadingText" style="text-align: center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/validate/jquery.validate.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<!--[if lte IE 9]>
+<script src="__PUBLIC__/vendor/ie8/respond.min.js"></script>
+<script src="__PUBLIC__/vendor/ie8/html5shiv.js"></script>
+
+<![endif]-->
+<script>
+    $(function () {
+        layui.use('layer', function() {
+            layer = layui.layer;
+        })
+        $(".chosen-select").chosen({disable_search_threshold: 0, search_contains: true, width: '300px'});
+        $("#risk_manager").chosen({disable_search_threshold: 0, search_contains: true, width: '705px'});
+        $('.search_user').eq(0).ajaxChosen({
+            dataType: 'json',
+            type: 'POST',
+            url:'__MODULE__/User/getUserLists'
+        },{
+        });  $('.search_user').eq(1).ajaxChosen({
+            dataType: 'json',
+            type: 'POST',
+            url:'__MODULE__/User/getUserLists'
+        },{
+        });  $('.search_user').eq(2).ajaxChosen({
+            dataType: 'json',
+            type: 'POST',
+            url:'__MODULE__/User/getUserLists'
+        },{
+        }); $('.search_user').eq(3).ajaxChosen({
+            dataType: 'json',
+            type: 'POST',
+            url:'__MODULE__/User/getUserLists'
+        },{
+        });$('.search_user').eq(4).ajaxChosen({
+            dataType: 'json',
+            type: 'POST',
+            url:'__MODULE__/User/getUserLists'
+        },{
+        });$('.search_user').eq(5).ajaxChosen({
+            dataType: 'json',
+            type: 'POST',
+            url:'__MODULE__/User/getUserLists'
+        },{
+        });
+
+        $.validator.setDefaults({
+            highlight:function(element){
+                $(element).parent().remove('has-success').addClass('has-error');
+            },
+            success:function(element){
+                $(element).parent().remove('has-error').addClass('has-success');
+            },
+            errorPlacement:function(error,element){
+                if(element.is(":radio") || element.is(":checkbox")){
+                    error.appendTo(element.parent());
+                }else{
+                    error.appendTo(element.parent());
+                }
+            },
+            errorClass:"help-block m-b-none",
+            validClass:"help-block m-b-none"
+        });
+
+        var id = $('#proj_id').val();
+        $('#sys_dlg_form1').validate({
+            onclick:false,
+            onfocusout:false,
+            onkeyup:false,
+            rules:{
+                code:{
+                    required:true,
+                    remote:'__CONTROLLER__/checkProjCode?id='+id
+                },
+                name:'required'
+                // starttime:'required',
+                // planfinishtime:'required',
+                // description:'required'
+            },
+            messages:{
+                code:{
+                    required:'必填且唯一',
+                    remote:'项目代号已存在！'
+                },
+                name:'请输入项目名称'
+                // starttime:'请输入立项日期',
+                // planfinishtime:'请输入计划完成时间',
+                // description:'请输入项目简介'
+            },submitHandler:function(){
+                layui.use('layer', function() {
+                    layer = layui.layer;
+                })
+                var result = checkForm(['secretlevel'],['密级']);
+                if(!result) return false;
+                // var result = checkForm(['domain','level','org','mngmode','risk_manager'],['领域',, '重要级别', '项目依托室', '管理方式', '风险管理员']);
+                // if(!result) return false;
+                var formbody = $("#sys_dlg_form1");
+                var risk_manager = $('#risk_manager').val();
+                formbody.append("<input type='hidden' name='risk_manager'  value="+risk_manager+">");
+                formbody.ajaxSubmit({
+                    type:'post',
+                    url:'__CONTROLLER__/addProject',
+                    data:formbody,
+                    dataType :'json',
+                    success:function(data){
+                        if(data.code > 0){
+                            layer.alert('操作成功');
+                             parent.$('#search').click();
+
+                            window.location.reload();
+                        }else{
+                            layer.alert(data.message);
+                        }
+                    }
+                })
+            }
+        })
+
+        $('#sys_report').click(function(){
+            $('#loading').modal('show');
+            var proj_id = $('#proj_id').val();
+            var t = "__MODULE__/ProjRisk/exportWord?proj_id="+proj_id;
+            t = encodeURI(t);
+            $.ajax({
+                type:'get',
+                url: t,
+                dataType:'json',
+                success:function(data){
+                    $('#loading').modal('hide');
+                    if(data.code > 0){
+                        location.href = data.message;
+                    }else{
+                        layer.msg(data.message);
+                    }
+                }
+            })
+        })
+
+
+        $('#sys_close').click(function(){
+            var id = "<?php echo $data['proj_id']; ?>";
+            $.ajax({
+                type:'post',
+                url: '__MODULE__/Project/closeProject',
+                data :{id:id},
+                dataType:'json',
+                success:function(data){
+                    if(data.code>0){
+                        layer.msg(data.message);
+                        parent.location.reload();
+                    }else{
+                        layer.msg(data.message);
+                    }
+                }
+            })
+        })
+    });
+    function checkForm(objArr, messageArr){
+        var len = objArr.length;
+        for(var i=0;i<len;i++){
+            var obj = objArr[i];
+            var val = $('#'+obj).val();
+            if(!val){
+                layer.msg('请选择'+messageArr[i]);
+                $('#'+obj).trigger('chosen:open');
+                return false;
+            }
+        }
+        return true;
+    }
+
+</script>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.css">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+    <title>应对措施管理</title>
+    <style>
+        body{
+            margin: 0 auto;
+            padding: 0;
+        }
+        .process{
+            border-left: 2px solid lightgrey;
+            /*margin-bottom: 15px;*/
+            margin-left: 10px;
+            padding-left: 10px;
+            box-sizing: border-box;
+        }
+        h1{
+            font-size: 20px;
+        }
+        h2{
+            font-size: 17px;
+            font-weight: bolder;
+        }
+        .content_span{
+            font-size: 14px;
+            display: inline-block;
+            line-height: 22px;
+        }
+        .cirle{
+            position: absolute;
+            top: 0;
+            left: -19px;
+            display: block;
+            width: 15px;
+            height: 15px;
+            background-color: #009688;
+            border-radius: 50%;
+            -ms-border-radius: 50%;
+            /*兼容ie8的关键属性*/
+            behavior: url(__PUBLIC__/vendor/ie8/PIE.htc);
+        }
+        .closeBox,.countBox,.releaseBox{
+            position: relative;
+        }
+        .form-group{
+            margin-bottom: 0;
+        }
+        ::-webkit-scrollbar{
+            /*display: none;*/
+        }
+
+    </style>
+</head>
+<body>
+<div class="wrapper wrapper-content">
+    <div class="container-fuild" >
+        <div class="closeBox" style="margin-bottom: 10px">
+            <h1 style="margin-top: 5px;text-align: center">风险状态：<span style="color:red">{$status}</span></h1>
+        </div>
+        <div>
+            <div class="process form-group" style="padding-bottom: 16px;box-sizing: border-box;">
+                <div class="closeBox" style="margin-bottom: 10px">
+                    <span class="cirle"></span><h2>风险关闭流程</h2>
+                </div>
+                <?php if(!empty($closeProcess)){  ?>
+                    <span style="margin: 10px 0;">
+                        <span class="content_span">发起时间：<?php echo $closeProcess['rcp_starttime']; ?></span> &nbsp;&nbsp;&nbsp;&nbsp;<br>
+                        <span class="content_span">发起人：<?php echo $closeProcess['startuser']; ?></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+                        <span class="content_span">风险管理员：{$projectManager}</span>&nbsp;&nbsp;<br>
+
+                        <?php if(!empty($closeProcess['enduser'])){ ?>
+                        <span class="content_span">确认时间：<?php echo $closeProcess['rcp_endtime']; ?></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+                        <span class="content_span">确认人：<?php echo $closeProcess['enduser']; ?></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+                        <?php }else{ echo '状态：<span style="color:red">'.$status.'</span>';} ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+
+                        <?php if(!empty($closeProcess['rcp_notcloseuser'])) {?>
+                        <span class="content_span" style="margin-top: 5px;">退回人：<?php echo $closeProcess['rcp_notcloseuser']; ?></span>&nbsp;&nbsp;
+                        <span class="content_span">退回时间：<?php echo $closeProcess['rcp_notclosetime']; ?></span>&nbsp;&nbsp;
+                        <span class="content_span">退回原因：<span style="color:red"><?php echo $closeProcess['reason']; ?></span></span>
+                        <?php } ?>
+                </span>
+                <?php }else{ echo '暂无';} ?>
+            </div>
+            <div class="process form-group" >
+                <div class="countBox">
+                    <span class="cirle"></span><h2>风险打分</h2>
+                </div>
+                <div style="">
+                    <table id="atpbiztable"  style=""></table>
+                </div>
+            </div>
+            <div class="process form-group" style="padding-top: 10px;box-sizing: border-box">
+                <div class="releaseBox">
+                    <span class="cirle"></span><h2>风险发布流程</h2>
+                </div>
+                <?php if(!empty($pubProcess)){  ?>
+                <div style="margin-top: 10px;">
+                    <span class="content_span">发布时间：<?php echo $pubProcess['rpp_pubtime']; ?></span>
+                    <span class="content_span">发布人：<?php echo $pubProcess['user_realusername']; ?></span>
+                </div>
+                <?php }else{ echo '暂无';} ?>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" value="{$riskId}" id="risk_id">
+</body>
+<script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/locale/bootstrap-table-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<script type="text/javascript">
+    layui.use('layer', function() {
+        layer = layui.layer;
+    })
+
+    var TableObj = {
+        oTableInit:function(){
+            $('#atpbiztable').bootstrapTable({
+                url: '__CONTROLLER__/getRiskScores',         //请求后台的URL（*）
+                method: 'post',                      //请求方式（*）
+                toolbar: '#atpbiztoolbar',                //工具按钮用哪个容器
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                iconSize: 'outline',
+                sortable: true,                     //是否启用排序
+                sortName:"",
+                sortOrder: "asc",                   //排序方式
+                queryParams:queryParams,
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 5,                       //每页的记录行数（*）
+                pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+//            strictSearch: true,
+                showColumns: false,                  //是否显示所有的列
+                showRefresh: false,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "risk_id",                     //每一行的唯一标识，一般为主键列
+                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: true,                   //是否显示父子表
+                detailFormatter: "detailFormatterExpert",
+                columns: [
+                    [
+
+                        {field: 'time', title: '打分时间'},
+                        {field: 'type', title: '打分类型'},
+                        {field: 'prob', title: '概率'},
+                        {field: 'affect', title: '影响'},
+                        {field: 'value', title: '风险值'},
+                        {field: 'tend', title: '趋势分析'}
+                    ]
+                ], onDblClickRow: function (row) {
+
+                },onLoadSuccess:function(data){
+                    var total = data['rows'].length;
+                    var arr = data['rows'];
+                    var count = 0;
+                    for( var i=0;i<total;i++){
+                        if(!arr[i].hasOwnProperty('score_info')){
+                            $('.detail-icon').eq(i).hide();
+                            count++;
+                        }else{
+                            $('.detail-icon').eq(i).show();
+                        }
+                    }
+                    if(count == total){
+                        $('thead tr').eq(0).children().eq(0).hide();
+                        var obj = $('tbody tr');
+                        for( var i=0;i<total;i++){
+                            obj.eq(i).children().eq(0).hide();
+                        }
+                    }else{
+                        $('thead tr').eq(0).children().eq(0).show();
+                        var obj = $('tbody tr');
+                        for( var i=0;i<total;i++){
+                            obj.eq(i).children().eq(0).show();
+                        }
+                    }
+                }
+            });
+        }
+    }
+    TableObj.oTableInit();
+    function queryParams(params){  //配置参数
+        return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            limit: params.limit,   //页面大小
+            offset: params.offset,  //页码
+            sort: params.sort,  //排序列名
+            order: params.order,//排位命令（desc，asc）
+            risk_id:$('#risk_id').val()
+        };
+        return temp;
+    }; //传递参数（*）
+
+    //专家打分父子表信息
+    function detailFormatterExpert(index, row,$detail){
+        if( row['score_info'] && row['score_info'].length > 0) {
+            var row = row['score_info'];
+            var html = [];
+            html.push("<table class='table' style='word-break: break-all;' >");
+            html.push("<tr>");
+            html.push("<th style='width:120px;'>专家</th>");
+            html.push("<th>成本</th>");
+            html.push("<th>工期</th>");
+            html.push("<th>概率</th>");
+            html.push("<th>影响</th>");
+            html.push("<th>风险值</th>");
+            html.push("<th>最后打分时间</th>");
+            html.push("<th style='width: 230px;'>意见</th>");
+            html.push("</tr>");
+
+            for (var i=0;i<row.length;i++){
+                html.push("<tr>");
+
+                html.push("<td>" + row[i]['user_realusername'] + "</td>");
+                html.push("<td>" + row[i]['es_cost'] + "</td>");
+                html.push("<td>" + row[i]['es_worktime'] + "</td>");
+                html.push("<td>" + row[i]['es_propability'] + "</td>");
+                html.push("<td>" + row[i]['es_affection'] + "</td>");
+                html.push("<td>" + row[i]['es_riskvalue'] + "</td>");
+                html.push("<td>" + row[i]['es_lastscoretime'] + "</td>");
+                html.push("<td style='width: 230px;'> " + row[i]['es_suggestion'] + "</td>");
+                html.push("</tr>");
+            }
+            html.push("</table>");
+            return html.join('');
+        }else{
+            return '暂无';
+        }
+    }
+</script>
+</html>
+
+
+
+
+

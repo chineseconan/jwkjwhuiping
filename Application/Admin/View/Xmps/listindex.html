@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+
+
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/global.css" media="all" />
+    <link rel="stylesheet" href="__PUBLIC__/vendor/bootstrap-table/font-awesome/css/font-awesome.css" />
+
+    <style>
+        .na{
+            padding-right: 30px;
+            height: auto;
+            white-space: normal;
+        }
+        .logo img{
+            width:70px;
+            height: 60px;
+            margin-top: -20px;
+            margin-left: -8px;
+        }
+        .layui-main{
+            background: url("__PUBLIC__/img/bgimg/0408_5.jpg") repeat;
+            background-size:cover;
+        }
+        .layui-nav{
+            height: 60px;
+            background-color:#000018;
+        }
+        .logo span{
+            display: inline-block;
+            margin-top:3px;
+            font-size: 17px;
+        }
+        .fl{
+            float: left;
+        }
+        .layui-bg-black{
+            background-color:#000018;
+        }
+        .layui-layout-admin .layui-header {
+            border-bottom: 5px solid #ffffff;
+        }
+        .layui-nav-tree .layui-nav-child dd.layui-this, .layui-nav-tree .layui-this, .layui-nav-tree .layui-this>a, .layui-nav-tree .layui-this>a:hover {
+            background-color: #445872;
+            color: #fff;
+        }
+        .layui-nav-tree .layui-nav-bar {
+            width: 5px;
+            height: 0;
+             background-color: #445872;
+        }
+    </style>
+</head>
+
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header header">
+        <div class="layui-main">
+            <div style="height:65px;">
+                <h1 class="fl logo cb">
+                    <img src="__PUBLIC__/img/green1.png" alt="" class="fl">
+                    <span class="fl" style="font-weight: bold;font-family:微软雅黑;">军事科技领域青年人才托举工程</span>
+                </h1>
+                <div style="padding-left:30%;padding-top:15px;">
+                       <span style="font-size:20px;font-weight: bold;font-family:微软雅黑;">{$showlable}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-body" style="bottom: 0;border-left: solid 2px #FFFFFF;left:0px;" id="admin-body">
+        <embed id="file" style="width:100%;height:100%;" src="{$file}" content="application/adobe-pdf" ></embed>
+    </div>
+    <script type="text/javascript" src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+</div>
+<script>
+
+</script>
+</body>
+</html>

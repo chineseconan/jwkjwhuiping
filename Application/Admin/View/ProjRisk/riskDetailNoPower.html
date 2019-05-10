@@ -1,0 +1,616 @@
+﻿<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="description" content="">
+
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.css">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+
+    <script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+    <script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+    <script src="__PUBLIC__/vendor/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+    <script src="__PUBLIC__/vendor/chosen-ajax-addition/chosen.ajaxaddition.jquery.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/locale/bootstrap-table-zh-CN.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+    <title>风险详情</title>
+    <style>
+        .control-label{
+            width:130px;
+        }
+         .form-group >div{
+             margin-top: 3px;
+             margin-bottom: 3px;
+         }
+        .chosen-select2{
+            z-index: 222;
+        }
+        .layui-tab-content{
+            padding-bottom: 0!important;
+        }
+        .modal-body{
+            padding-bottom: 0!important;
+        }
+        input,textarea,select{
+            margin-bottom: 8px;
+        }
+        .form-control{
+            border-radius: 2px;
+        }
+        .chosen-choices{
+            margin-bottom: 6px;
+        }
+        html{
+            height: auto;
+        }
+        .layui-tab{
+            margin-bottom: 0!important;
+        }
+       #layui-title li{
+           width: 10%;
+       }
+        .chosen-container-multi .chosen-choices{
+            width: 105%!important;
+        }
+        #personLiable .chosen-container .chosen-drop{
+            width: 105%!important;
+        }
+        ::-webkit-scrollbar{
+            display: none;
+        }
+        .chosen-container-single .chosen-single {
+            min-height: inherit;
+            height: 34px!important;
+        }
+    </style>
+</head>
+<body>
+    <div class="">
+        <div class="modal-body" style="overflow-y:hidden;height: 558px">
+            <div class="layui-tab layui-tab-brief" lay-filter="demo" style="overflow-y: hidden">
+                <ul class="layui-tab-title" id="layui-title">
+                    <li class="layui-this layui-tab-item">风险识别</li>
+                    <li class="layui-tab-item">定性分析</li>
+                    <li class="layui-tab-item">专家打分</li>
+                    <li class="layui-tab-item">应对措施</li>
+                    <li class="layui-tab-item">流程信息</li>
+                </ul>
+                <div class="layui-tab-content" id="layui-content">
+                    <div lay-id="1" class=" layui-tab-item " style="overflow-y: auto">
+                        <div class="tab-content">
+                            <div class="panel-body" >
+                                <form id="sys_dlg_form1" role="form" class="form-horizontal" enctype="multipart/form-data">
+                                    <h3 style="text-align: center;margin-bottom: 20px;font-size: 20px;">
+                                        风险状态:<span style="color:red"><?php if(isset($data['risk_status'])){echo $data['risk_status'];} ?></span>
+                                    </h3>
+                                    <h2 style="text-align: center;margin-bottom: 10px;font-size: 13px;">
+                                        风险管理员：<a style="color:green;text-underline:auto ">{$projectManager}</a>&nbsp;&nbsp;&nbsp;
+                                        风险创建人：<a style="color:green;text-underline:auto ">{$data.risk_creater.text}</a>&nbsp;&nbsp;&nbsp;
+                                    </h2>
+                                    <div class="form-group">
+                                        <div>
+                                            <label class=" control-label">风险名称 ：</label>
+                                            <input  name="name" type="text"  value="{$data.risk_name}" style="width:300px;display: inline-block" class="form-control">
+                                            <label class=" control-label">所属项目 ：</label>
+                                            <select name="project" class="chosen-select2" >
+                                                <option value="">&nbsp;</option>
+                                                <?php foreach($project as $key=>$value){ ?>
+                                                <option value="{$value.id}"  <?php if( !empty($data['risk_projid']) && $data['risk_projid'] == $value['id'] )echo 'selected'; ?>>{$value.proj_name}</option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="  control-label">风险密级 ：</label>
+                                            <select name="secretlevel" class=" chosen-select2" id="secretlevel"   <?php  if(!empty($data['risk_secretlevel'])) echo 'disabled'; ?> >
+                                            <option value="">&nbsp;</option>
+                                            <?php foreach($riskSecretLevel as $key=>$value){  ?>
+                                            <option value="{$value.dic_name}" <?php if( $value['dic_name'] ==$data['risk_secretlevel'] )echo 'selected'; ?> <?php if(empty($data)){ if(!systemIsSecret()) { if($value['dic_name'] == '非密'){echo 'selected';} } } ?>> {$value.dic_name}</option>
+                                            <?php } ?>
+                                            </select>
+                                            <label class="control-label " >预计关闭时间 ：</label>
+                                            <input  name="risk_planclosetime" type="text"  value="{$data.risk_planclosetime}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"  style="width:300px;display: inline-block;margin-left: 2px" class="form-control ">
+                                        </div>
+                                        <div id="personLiable">
+                                            <label class=" control-label">责任人 ：</label>
+                                            <select name="person_liable" data-placeholder="请输入用户账号或姓名进行检索"  id="person_liable" <?php if(isset($canUpRiskDuty) && $canUpRiskDuty == 0){ ?>disabled<?php } ?>  multiple>
+                                            <option value="">&nbsp;</option>
+                                            </select>
+                                        </div>
+                                        <div style="margin: 15px 0;">
+                                            <label class=" control-label">风险类型 ：</label>
+                                            <select name="risk_type" class="chosen-select2" >
+                                                <option value="">&nbsp;</option>
+                                                <?php foreach($riskType as $key=>$value){ ?>
+                                                <option value="{$value.val}" <?php if(!empty($data['risk_type']) && $data['risk_type'] == $value['val'])echo 'selected'; ?> >{$value.val}</option>
+                                                <?php } ?>
+                                            </select>
+                                            <label class=" control-label">阶段 ：</label>
+                                            <select name="risk_stage" class="chosen-select2" >
+                                                <option value="">&nbsp;</option>
+                                                <?php foreach($riskStage as $key=>$value){ ?>
+                                                <option value="{$value.val}" <?php if(!empty($data['risk_stage']) && $data['risk_stage'] == $value['val'])echo 'selected'; ?> >{$value.val}</option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                        <div style="margin: 6px 0 15px">
+                                            <label class=" control-label">风险领域 ：</label>
+                                            <select name="risk_domain" class="chosen-select2">
+                                                <option value="">&nbsp;</option>
+                                                <?php foreach($riskField as $key=>$value){ ?>
+                                                <option value="{$value.val}" <?php if(!empty($data['risk_domain']) && $data['risk_domain'] == $value['val'])echo 'selected'; ?> >{$value.val}</option>
+                                                <?php } ?>
+                                            </select>
+                                            <label class=" control-label">是否发生 ：</label>
+                                            <select name="is_happen" class="chosen-select2" >
+                                                <option <?php if( $data['is_happen'] == '0')echo 'selected'; ?> value="0">否</option>
+                                                <?php if(!empty($data)){ ?>
+                                                <option <?php if( $data['is_happen'] == '1')echo 'selected'; ?> value="1">是</option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                        <div style="margin-top: 10px">
+                                            <label class=" control-label">起因：</label>
+                                            <input  name="risk_reason" type="text"  value="{$data.risk_reason}" style="width:300px;display: inline-block" class="form-control">
+                                            <label class=" control-label">后果：</label>
+                                            <input  name="risk_result" type="text"  value="{$data.risk_result}" style="width:300px;display: inline-block" class="form-control">
+                                        </div>
+                                        <div style="margin-top: 10px;" class="clearfix">
+                                            <div style="width: 100%" class="pull-left">
+                                                <label class=" control-label" >风险描述： </label>
+                                                <textarea name="risk_description"  cols="10" rows="5" class="form-control" style="display:inline-block;width: 700px;height: 75px;vertical-align: top;">{$data.risk_description}</textarea>
+                                            </div>
+
+                                        </div>
+                                        <div>
+                                            <label class=" control-label">计划名称：</label>
+                                            <input  name="plan_name" type="text"  value="{$data.plan_name}" style="width:300px;display: inline-block" class="form-control">
+                                            <label class=" control-label">计划滞后时间：</label>
+                                            <input  name="plan_zhihoutime" type="text"  value="{$data.plan_zhihoutime}" style="width:300px;display: inline-block"  class="form-control"> (天)
+                                        </div>
+                                        <div style="text-align: right;padding:3px 76px 0 0 ;box-sizing:border-box;-moz-box-sizing: border-box;">
+                                            <?php if(isset($canUpRisk)  && $canUpRisk){  ?>
+                                            <input type="button" class="btn btn-info" value="保存" width="100px;"  id="sys_dlg_submit">
+                                            <?php }?>
+                                        </div>
+                                        <input type="hidden" value="{$risk_id}" id="risk_id" name='risk_id'>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div lay-id="2" class=" layui-tab-item">
+                        <div style="margin-bottom: 10px;">
+                            <!--<label class=" control-label">名称：</label>-->
+                            <!--<input type="text" class="form-control" style="display:inline-block;width:200px;">-->
+                            <button class="btn btn-info" style="margin-left: 10px;" type="button" id="sys_refresh_dingxingfenxi">&nbsp;刷新</button>
+                            <!--<button class="btn btn-error" style=";" type="button" id="sys_del_dingxingfenxi">&nbsp;删除</button>-->
+                        </div>
+                        <table id="dingxingfenxi"></table>
+                    </div>
+                    <div lay-id="3" class=" layui-tab-item">
+                        <div style="margin-bottom: 10px;">
+                            <!--<label class=" control-label">关闭时间：</label>-->
+                            <!--<input type="text" class="form-control" style="display:inline-block;width:200px;">-->
+                            <button class="btn btn-info" style="margin-left: 10px;" type="button" id="sys_refresh_zhuanjiadafen">&nbsp;查询</button>
+                            <!--<a class="btn btn-warning " style="" type="button" id="sys_update_zhuanjiadafen" >&nbsp;打分</a>-->
+                        </div>
+                        <div style="height:450px;overflow: auto">
+                            <table id="zhuanjiadafen"></table>
+                        </div>
+                    </div>
+                    <div lay-id="4" class=" layui-tab-item">
+                        <div>
+                            <label class=" control-label" style="width: 80px">措施名称：</label>
+                            <input id="measure_search_name" class="form-control" style="display:inline-block;width:200px;">
+                            <button class="btn btn-info" style="margin-left: 10px;" type="button" id="sys_refresh_yingduicuoshi">&nbsp;查询</button>
+                        </div>
+                        <div style="height:450px;overflow: auto">
+                            <table id="yingduicuoshi"></table>
+                        </div>
+                    </div>
+                    <div lay-id="5"  class=" layui-tab-item">
+                        <div>
+                            <iframe src="__CONTROLLER__/riskProcess?risk_id={$risk_id}"   style="width: 100%;box-sizing:border-box;min-height: 480px;height:90%;overflow-y:hidden;border: none;" frameborder="0"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/ie8/respond.min.js"></script>
+<script>
+$(function () {
+    //判断先展示那个div
+    var show_div = "<?php echo I('get.show_div',0,'intval'); ?>";
+    var content_obj = $('#layui-content').children();
+    var title_obj = $('#layui-title').children();
+    if(show_div != 0){
+        content_obj.eq(show_div -1 ).addClass('layui-show').siblings().removeClass('layui-show');
+        title_obj.eq(show_div - 1).addClass('layui-this').siblings().removeClass('layui-this');
+    }else{
+        content_obj.eq(0).addClass('layui-show');
+        title_obj.eq(0).addClass('layui-this');
+    }
+
+    layui.use('layer', function() {
+        layer = layui.layer;
+    })
+    layui.use('element', function() {
+        var element = layui.element();
+        element.on('tab(demo)',function(data){});
+    })
+    $(".chosen-select2").chosen({disable_search_threshold: 0, search_contains: true, width: '300px'});
+    $("#person_liable").chosen({disable_search_threshold: 0, search_contains: true, width: '700px'});
+
+    //填入风险管理员
+    var riskmanage = '<?php  if(!empty($data[risk_manager])){echo json_encode($data[risk_manager]);}else{echo '';} ?>';
+    if(riskmanage){
+        riskmanage = eval('('+riskmanage+')');
+        for(var i=0;i<riskmanage.length;i++) {
+            $('#person_liable').append('<option value="'+riskmanage[i].id+'" selected  >'+riskmanage[i].text+'</option>');
+        }
+        $('#person_liable').trigger("chosen:updated");
+    }
+
+    $(".js-switch").each(function(){
+        new Switchery(this, {color: '#1AB394'});
+    });
+
+
+    //应对措施js
+    var TableObj_yingduicuoshi = {
+        oTableInit:function(){
+            $('#yingduicuoshi').bootstrapTable({
+                url: '__MODULE__/Measure/getRiskMeasures',         //请求后台的URL（*）
+                method: 'post',                      //请求方式（*）
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                iconSize: 'outline',
+                sortable: true,                     //是否启用排序
+                sortName:"msr_planfinishtime",
+                sortOrder: "asc",                   //排序方式
+                queryParams:queryParams_yingduicuoshi,
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 7,                       //每页的记录行数（*）
+                pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+//            strictSearch: true,
+                showColumns: false,                  //是否显示所有的列
+                showRefresh: false,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "msr_id",                     //每一行的唯一标识，一般为主键列
+                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: true,                   //是否显示父子表
+                detailFormatter: "detailFormatter_yingduicuoshi",
+                columns: [
+                    [
+                        {title: '序号', width: 40,
+                            formatter: function (value, row, index)
+                            {
+                                var option =  $('#yingduicuoshi').bootstrapTable("getOptions");
+                                return option.pageSize * (option.pageNumber - 1) + index + 1;
+                            }
+                        },
+                        {field: 'msr_name', title: '应对措施名称',sortable:true,formatter:function(value,row){
+                            var msr_id = "'"+  row['msr_id'] +"'";
+                            var risk_id = "'"+  row['risk_id'] +"'";
+                            return '<a style="color:blue" onclick="measureDetail('+risk_id+','+msr_id+')" >'+value+'</a>';
+                        }},
+                        {field: 'zrr', title: '责任人',sortable:true},
+                        {field: 'zrbm', title: '责任部门',sortable:true},
+                        {field: 'msr_status', title: '状态',sortable:true},
+                        {field: 'msr_planfinishtime', title: '计划完成时间',sortable:true},
+                        {field: 'msr_realfinishtime', title: '实际完成时间',sortable:true},
+                        {field: 'msr_planreducevalue', title: '计划/实际降低值',width:50,formatter:function(value,row){
+                            return row['msr_planreducevalue'] + '/' +row['msr_realreducevalue'];
+                        }}
+                    ]
+                ], onDblClickRow: function (row) {
+                    var risk_id = $('#risk_id').val();
+                    layer.open({
+                        title: '应对措施编辑',
+                        type: 2,
+                        content: '__MODULE__/Measure/addMeasure?measure_id='+row['msr_id']+'&risk_id='+risk_id+'&from=riskdetail',
+                        closeBtn:1,
+                        shadeClose:true,
+                        area: ['1000px', '580px']
+                    });
+                },onLoadSuccess:function(data){
+                    if(parseInt(data.total)>0){
+                        var data = data.rows;
+                        var tr = $('#yingduicuoshi tbody tr');
+                        var len = tr.length;
+                        for(var i=0;i<len;i++){
+                            tr.eq(i).children().eq(2).addClass('td-hover');
+                            tr.eq(i).children().eq(2).attr('fullName', data[i].msr_fullname);
+                            tr.eq(i).children().eq(2).attr('shortName', data[i].msr_name);
+                        }
+                    }
+                }
+            });
+        }
+    }
+    TableObj_yingduicuoshi.oTableInit();
+    function queryParams_yingduicuoshi(params){
+        return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            limit: params.limit,   //页面大小
+            offset: params.offset,  //页码
+            sort: params.sort,  //排序列名
+            order: params.order,//排位命令（desc，asc）
+            risk_id:$('#risk_id').val(),
+            measure_name :$('#measure_search_name').val()
+        };
+        return temp;
+    };
+
+    $('#sys_refresh_yingduicuoshi').click(function(){
+        $('#yingduicuoshi').bootstrapTable('destroy')
+        TableObj_yingduicuoshi.oTableInit();
+    })
+
+
+
+
+
+    //专家打分js
+    var TableObj_zhuanjiadafen = {
+        oTableInit:function(){
+            $('#zhuanjiadafen').bootstrapTable({
+                url: '__MODULE__/ExpertScore/getExpertScores',         //请求后台的URL（*）
+                method: 'post',                      //请求方式（*）
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                iconSize: 'outline',
+                sortable: true,                     //是否启用排序
+                sortName:"esp_riskvalue",
+                sortOrder: "desc",                   //排序方式
+                queryParams:queryParams_zhuanjiadafen,
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 7,                       //每页的记录行数（*）
+                pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+//            strictSearch: true,
+                showColumns: false,                  //是否显示所有的列
+                showRefresh: false,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "esp_id",                     //每一行的唯一标识，一般为主键列
+                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: true,                   //是否显示父子表
+                detailFormatter: "detailFormatterExpert",
+                columns: [
+                    [
+                        {field: 'esp_startuser', title: '开启人',sortable:true,width:150},
+                        {field: 'esp_enduser', title: '关闭人',sortable:true,width:150},
+                        {field: 'esp_starttime', title: '评估时间',sortable:true,width:120},
+                        {field: 'esp_endtime', title: '截止时间',sortable:true,width:120},
+                        {field: 'esp_riskvalue', title: '风险值',sortable:true,width:80},
+                        {field: 'esp_tend', title: '趋势分析',sortable:true,width:150},
+                        {field: 'esp_status', title: '状态',sortable:true,width:80}
+                    ]
+                ], onDblClickRow: function (row) {
+                    var risk_id = $('#risk_id').val();
+                    layer.open({
+                        title: '专家打分',
+                        type: 2,
+                        content: '__MODULE__/ExpertScore/startProcess?esp_id='+row['esp_id']+'&risk_id='+risk_id,
+                        closeBtn:1,
+                        shadeClose:true,
+                        area: ['1000px', '580px']
+                    });
+                }
+            });
+        }
+    }
+    TableObj_zhuanjiadafen.oTableInit();
+    function queryParams_zhuanjiadafen(params){
+        return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            limit: params.limit,   //页面大小
+            offset: params.offset,  //页码
+            sort: params.sort,  //排序列名
+            order: params.order,//排位命令（desc，asc）
+            risk_id:$('#risk_id').val()
+        };
+        return temp;
+    };
+
+
+
+    $('#sys_refresh_zhuanjiadafen').click(function(){
+        $('#zhuanjiadafen').bootstrapTable('destroy')
+        TableObj_zhuanjiadafen.oTableInit();
+    })
+
+
+
+
+    //定性分析js
+    var TableObj_dingxingfenxi = {
+        oTableInit:function(){
+            $('#dingxingfenxi').bootstrapTable({
+                url: '__MODULE__/QualitativeAnalysis/getData',         //请求后台的URL（*）
+                method: 'post',                      //请求方式（*）
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                iconSize: 'outline',
+                sortable: true,                     //是否启用排序
+                sortName:"qa_createtime",
+                sortOrder: "desc",                   //排序方式
+                queryParams:queryParams,
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 7,                       //每页的记录行数（*）
+                pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+//            strictSearch: true,
+                showColumns: false,                  //是否显示所有的列
+                showRefresh: false,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "qa_id",                     //每一行的唯一标识，一般为主键列
+                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                   //是否显示父子表
+                columns: [
+                    [
+                        {field: 'user_realusername', title: '分析人',sortable:true,width:150},
+                        {field: 'qa_createtime', title: '分析时间',sortable:true,width:150},
+                        {field: 'qa_cost', title: '成本',sortable:true,width:120},
+                        {field: 'qa_worktime', title: '工期',sortable:true,width:120},
+                        {field: 'qa_propability', title: '概率',sortable:true,width:150},
+                        {field: 'qa_affection', title: '影响',sortable:true,width:80},
+                        {field: 'qa_riskvalue', title: '风险值',sortable:true,width:80}
+                    ]
+                ], onDblClickRow: function (row) {
+                    var risk_id = $('#risk_id').val();
+                    layer.open({
+                        title: '定性分析',
+                        type: 2,
+                        content: '__MODULE__/QualitativeAnalysis/addAnalysis?qa_id='+row['qa_id']+'&risk_id='+risk_id,
+                        closeBtn:1,
+                        shadeClose:true,
+                        area: ['1000px', '580px']
+                    });
+                }
+            });
+        }
+    }
+    TableObj_dingxingfenxi.oTableInit();
+    function queryParams(params){
+        return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            limit: params.limit,   //页面大小
+            offset: params.offset,  //页码
+            sort: params.sort,  //排序列名
+            order: params.order,//排位命令（desc，asc）
+            risk_id:$('#risk_id').val()
+        };
+        return temp;
+    };
+
+
+    $('#sys_refresh_dingxingfenxi').click(function(){
+        $('#dingxingfenxi').bootstrapTable('destroy')
+        TableObj_dingxingfenxi.oTableInit();
+    })
+
+
+});
+
+
+//专家打分父子表信息
+function detailFormatterExpert(index, row){
+    if( row['score_info'] && row['score_info'].length > 0) {
+        var row = row['score_info'];
+        var html = [];
+        html.push("<table class='table'style='table-layout:fixed' >");
+        html.push("<tr>");
+        html.push("<th style='width:50px;'>&nbsp;</th>");
+        html.push("<th>专家</th>");
+        html.push("<th>成本</th>");
+        html.push("<th>工期</th>");
+        html.push("<th>概率</th>");
+        html.push("<th>影响</th>");
+        html.push("<th>风险值</th>");
+        html.push("<th>最后打分时间</th>");
+        html.push("<th>状态</th>");
+        html.push("</tr>");
+
+        for (var i=0;i<row.length;i++){
+            html.push("<tr>");
+            html.push("<td ><a suggestion=" +row[i]['es_suggestion'] +" class='detail-icon' href='javascript:'> <i class='glyphicon glyphicon-plus icon-plus'></i> </a></td>");
+            html.push("<td>" + row[i]['user_realusername'] + "</td>");
+            html.push("<td>" + row[i]['es_cost'] + "</td>");
+            html.push("<td>" + row[i]['es_worktime'] + "</td>");
+            html.push("<td>" + row[i]['es_propability'] + "</td>");
+            html.push("<td>" + row[i]['es_affection'] + "</td>");
+            html.push("<td>" + row[i]['es_riskvalue'] + "</td>");
+            html.push("<td>" + row[i]['es_lastscoretime'] + "</td>");
+            html.push("<td>" + row[i]['es_status'] + "</td>");
+            html.push("</tr>");
+        }
+        html.push("</table>");
+        return html.join('');
+    }else{
+        return '暂无';
+    }
+}
+function measureDetail(risk_id, msr_id){
+    layer.open({
+        title: '应对措施编辑',
+        type: 2,
+        content: '__MODULE__/Measure/processInfoNoPower?measure_id='+msr_id+'&risk_id='+risk_id,
+        closeBtn:1,
+        shadeClose:true,
+        area: ['1000px', '610px'],
+        move:false
+    });
+}
+
+function detailFormatter_yingduicuoshi(index, row){
+    return "<table class='table' style='word-break: break-all;' ><tr><td style='width:100px;'>应对措施描述</td><td>"+row['msr_description']+"</td></tr></table>";
+}
+
+
+$('body').on('mouseover','.td-hover',function(){
+    var fullname = $(this).attr('fullName');
+    var width = parseInt($(this).css('width'))+200;
+    $(this).css('width', width+'px')
+    $(this).children(':first').text(fullname);
+
+})
+$('body').on('mouseout','.td-hover',function(){
+    var shortName = $(this).attr('shortName');
+    var width = parseInt($(this).css('width'))-200;
+    $(this).css('width', width+'px')
+    $(this).children(':first').text(shortName);
+})
+
+$('body').on('mouseout','.td-hover',function(){
+    var shortName = $(this).attr('shortName');
+    var width = parseInt($(this).css('width'))-200;
+    $(this).css('width', width+'px')
+    $(this).children(':first').text(shortName);
+})
+$('body').on('click','.detail-icon',function(){
+    var obj = $(this).children().eq(0);
+    var suggestion = $(this).attr('suggestion');
+    if(obj.hasClass('glyphicon-plus')){
+        $(this).parent().parent().after("<tr><th >意见</th><td colspan='8' style='word-wrap: break-word'> "+suggestion+"</td></tr>");
+        obj.removeClass('glyphicon-plus');
+        obj.addClass('glyphicon-minus');
+    }else{
+        $(this).parents('tr').next().remove();
+        obj.removeClass('glyphicon-minus');
+        obj.addClass('glyphicon-plus');
+    }
+
+})
+</script>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>matrix</title>
+    <link rel="stylesheet" href="__PUBLIC__/css/public.css">
+    <script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+    <style>
+        body{
+            width: 95%;
+            height:80%;
+            padding-top: 70px;
+            box-sizing: border-box;
+        }
+        h1{
+            font-size: 20px;
+            text-align: center;
+            color: blue;
+        }
+        h2{
+            font-size: 15px;
+            color: #2e2e2e;
+            text-align: center;
+            margin-bottom: 0!important;
+        }
+        .prob{
+            width: 100%;
+        }
+        h3{
+            font-size: 18px;
+            color: #2e2e2e;
+            transform: rotate(270deg);
+            -Webkit-transform: rotate(270deg);
+            float: left;
+            margin-top: 150px;
+        }
+        .box{
+            width: 100%;
+        }
+        .box li{
+            list-style: none;
+        }
+        .prob{
+            width: 100%;
+            margin-bottom: 0!important;
+        }
+        .prob li{
+            width: 14.25%;
+            height: 25px;
+            background-color:#eef2fc;
+            border: 1px solid #d1e3fb;
+
+            float: left;
+            list-style: none;
+            text-align: center;
+            line-height: 25px;
+
+        }
+        .prob .none{
+            background: #fff;
+            width: 64px;
+            border: none;
+            box-shadow:none;
+            margin-left: 40px;
+        }
+        .effect{
+            float: left;
+            width: 66px;
+            margin: 0;
+            /*padding-left: 0!important;*/
+
+        }
+        .effect li{
+            border: 1px solid #d1e3fb;
+            text-align: center;
+            background-color:#eef2fc;
+            height: 60px;
+            width: 64px;
+            margin-bottom: 1px;
+            line-height: 60px;
+            /*transform: rotate(270deg);*/
+            /*-webkit-transform: rotate(270deg);*/
+        }
+        td{
+            width: 19%;
+            height: 61px;
+            background-color: #eef2fc;
+            border: 1px solid #7da8dd;
+            float: left;
+            padding: 0;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 55px;
+        }
+
+        table{
+            width: 75%;
+            border-collapse: collapse;
+            border: 0;
+            margin: 0;
+            float: left;
+        }
+
+    </style>
+</head>
+<body >
+<div style="overflow: hidden">
+
+<h1>风险矩阵</h1>
+<h2>概率</h2>
+<div class="box">
+    <ul class="prob cb">
+        <li class="none"></li>
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+        <li>4</li>
+        <li>5</li>
+    </ul>
+
+    <div class="bottom cb">
+        <h3 class="fl">影响</h3>
+        <ul class="effect fl">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+        </ul>
+        <!--table-->
+        <table style="margin: 0 auto;" class="fl">
+            <?php for($i=0;$i<5;$i++){ ?>
+                <tr>
+                    <?php for($j=0;$j<5;$j++){ ?>
+                            <td x="<?php echo $j+1; ?>"  y="<?php echo $i+1; ?>"  prob="<?php echo $riskProb[$j] ?>" affect="<?php echo $riskAffect[$i] ?>"></td>
+                    <?php } ?>
+                </tr>
+            <?php } ?>
+        </table>
+    </div>
+</div>
+</div>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<script>
+    layui.use('layer', function() {
+        layer = layui.layer;
+    })
+    beforeColor = '';
+    $(function () {
+        var obj = $('td');
+        var length = obj.length;
+        for(var i=0; i< length; i++){
+            var x = obj.eq(i).attr('x');
+            var y = obj.eq(i).attr('y');
+            var pro = parseInt(x) * parseInt(y);
+            if(pro >0 && pro <=2){
+                obj.eq(i).css('background', '#00ff00');
+            }else if (pro >2 && pro <= 6){
+                obj.eq(i).css('background', '#ffff00');
+            }else if (pro >6 && pro <= 16){
+                obj.eq(i).css('background', '#ff6600');
+            }else if (pro >15 && pro <= 25){
+                obj.eq(i).css('background', '#ff0000');
+            }
+        }
+    })
+
+    $("td").mouseover(function(){
+        var color = $(this).css("background");
+        beforeColor = color;
+        $(this).css('background', '#fff');
+    })
+    $("td").mouseout(function(){
+        $(this).css('background', beforeColor);
+    });
+
+    var data = '<?php echo $data; ?>';
+    var data = JSON.parse(data);
+    var len = data.length;
+    var tabObj = $('td');
+    var tabLen = tabObj.length;
+    for(var i=0;i<len;i++){
+        var prob = parseFloat(data[i]['risk_propability']);
+        var affect = parseFloat(data[i]['risk_affection']);
+        for(var j=0;j<tabLen;j++){
+            var td_prob_end = parseFloat(tabObj.eq(j).attr('prob'));
+            var td_affect_end = parseFloat(tabObj.eq(j).attr('affect'));
+            var x = tabObj.eq(j).attr('x');
+            var y = tabObj.eq(j).attr('y');
+            var td_prob_start = 0;
+            var td_affect_start = 0;
+            if(x=='1'){
+                 td_prob_start = 0;
+            }else{
+                 td_prob_start = parseFloat(tabObj.eq(j-1).attr('prob'));
+            }
+            if(y == '1'){
+                 td_affect_start = 0;
+            }else{
+                 td_affect_start = parseFloat(tabObj.eq(j-5).attr('affect'));
+            }
+            if((td_prob_end >= prob) && (td_prob_start < prob)){
+                if((td_affect_end >= affect) && (td_affect_start < affect)){
+                    var text = tabObj.eq(j).text();
+                    if(text == ''){
+                        tabObj.eq(j).html("<a probrange="+td_prob_start+'-'+td_prob_end+" affectrange="+td_affect_start+'-'+td_affect_end+" class='openRisk' href='javascript:void(0)'>1</a>");
+                    }else{
+                        text = parseInt(text);
+                        text++;
+                        var num = "<a probrange="+td_prob_start+'-'+td_prob_end+" affectrange="+td_affect_start+'-'+td_affect_end+"  class='openRisk' href='javascript:void(0)'>"+text+"</a>"
+                        tabObj.eq(j).html(num);
+                    }
+                }
+            }
+        }
+    }
+    $('.openRisk').click(function () {
+        var prob_range = $(this).attr('probrange');
+        var affect_range = $(this).attr('affectrange');
+        layer.open({
+            title: '风险编辑',
+            type: 2,
+            content: '__MODULE__/ProjRisk/riskCount?prob_range='+prob_range+'&affect_range='+affect_range,
+            maxmin: true,
+            closeBtn:1,
+            shadeClose:true,
+            area: ['1200px', '800px']
+        });
+    })
+</script>
+</body>
+</html>

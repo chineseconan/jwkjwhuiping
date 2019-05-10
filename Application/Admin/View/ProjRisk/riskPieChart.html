@@ -1,0 +1,769 @@
+<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/css/public.css">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+    <script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+    <!--[if lte IE 9]>
+    <script src="__PUBLIC__/vendor/ie8/respond.min.js"></script>
+    <script src="__PUBLIC__/vendor/ie8/html5shiv.js"></script>
+    <![endif]-->
+    <title>风险饼图</title>
+    <style>
+        html,body{
+            height: 100%;;
+        }
+        .pieBox{
+            width: 48%;
+            height: 400px;
+            float: left;
+            border: 1px solid #eeeeee;
+            margin:  6px;
+            padding-top: 10px;
+            box-sizing: border-box;
+        }
+        .matrix{
+            width: 900px;
+            height: auto;
+            margin: 0 auto;
+        }
+        .matrix li{
+            list-style: none;
+        }
+        .matrix h1{
+            font-size: 20px;
+            color: blue;
+        }
+        .effectDiv{
+            float: left;
+            width: 120px;
+            height: auto;
+            padding: 71px 0 0 0;
+            box-sizing: border-box;
+        }
+        .effectDiv h2{
+            font-size: 15px;
+            color: #2e2e2e;
+            transform: rotate(270deg);
+            -ms-transform: rotate(270deg);
+            float: left;
+            margin-top: 150px;
+        }
+        .effect li{
+            border: 1px solid #d1e3fb;
+            text-align: center;
+            background-color:#eef2fc;
+            height: 60px;
+            line-height: 60px;
+            margin-bottom: 1.2px;
+        }
+        /*rigth start*/
+        .right{
+            width: 650px;
+        }
+        .probDiv h2{
+            font-size: 15px;
+            color: #2e2e2e;
+            text-align: center;
+            padding-bottom: 10px;
+            margin-bottom: 0!important;
+        }
+        .prob{
+            height: 25px;
+            padding-left: 0!important;
+            margin-bottom: 0!important;
+        }
+        .prob li{
+            width: 120px;
+            height: 25px;
+            background-color:#eef2fc;
+            border: 1px solid #d1e3fb;
+            float: left;
+            list-style: none;
+            text-align: center;
+            line-height: 25px;
+        }
+        table{
+            width: 602px;
+            border-collapse: collapse;
+            border: 0;
+            margin: 0;
+            float: left;
+        }
+        .matrix td{
+            width: 120px;
+            height: 61px;
+            background-color: #eef2fc;
+            border: 1px solid #7da8dd;
+            float: left;
+            padding: 0;
+            text-align: center;
+            line-height: 55px;
+        }
+        ::-webkit-scrollbar{
+            display: none;
+        }
+        #table td,th{
+            border:1px solid grey;
+            width:20%
+        }
+        #first-td{
+            border: none;
+        }
+        #first-td img{
+            width: 100%;
+        }
+        #table-th >div{
+            float:left;
+            width:20%;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border: 1px solid grey;
+            line-height: 39px;
+            border-bottom: none;
+            border-right: none;
+            box-sizing:border-box;
+        }
+        .risk-count{
+            color: red;
+            text-decoration: underline;
+        }
+        .tableBox{
+            padding: 0 50px;
+            box-sizing: border-box;
+        }
+        #riskType,#riskStage{
+            margin: 6px 8px 10px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cb">
+        <div style="" class="pieBox" id="riskType" ></div>
+        <div class="pieBox"  id="riskStatus"></div>
+    </div>
+    <div class="cb">
+        <div class="pieBox" style="" id="riskStage"></div>
+        <div class="pieBox"  id="riskDomain"></div>
+    </div>
+    <!--matrix-->
+    <div class="matrix ma">
+        <h1 class="tc">风险矩阵</h1>
+        <!--effectDiv-->
+        <div style="text-align: center">
+            <div class="cb matrixBox ma" style="display: inline-block">
+                <div class="effectDiv fl">
+                    <h2>影响</h2>
+                    <ul class="effect cb">
+                        <li>1</li>
+                        <li>2</li>
+                        <li>3</li>
+                        <li>4</li>
+                        <li>5</li>
+                    </ul>
+                </div>
+                <div class="fl right">
+                <div class="probDiv">
+                    <h2>概率</h2>
+                    <ul class="prob bb">
+                        <li>1</li>
+                        <li>2</li>
+                        <li>3</li>
+                        <li>4</li>
+                        <li>5</li>
+                    </ul>
+                </div>
+                <table id="matrix_table">
+                    <?php for($i=0;$i<5;$i++){ ?>
+                        <tr>
+                            <?php for($j=0;$j<5;$j++){ ?>
+                            <td x="<?php echo $j+1; ?>"  y="<?php echo $i+1; ?>"  prob="<?php echo $riskProb[$j] ?>" affect="<?php echo $riskAffect[$i] ?>"></td>
+                            <?php } ?>
+                        </tr>
+                    <?php } ?>
+                </table>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div id="project" style="height: 400px;border:1px;padding: 10px;box-sizing:border-box;width: 900px;margin:0 auto"></div>
+    <div class="tableBox">
+        <h2 style="text-align: center;font-size:17px;font-weight: bolder">风险分布详情(平均值/数量)</h2>
+        <div id="table-th" class="cb">
+            <div id="first-td" style="border-left: 1px solid grey;border-top: 1px solid grey">
+                <img src="__PUBLIC__/img/line.png" style="height:36px;" alt="">
+            </div>
+            <div>I类风险</div>
+            <div>II类风险</div>
+            <div>III类风险</div>
+            <div style="border-right: 1px solid grey">IV类风险</div>
+        </div>
+        <table class="table cb" id='table'>
+            <tbody>
+                <?php foreach($projects as $key=>$value){ ?>
+                    <tr>
+                        <td><?php echo $value['proj_code'] ?></td>
+                        <td>
+                            <?php echo $value['data']['I类风险']['average'] ?> /
+                            <?php if(!empty($value['data']['I类风险']['num'])){  ?>
+                            <a project="<?php echo $value['proj_code'] ?>" risklevel="1" class="risk-count"><?php echo $value['data']['I类风险']['num']  ?></a>
+                            <?php }else{
+                             echo $value['data']['I类风险']['num'];
+                             } ?>
+                        </td>
+                        <td>
+                            <?php echo $value['data']['II类风险']['average'] ?>/
+                            <?php if(!empty($value['data']['II类风险']['num'])){  ?>
+                            <a project="<?php echo $value['proj_code'] ?>" risklevel="2" class="risk-count"><?php echo $value['data']['II类风险']['num']  ?></a>
+                            <?php }else{
+                             echo $value['data']['II类风险']['num'];
+                             } ?>
+                        </td>
+                        <td>
+                            <?php echo $value['data']['III类风险']['average'] ?>/
+                            <?php if(!empty($value['data']['III类风险']['num'])){  ?>
+                            <a project="<?php echo $value['proj_code'] ?>" risklevel="3" class="risk-count"><?php echo $value['data']['III类风险']['num']  ?></a>
+                            <?php }else{
+                             echo $value['data']['III类风险']['num'];
+                             } ?>
+                        </td>
+                        <td>
+                            <?php echo $value['data']['IV类风险']['average'] ?> /
+                            <?php if(!empty($value['data']['IV类风险']['num'])){  ?>
+                            <a project="<?php echo $value['proj_code'] ?>" risklevel="4" class="risk-count"><?php echo $value['data']['IV类风险']['num']  ?></a>
+                            <?php }else{
+                             echo $value['data']['IV类风险']['num'];
+                             } ?>
+                        </td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
+    </div>
+</body>
+<script src="__PUBLIC__/vendor/echart/echarts-all.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<script>
+    var proj_id = '<?php echo $proj_id; ?>';
+    layui.use('layer', function() {
+        layer = layui.layer;
+    })
+    beforeColor = '';
+    $(function () {
+        var obj = $('#matrix_table td');
+        var length = obj.length;
+        for(var i=0; i< length; i++){
+            var x = obj.eq(i).attr('x');
+            var y = obj.eq(i).attr('y');
+            var pro = parseInt(x) * parseInt(y);
+            if(pro >0 && pro <=2){
+                obj.eq(i).css('background', '#00ff00');
+            }else if (pro >2 && pro <= 6){
+                obj.eq(i).css('background', '#ffff00');
+            }else if (pro >6 && pro <= 16){
+                obj.eq(i).css('background', '#ff6600');
+            }else if (pro >15 && pro <= 25){
+                obj.eq(i).css('background', '#ff0000');
+            }
+        }
+    })
+
+//    $("td").mouseover(function(){
+//        var color = $(this).css("background");
+//        beforeColor = color;
+//        $(this).css('background', '#fff');
+//    })
+//    $("td").mouseout(function(){
+//        $(this).css('background', beforeColor);
+//    });
+    var data = '<?php echo $data; ?>';
+    data = JSON.parse(data);
+//    console.log(data);
+    var len = data.length;
+    var tabObj =  $('#matrix_table td');
+    var tabLen = tabObj.length;
+    for(var i=0;i<len;i++){
+        var prob = parseFloat(data[i]['risk_propability']);
+        var affect = parseFloat(data[i]['risk_affection']);
+        for(var j=0;j<tabLen;j++){
+            var td_prob_end = parseFloat(tabObj.eq(j).attr('prob'));
+            var td_affect_end = parseFloat(tabObj.eq(j).attr('affect'));
+            var x = tabObj.eq(j).attr('x');
+            var y = tabObj.eq(j).attr('y');
+            var td_prob_start = 0;
+            var td_affect_start = 0;
+            if(x=='1'){
+                td_prob_start = 0;
+            }else{
+                td_prob_start = parseFloat(tabObj.eq(j-1).attr('prob'));
+            }
+            if(y == '1'){
+                td_affect_start = 0;
+            }else{
+                td_affect_start = parseFloat(tabObj.eq(j-5).attr('affect'));
+            }
+            if((td_prob_end >= prob) && (td_prob_start < prob)){
+                if((td_affect_end >= affect) && (td_affect_start < affect)){
+                    var text = tabObj.eq(j).text();
+                    if(text == ''){
+                        tabObj.eq(j).html("<a probrange="+td_prob_start+'-'+td_prob_end+" affectrange="+td_affect_start+'-'+td_affect_end+" class='openRisk' href='javascript:void(0)'>1</a>");
+                    }else{
+                        text = parseInt(text);
+                        text++;
+                        var num = "<a probrange="+td_prob_start+'-'+td_prob_end+" affectrange="+td_affect_start+'-'+td_affect_end+"  class='openRisk' href='javascript:void(0)'>"+text+"</a>"
+                        tabObj.eq(j).html(num);
+                    }
+                }
+            }
+        }
+    }
+    $('.openRisk').click(function () {
+        var prob_range = $(this).attr('probrange');
+        var affect_range = $(this).attr('affectrange');
+        parent.layer.open({
+            title: '风险统计',
+            type: 2,
+            content: '__MODULE__/ProjRisk/riskCount?prob_range='+prob_range+'&affect_range='+affect_range+'&proj_id='+proj_id,
+            maxmin: true,
+            closeBtn:1,
+            shadeClose:true,
+            area: ['1180px', '630px']
+        });
+    })
+    riskType();
+    riskStatus();
+    riskStage();
+    riskDomain();
+    projectCount();
+    function riskType(){
+        var myChart = echarts.init(document.getElementById('riskType'));
+        option = {
+            title : {
+                text: '风险类型',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient : 'vertical',
+                x : 'left',
+                data:[{$riskTypeData['names_str']}]
+            },
+            toolbox: {
+                show : false,
+                feature : {
+                    mark : {show: true},
+                    dataView : {show: true, readOnly: false},
+                    magicType : {
+                        show: true,
+                        type: ['pie', 'funnel'],
+                        option: {
+                            funnel: {
+                                x: '20%',
+                                width: '40%',
+                                funnelAlign: 'left',
+                                max: 1548
+                            }
+                        }
+                    }
+                }
+            },
+            calculable : false,
+            series : [
+                {
+                    name:'风险类型',
+                    type:'pie',
+                    radius : '55%',
+                    center: ['45%', '50%'],
+                    data:[{$riskTypeData['values_str']}]
+                }
+            ]
+        };
+        myChart.setOption(option);
+        var ecConfig = echarts.config;
+        function eConsole(param) {
+            if (typeof param.seriesIndex != 'undefined') {
+                parent.layer.open({
+                    title: '风险统计',
+                    type: 2,
+                    content:"__MODULE__/ProjRisk/riskCount?risk_type="+param.name+'&proj_id='+proj_id,
+                    maxmin: true,
+                    closeBtn:1,
+                    shadeClose:true,
+                    area: ['1180px', '630px']
+                });
+            }
+        }
+        myChart.on(ecConfig.EVENT.CLICK, eConsole);
+        myChart.on(ecConfig.EVENT.DBLCLICK, eConsole);
+        //myChart.on(ecConfig.EVENT.HOVER, eConsole);
+        myChart.on(ecConfig.EVENT.DATA_ZOOM, eConsole);
+        myChart.on(ecConfig.EVENT.LEGEND_SELECTED, eConsole);
+        myChart.on(ecConfig.EVENT.MAGIC_TYPE_CHANGED, eConsole);
+        myChart.on(ecConfig.EVENT.DATA_VIEW_CHANGED, eConsole);
+        $('#riskType').removeAttr('style');
+    }
+    function riskStatus(){
+        var myChart = echarts.init(document.getElementById('riskStatus'));
+        option = {
+            title : {
+                text: '风险状态',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient : 'vertical',
+                x : 'left',
+                data:[{$riskStatusData['names_str']}]
+            },
+            toolbox: {
+                show : false,
+                feature : {
+                    mark : {show: true},
+                    dataView : {show: true, readOnly: false},
+                    magicType : {
+                        show: true,
+                        type: ['pie', 'funnel'],
+                        option: {
+                            funnel: {
+                                x: '20%',
+                                width: '40%',
+                                funnelAlign: 'left',
+                                max: 1548
+                            }
+                        }
+                    }
+                }
+            },
+            calculable : false,
+            series : [
+                {
+                    name:'风险状态',
+                    type:'pie',
+                    radius : '55%',
+                    center: ['45%', '50%'],
+                    data:[{$riskStatusData['values_str']}]
+                }
+            ]
+        };
+
+        myChart.setOption(option);
+        var ecConfig = echarts.config;
+        function eConsole(param) {
+            if (typeof param.seriesIndex != 'undefined') {
+                parent.layer.open({
+                    title: '风险统计',
+                    type: 2,
+                    content:"__MODULE__/ProjRisk/riskCount?risk_status="+param.name+'&proj_id='+proj_id,
+                    maxmin: true,
+                    closeBtn:1,
+                    shadeClose:true,
+                    area: ['1180px', '630px']
+                });
+            }
+        }
+        myChart.on(ecConfig.EVENT.CLICK, eConsole);
+        myChart.on(ecConfig.EVENT.DBLCLICK, eConsole);
+        //myChart.on(ecConfig.EVENT.HOVER, eConsole);
+        myChart.on(ecConfig.EVENT.DATA_ZOOM, eConsole);
+        myChart.on(ecConfig.EVENT.LEGEND_SELECTED, eConsole);
+        myChart.on(ecConfig.EVENT.MAGIC_TYPE_CHANGED, eConsole);
+        myChart.on(ecConfig.EVENT.DATA_VIEW_CHANGED, eConsole);
+        $('#riskStatus').removeAttr('style');
+    }
+    function riskStage(){
+      var myChart = echarts.init(document.getElementById('riskStage'));
+      option = {
+          title : {
+              text: '风险阶段',
+              x:'center'
+          },
+          tooltip : {
+              trigger: 'item',
+              formatter: "{a} <br/>{b} : {c} ({d}%)"
+          },
+          legend: {
+              orient : 'vertical',
+              x : 'left',
+              data:[{$riskStageData['names_str']}]
+          },
+          toolbox: {
+              show : false,
+              feature : {
+                  mark : {show: true},
+                  dataView : {show: true, readOnly: false},
+                  magicType : {
+                      show: true,
+                      type: ['pie', 'funnel'],
+                      option: {
+                          funnel: {
+                              x: '20%',
+                              width: '40%',
+                              funnelAlign: 'left',
+                              max: 1548
+                          }
+                      }
+                  }
+              }
+          },
+          calculable : false,
+          series : [
+              {
+                  name:'风险阶段',
+                  type:'pie',
+                  radius : '55%',
+                  center: ['45%', '50%'],
+                  data:[{$riskStageData['values_str']}]
+              }
+          ]
+      };
+
+      myChart.setOption(option);
+      var ecConfig = echarts.config;
+      function eConsole(param) {
+          if (typeof param.seriesIndex != 'undefined') {
+              parent.layer.open({
+                  title: '风险统计',
+                  type: 2,
+                  content:"__MODULE__/ProjRisk/riskCount?risk_stage="+param.name+'&proj_id='+proj_id,
+                  maxmin: true,
+                  closeBtn:1,
+                  shadeClose:true,
+                  area: ['1180px', '630px']
+              });
+          }
+      }
+      myChart.on(ecConfig.EVENT.CLICK, eConsole);
+      myChart.on(ecConfig.EVENT.DBLCLICK, eConsole);
+      //myChart.on(ecConfig.EVENT.HOVER, eConsole);
+      myChart.on(ecConfig.EVENT.DATA_ZOOM, eConsole);
+      myChart.on(ecConfig.EVENT.LEGEND_SELECTED, eConsole);
+      myChart.on(ecConfig.EVENT.MAGIC_TYPE_CHANGED, eConsole);
+      myChart.on(ecConfig.EVENT.DATA_VIEW_CHANGED, eConsole);
+     $('#riskStage').removeAttr('style');
+  }
+    function riskDomain(){
+       var myChart = echarts.init(document.getElementById('riskDomain'));
+       option = {
+           title : {
+               text: '风险领域',
+               x:'center'
+           },
+           tooltip : {
+               trigger: 'item',
+               formatter: "{a} <br/>{b} : {c} ({d}%)"
+           },
+           legend: {
+               orient : 'vertical',
+               x : 'left',
+               data:[{$riskDomainData['names_str']}]
+           },
+           toolbox: {
+               show : false,
+               feature : {
+                   mark : {show: true},
+                   dataView : {show: true, readOnly: false},
+                   magicType : {
+                       show: true,
+                       type: ['pie', 'funnel'],
+                       option: {
+                           funnel: {
+                               x: '20%',
+                               width: '40%',
+                               funnelAlign: 'left',
+                               max: 1548
+                           }
+                       }
+                   }
+               }
+           },
+           calculable : false,
+           series : [
+               {
+                   name:'风险领域',
+                   type:'pie',
+                   radius : '55%',
+                   center: ['45%', '50%'],
+                   data:[{$riskDomainData['values_str']}]
+               }
+           ]
+       };
+
+       myChart.setOption(option);
+       var ecConfig = echarts.config;
+       function eConsole(param) {
+           if (typeof param.seriesIndex != 'undefined') {
+               parent.layer.open({
+                   title: '风险统计',
+                   type: 2,
+                   content:"__MODULE__/ProjRisk/riskCount?risk_domain="+param.name+'&proj_id='+proj_id,
+                   maxmin: true,
+                   closeBtn:1,
+                   shadeClose:true,
+                   area: ['1180px', '630px']
+               });
+           }
+       }
+       myChart.on(ecConfig.EVENT.CLICK, eConsole);
+       myChart.on(ecConfig.EVENT.DBLCLICK, eConsole);
+       //myChart.on(ecConfig.EVENT.HOVER, eConsole);
+       myChart.on(ecConfig.EVENT.DATA_ZOOM, eConsole);
+       myChart.on(ecConfig.EVENT.LEGEND_SELECTED, eConsole);
+       myChart.on(ecConfig.EVENT.MAGIC_TYPE_CHANGED, eConsole);
+       myChart.on(ecConfig.EVENT.DATA_VIEW_CHANGED, eConsole);
+        $('#riskDomain').removeAttr('style');
+
+    }
+
+    function projectCount(){
+        var initdata = '<?php echo $initData; ?>';
+        initdata = JSON.parse(initdata);
+        var myChart = echarts.init(document.getElementById('project'));
+        option = {
+            title : {
+                text: '',
+                subtext: ''
+            },
+            tooltip : {
+                trigger: 'axis'
+            },
+            legend: {
+                data:[
+                    {$types}
+                ]
+            },
+            calculable : true,
+            grid: {y: 70, y2:30, x2:20},
+            xAxis : [
+                {
+                    type : 'category',
+                    data : [{$names}]
+                },
+                {
+                    type : 'category',
+                    axisLine: {show:false},
+                    axisTick: {show:false},
+                    axisLabel: {show:false},
+                    splitArea: {show:false},
+                    splitLine: {show:false},
+                    data : [{$names}]
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value',
+                    axisLabel:{formatter:'{value} '}
+                }
+            ],
+            series : [
+            <?php
+                $count = count($projCountData);
+                $i = 0;
+                foreach($projCountData as $key=>$value){
+                $i++;
+            ?>
+            {
+                name:'<?php echo $key ?>',
+                        type:'bar',
+                        xAxisIndex:1,
+                        itemStyle: {
+                                normal: {
+                                    color:function(params){
+                                        var value = "<?php echo $value['color']; ?>";
+                                        return value;
+                                    }, label:{
+                                        show:true,
+                                        formatter:function(p){
+                                        var data = initdata[p['seriesName']];
+                                        var name = p.name;
+                                        var len = data.length;
+                                        for(var i=0;i<len;i++){
+                                            if(data[i]['name'] == name){
+                                                if(data[i]['num'] > 0){
+                                                    return data[i]['num'] ;
+                                                }else{
+                                                    return 0;
+                                                }
+                                            }
+                                        }
+                                     } }
+                                }
+            },
+            data:[{$value['valuestr']}]
+            }
+            <?php if($i <$count) {echo ",";} ?>
+            <?php } ?>
+        ]
+    };
+
+    myChart.setOption(option);
+    var ecConfig = echarts.config;
+    function eConsole(param) {
+        if (typeof param.seriesIndex != 'undefined') {
+            var risk_level = param.seriesName;
+            switch(risk_level){
+                case 'I类风险':
+                    risk_level = 1;
+                    break;
+                case 'II类风险':
+                    risk_level = 2;
+                    break;
+                case 'III类风险':
+                    risk_level = 3;
+                    break;
+                case 'IV类风险':
+                    risk_level = 4;
+                    break;
+            }
+            var url = encodeURI("__CONTROLLER__/riskCountByLevel?risk_level="+risk_level+'&proj_code='+param.name);
+            parent.layer.open({
+                title: '风险统计',
+                type: 2,
+                content:url,
+                closeBtn:1,
+                shadeClose:true,
+                area: ['1180px', '630px']
+            });
+        }
+    }
+    myChart.on(ecConfig.EVENT.CLICK, eConsole);
+    myChart.on(ecConfig.EVENT.DBLCLICK, eConsole);
+    //myChart.on(ecConfig.EVENT.HOVER, eConsole);
+    myChart.on(ecConfig.EVENT.DATA_ZOOM, eConsole);
+    myChart.on(ecConfig.EVENT.LEGEND_SELECTED, eConsole);
+    myChart.on(ecConfig.EVENT.MAGIC_TYPE_CHANGED, eConsole);
+    myChart.on(ecConfig.EVENT.DATA_VIEW_CHANGED, eConsole);
+    }
+
+    $('.risk-count').click(function(){
+        var proj_code = $(this).attr('project');
+        var risk_level = $(this).attr('risklevel');
+        var url = encodeURI("__CONTROLLER__/riskCountByLevel?risk_level="+risk_level+'&proj_code='+proj_code);
+
+        parent.layer.open({
+            title: '风险统计',
+            type: 2,
+            content:url,
+            closeBtn:1,
+            shadeClose:true,
+            area: ['1180px', '630px']
+        });
+    })
+</script>
+</html>

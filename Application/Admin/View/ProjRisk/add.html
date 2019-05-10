@@ -1,0 +1,351 @@
+﻿<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.css">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+    <script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+    <script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+    <script src="__PUBLIC__/vendor/My97DatePicker/WdatePicker.js"></script>
+    <script src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+    <script src="__PUBLIC__/vendor/chosen-ajax-addition/chosen.ajaxaddition.jquery.js"></script>
+    <!--[if lte IE 9]>
+    <script src="__PUBLIC__/vendor/ie8/respond.min.js"></script>
+    <script src="__PUBLIC__/vendor/ie8/html5shiv.js"></script>
+    <![endif]-->
+    <title>风险管理</title>
+    <style>
+        .chosen-container {
+            height: 24px;
+            top: 0px;
+        }
+         .control-label{
+            width:160px!important;
+        }
+        #riskForm{
+            /*height:500px;*/
+        }
+        .container{
+            padding: 0!important;
+        }
+        #layui-layer-iframe2{
+            height: 521px;
+        }
+        .form-control,textarea{
+            border-radius: 2px;;
+        }
+        .layui-layer .layui-layer-iframe  .layer-anim{
+            height: 570px!important;
+        }
+        .chosen-container-multi .chosen-choices{
+            width: 103%!important;
+        }
+        #personLiable .chosen-container .chosen-drop{
+            width: 103%!important;
+        }
+        .must_filter{
+            color:red
+        }
+    </style>
+</head>
+<body class="gray-bg" style="overflow-x: hidden;margin-top:20px;left:-5px;">
+<div class="row">
+    <div class="container" style="min-width: 992px">
+        <?php if(isset($data['risk_status'])){ ?>
+            <h3 style="text-align: center;margin-bottom: 25px;margin-top: 0">
+                风险状态:<span style="color:red"><?php echo $data['risk_status']; ?></span>
+            </h3>
+        <?php } ?>
+        <form id="riskForm" role="form" class="form-horizontal" enctype="multipart/form-data">
+            <div class="form-group">
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">风险名称 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3" >
+                        <input  name="name"  type="text"  value="{$data.risk_name}" style="width:300px;display: inline-block" class="form-control">
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">所属项目 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3" >
+                        <select id="project" name="project" class="chosen-select2" >
+                            <option value="">&nbsp;</option>
+                            <?php foreach($project as $key=>$value){ ?>
+                            <option value="{$value.id}"  <?php if(($addProject == $value['id']) || (!empty($data['risk_projid']) && $data['risk_projid'] == $value['id']) )echo 'selected'; ?>>{$value.proj_name}</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">预计关闭时间 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3" >
+                        <input  name="risk_planclosetime" type="text"  value="{$data.risk_planclosetime}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"  style="width:300px;display: inline-block" class="form-control">
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">风险密级 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3" >
+                        <select name="secretlevel" class=" chosen-select2" id="secretlevel"   <?php  if(!empty($data['risk_secretlevel'])) echo 'disabled'; ?> >
+                            <option value="">&nbsp;</option>
+                            <?php foreach($riskSecretLevel as $key=>$value){  ?>
+                            <option value="{$value.dic_name}" <?php if( $value['dic_name'] ==$data['risk_secretlevel'] )echo 'selected'; ?> <?php if(empty($data)){ if(!systemIsSecret()) { if($value['dic_name'] == '非密'){echo 'selected';} } } ?>> {$value.dic_name}</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" id="personLiable">
+                <label class=" col-sm-2 control-label">责任人 <span class="must_filter">*</span>：</label>
+                <div class="col-sm-3" >
+                    <select name="person_liable"  id="person_liable"  <?php if(isset($canUpRiskDuty) && $canUpRiskDuty == 0){ ?>disabled<?php } ?> multiple data-placeholder="请先选择密级再输入用户账号或姓名进行检索">
+                        <option value="">&nbsp;</option>
+                    </select>
+                </div>
+            </div>
+            <div  class="form-group">
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">风险类型 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3" >
+                        <select name="risk_type" id="risk_type" class="chosen-select2" >
+                            <option value="">&nbsp;</option>
+                            <?php foreach($riskType as $key=>$value){ ?>
+                            <option value="{$value.val}" <?php if(!empty($data['risk_type']) && $data['risk_type'] == $value['val'])echo 'selected'; ?> >{$value.val}</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">阶段 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3" >
+                         <select name="risk_stage" id="risk_stage" class="chosen-select2" >
+                            <option value="">&nbsp;</option>
+                            <?php foreach($riskStage as $key=>$value){ ?>
+                            <option value="{$value.val}" <?php if(!empty($data['risk_stage']) && $data['risk_stage'] == $value['val'])echo 'selected'; ?> >{$value.val}</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div  class="form-group">
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">风险领域 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3" >
+                        <select name="risk_domain" id="risk_domain" class="chosen-select2" >
+                            <option value="">&nbsp;</option>
+                            <?php foreach($riskField as $key=>$value){ ?>
+                            <option value="{$value.val}" <?php if(!empty($data['risk_domain']) && $data['risk_domain'] == $value['val'])echo 'selected'; ?> >{$value.val}</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">是否发生 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3" >
+                        <select name="is_happen" class="chosen-select2" >
+                            <option <?php if( $data['is_happen'] == '0')echo 'selected'; ?> value="0">否</option>
+                            <?php if(!empty($data)){ ?>
+                            <option <?php if( $data['is_happen'] == '1')echo 'selected'; ?> value="1">是</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div  class="form-group clearfix">
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">起因：</label>
+                    <div class="col-sm-3" >
+                        <input  name="risk_reason" type="text"  value="{$data.risk_reason}" style="width:300px;display: inline-block" class="form-control">
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">后果：</label>
+                    <div class="col-sm-3" >
+                        <input  name="risk_result" type="text"  value="{$data.risk_result}" style="width:300px;display: inline-block" class="form-control">
+                    </div>
+                </div>
+            </div>
+
+            <div  class="form-group clearfix">
+                <div style="width: 100%;float: left">
+                    <label class=" col-sm-2 control-label">风险描述 <span class="must_filter">*</span>：</label>
+                    <div class="col-sm-3" >
+                        <textarea name="risk_description"  cols="10" rows="5" class="form-control" style="display:inline-block;width: 800px;height: 75px;">{$data.risk_description}</textarea>
+                    </div>
+               </div>
+            </div>
+            <div  class="form-group clearfix">
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">计划名称：</label>
+                    <div class="col-sm-3" >
+                        <input  name="plan_name" type="text"  value="{$data.plan_name}" style="width:300px;display: inline-block" class="form-control">
+                    </div>
+                </div>
+                <div style="width: 50%;float: left">
+                    <label class=" col-sm-2 control-label">计划滞后时间：</label>
+                    <!--<div style="margin-left: 20px">-->
+                        <input  name="plan_zhihoutime" type="text"  value="{$data.plan_zhihoutime}" style="width:268px;display: inline-block;margin-left: 15px" class="form-control">（天）
+                    <!--</div>-->
+                </div>
+            </div>
+            <div style="text-align: center;margin-top: -5px">
+                <?php if(isset($canUpRisk)  && $canUpRisk){  ?>
+                    <input type="submit" class="btn btn-info" value="保存" width="100px;"  id="sys_dlg_submit">
+                <?php }?>
+            </div>
+            <input type="hidden" value="{$risk_id}" name='risk_id'>
+        </form>
+    </div>
+    </div>
+</body>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/validate/jquery.validate.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<script>
+$(function () {
+    layui.use('layer', function() {
+        layer = layui.layer;
+    })
+    $(".chosen-select2").chosen({disable_search_threshold: 0, search_contains: true, width: '300px'});
+    $("#domain").chosen({disable_search_threshold: 0, search_contains: false, width: '300px'});
+    $("#person_liable").chosen({disable_search_threshold: 0, search_contains: true, width: '784px'});
+
+    var riskmanage = '<?php  if(!empty($data[risk_manager])){echo json_encode($data[risk_manager]);}else{echo "";} ?>';
+    if(riskmanage){
+        riskmanage = eval('('+riskmanage+')');
+        for(var i=0;i<riskmanage.length;i++) {
+            $('#person_liable').append('<option value="'+riskmanage[i].id+'" selected  >'+riskmanage[i].text+'</option>');
+        }
+        $('#person_liable').trigger("chosen:updated");
+    }
+
+
+    $('#person_liable').ajaxChosen({
+        beforeSend:function(){
+            var secretlevel = $('#secretlevel').val();
+            if(!secretlevel){
+                layer.msg('请先选择密级');
+                return false;
+            }else{
+                this.data = this.data+','+$('#secretlevel').val();
+            }
+        },
+        dataType: 'json',
+        type: 'POST',
+        url:'__MODULE__/User/getUsersBySecretLevel'
+    },{
+    });
+
+    var from = "<?php echo I('get.from'); ?>";
+    $.validator.setDefaults({
+        highlight:function(element){
+            $(element).parent().remove('has-success').addClass('has-error');
+        },
+        errorPlacement:function(error,element){
+            if(element.is(":radio") || element.is(":checkbox")){
+                error.appendTo(element.parent());
+            }else{
+                error.appendTo(element.parent());
+            }
+        },
+        errorClass:"help-block m-b-none",
+        validClass:"help-block m-b-none"
+    });
+
+    $('#riskForm').validate({
+            onclick:false,
+            onfocusout:false,
+            onkeyup:false,
+        rules:{
+            name:'required',
+            project:'required',
+            risk_planclosetime:'required',
+            risk_description:'required',
+            is_happen:'required'
+        },
+        messages:{
+            name:'必填项',
+            risk_planclosetime:'必填项',
+            risk_description:'必填项',
+            plan_name:'必填项',
+        },submitHandler:function(){
+            layui.use('layer', function() {
+                layer = layui.layer;
+            })
+            var result = checkForm(['project','person_liable','risk_type','risk_stage','risk_domain','secretlevel'],['项目','责任人', '风险类型', '阶段', '风险领域', '密级']);
+            if(!result) return false;
+
+            var formbody = $("#riskForm");
+            var risk_manager = $('#person_liable').val();
+            formbody.append("<input type='hidden' name='risk_manager'  value="+risk_manager+">");
+            var secretlevel = $('#secretlevel').val();
+            layer.confirm('风险密级保存后不可更改，确认要将项目密级设为'+secretlevel+'吗？' ,
+            {btn:['确定','取消']},function(){
+                $.ajax({
+                    type:'post',
+                    url:'__CONTROLLER__/addRisk',
+                    data:formbody.serialize(),
+                    dataType :'json',
+                    success:function(data){
+                        if(data.code > 0){
+                            layer.msg('操作成功');
+                            switch(from){
+                                case 'desk':
+                                    parent.$('#box1').contents().find('#mycreate_refresh').click();
+                                    parent.$('#box1').contents().find('#myduty_refresh').click();
+                                    parent.$('#box1').contents().find('#history_refresh').click();
+                                    break;
+                                case 'riskdetail':
+                                    parent.$('#sys_refresh_yingduicuoshi').click();
+                                    break;
+                                case 'getmeasurebyproject':
+                                    parent.$('#measure_box').contents().find('#sys_refresh_yingduicuoshi').click();
+                                    break;
+                                case  'riskmanageadd':
+                                    parent.$('#risk_box').contents().find('#sys_refresh').click();
+                                    break;
+                            }
+
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                        }else{
+                            if(data.code == -1001){
+                                layer.msg('请先登录');
+                                location.href='__MODULE__/Index/index';
+                            }else{
+                                layer.msg(data.message);
+                            }
+                        }
+                    }
+                })
+
+            })
+        }
+    })
+
+});
+function checkForm(objArr, messageArr){
+    var len = objArr.length;
+    for(var i=0;i<len;i++){
+        var obj = objArr[i];
+        var val = $('#'+obj).val();
+        if(!val){
+            layer.msg('请选择'+messageArr[i]);
+            $('#'+obj).trigger('chosen:open');
+            return false;
+        }
+    }
+    return true;
+}
+
+</script>

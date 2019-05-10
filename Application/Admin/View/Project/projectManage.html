@@ -1,0 +1,570 @@
+<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.css">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/zTree_v3/css/zTreeStyle/zTreeStyle.css" type="text/css">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+
+    <script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/locale/bootstrap-table-zh-CN.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/vendor/zTree_v3/js/jquery.ztree.core.js"></script>
+    <script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+    <script src="__PUBLIC__/vendor/chosen/chosen.order.jquery.js"></script>
+    <script src="__PUBLIC__/vendor/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+    <script src="__PUBLIC__/js/flex.js"></script>
+    <style>
+        html,body{
+            height: 100%;
+            *overflow: hidden;
+        }
+        body{
+            margin: 0;
+            padding: 0;
+            font-family: 微软雅黑;
+        }
+        #search {
+            width: 50px;
+            border: 0;
+            height: 30px;
+            background-color: #009688;
+            line-height: 24px;
+            color: #fff;
+        }
+        #treearea{
+            position: absolute;
+            left:5px;
+            top:5px;
+            bottom:0;
+            width:300px;
+            height:auto;
+            overflow:auto;
+            border: 1px solid #E2E2E2;
+        }
+        #atp_wrapper{
+            position: absolute;
+            top:5px;
+            bottom:0;
+            left: 310px;
+            right: 5px;
+            width: auto;
+            height:auto;
+            border: 1px solid #E2E2E2;
+            overflow: auto;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+        #atp_wrapper #top_nav{
+            position: absolute;
+            top:5px;
+            left:5px;
+            right:5px;
+            width:auto;
+            height:200px;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+        #atp_wrapper .content{
+            position: absolute;
+            top:175px;
+            left:5px;
+            right: 5px;
+            bottom: 5px;
+            height: auto;
+            width: auto;
+            overflow: auto;
+        }
+        .fixed-table-container{
+            margin-left: 10px;
+        }
+        #main{
+            min-width: 1270px;
+        }
+        .form_box >div{
+            margin-bottom: 2px;
+        }
+        .form-control{
+            border-radius: 2px;
+        }
+        .arrow{
+            position: absolute;
+            top: 50%;
+            left: 292px;
+            margin-top: -15px;
+            display: block;
+            width: 18px;
+            height: 30px;
+            background: #009cd6;
+            z-index: 6666666;
+            text-align: center;
+        }
+        .arrow:hover{
+            background: #009688;
+        }
+        .arrow i{
+            display: inline-block;
+            line-height: 30px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div id="main" style="width:100%;height:100%;margin:0 auto;position:relative">
+    <!--treearea start-->
+    <div id="treearea">
+        <div class="content_wrap" style="overflow-x: hidden;">
+            <div class="zTreeDemoBackground left" style="float: left;">
+                <p  style="font-size: 15px;height: 30px;line-height: 30px;margin-bottom: 0px;margin-top: 10px;text-align: left;">&nbsp;&nbsp;项目列表</p>
+                <hr style="height: 1px;border: none;border-top: 3px solid #18a594;margin-top: 0;margin-bottom: 0;margin-left: 10px;">
+                <div style="margin-top: 4px;width: 100%;">
+                    <input  id="search_project_name" value=""  style="width: 190px;height: 30px;margin-left: 9px;"/>
+                    <input type="button" id="search" value="搜索" style=""/>
+                </div>
+                <ul id="treeDemo"  class="ztree" style="width: 290px;border:0;"></ul>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="choosemenu" id="choosemenu" value=""/>
+    <!--treearea end-->
+
+    <!--arrow start-->
+    <span class="arrow">
+        <i class="fa fa-angle-double-left" ></i>
+    </span>
+    <!--arrow end-->
+
+    <div id="atp_wrapper" style="">
+        <div style="width: 90%;margin: 0 auto;padding: 0 10px;box-sizing: border-box">
+            <div class="" style="" id="top_nav">
+                <p class="name" style="font-size: 20px;height: 30px;line-height: 30px;margin-bottom: 10px;margin-top: 10px;">项目管理</p>
+                <div class="_box" style="margin-top: -5px;">
+                    <div class="form_box">
+                        <div>
+                            <label class=" control-label">项目名称：</label>
+                            <input id="name"  class="form-control" value="" style="display: inline-block;width: 250px;" type="text"  >
+                            <label class=" control-label" style="margin-left: 80px">领域：</label>
+                            <select id="domain" class="chosen-select" >
+                                <option value="">全部</option>
+                                <?php foreach($field as $key=>$value){ ?>
+                                <option value="{$value.val}"  >{$value.val}</option>
+                                <?php } ?>
+                            </select>
+                            <!--<label class=" control-label" style="margin-left: 80px">设计阶段：</label>-->
+                            <!--<select id="designstage" class="chosen-select" >-->
+                                <!--<option value="">全部</option>-->
+                                <!--<?php foreach($designStage as $key=>$value){ ?>-->
+                                <!--<option value="{$value.val}" >{$value.val}</option>-->
+                                <!--<?php } ?>-->
+                            <!--</select>-->
+                        </div>
+                    </div>
+                    <!--<div class="form_box">-->
+                        <!--<div>-->
+
+                            <!--<label class="control-label" style="margin-left: 80px">板块：</label>-->
+                            <!--<select id="bankuai" class="chosen-select" >-->
+                                <!--<option value="">全部</option>-->
+                                <!--<?php foreach($plate as $key=>$value){ ?>-->
+                                <!--<option value="{$value.val}">{$value.val}</option>-->
+                                <!--<?php } ?>-->
+                            <!--</select>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                    <div class="form_box">
+                        <div>
+                           <label class="control-label" style="">项目重要级：</label>
+                           <select id="level" class="chosen-select" >
+                               <option value="">全部</option>
+                               <?php foreach($importantLevel as $key=>$value){ ?>
+                               <option value="{$value.val}" >{$value.val}</option>
+                               <?php } ?>
+                           </select>
+                           <label class=" control-label" style="margin-left: 80px">项目依托室：</label>
+                           <select id="org" class="chosen-select" >
+                               <option value="">全部</option>
+                               <?php foreach($org as $key=>$value){ ?>
+                               <option value="{$value.id}" >{$value.org_name}</option>
+                               <?php } ?>
+                           </select>
+                        </div>
+                    </div>
+                    <div class="form_box">
+                        <div>
+                            <label class=" control-label">管理方式：</label>
+                            <select id="mngmode" class="chosen-select" >
+                                <option value="">全部</option>
+                                <?php foreach($manageWay as $key=>$value){ ?>
+                                <option value="{$value.val}" >{$value.val}</option>
+                                <?php } ?>
+                            </select>
+                            <a class="btn btn-warning " style="margin-left: 78px;" type="button" id="sys_add" >&nbsp;添加项目</a>
+                            <a class="btn btn-warning " style="margin-left: 10px;background: #9bc63e;border:1px #9bc63e solid" type="button" id="sys_updateproj" >&nbsp;修改项目</a>
+                            <button class="btn btn-info" style="margin-left: 10px;" type="button" id="sys_refresh">&nbsp;查询</button>
+                            <button class="btn btn-error" style="margin-left: 10px;" type="button" id="sys_del">&nbsp;删除</button>
+                            <a class="btn btn-error" id="score_rule" style="margin-left: 10px;background: #5FB878;border:1px #5FB878 solid" >&nbsp;打分规则管理</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content" style="overflow: auto" >
+                <table id="atpbiztable"  style="" ></table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="loading" role="dialog" data-backdrop='static'>
+    <div class="modal-dialog" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">处理中</h4>
+            </div>
+            <div class="modal-body">
+                <img src="__PUBLIC__/img/loading/loading9.gif" style='display: block;margin: 0 auto'>
+                <div id="loadingText" style="text-align: center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="sort" >
+<input type="hidden" id="sortOrder" >
+</body>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<script type="text/javascript">
+    layui.use('layer', function() {
+        layer = layui.layer;
+    })
+    $(".chosen-select").chosen({disable_search_threshold: 0, search_contains: true, width: '250px'});
+    var openNodes = [];
+    var setting = {
+        view: {
+            selectedMulti: false
+        },
+        data: {
+            simpleData: {
+                enable: true,
+                idKey: "id",
+                pIdKey: "pid",
+                rootPId: 0
+            }
+        },
+        callback: {
+            beforeClick:beforeClick,
+            onClick:onClick
+        }
+    };
+    var table = null;
+    var zNodes = null;
+    var departmentId = '0';
+    function beforeClick(event, treeId, treeNode, clickFlag) {
+    }
+    function onClick(event, treeId, treeNode, clickFlag) {
+
+        var resultZtree = $.fn.zTree.getZTreeObj("treeDemo");
+        var node =  resultZtree.getSelectedNodes()[0];
+        $('#choosemenu').val(node.id);
+        $('#atpbiztable').bootstrapTable('refresh');
+    }
+    $(document).ready(function() {
+        $.ajax({
+            url: "__CONTROLLER__/getProjectTree",
+            type: "post",
+            async: false,
+            dataType: "json",
+            success: function (data) {
+                zNodes = data;
+            },
+            error: function () {
+                layer.alert('获取数据失败');
+            }
+        });
+        $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+
+        var resultZtree = $.fn.zTree.getZTreeObj("treeDemo");
+        var node = resultZtree.getNodes()[0];
+    });
+
+    $('#search_project_name').bind('keypress', function (event) {
+        if(event.keyCode == "13"){
+            refreshZTree();
+        }
+    })
+    $('#search').click(function(){
+        refreshZTree();
+    })
+    function refreshZTree() {
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        openNodes = getOpenNode();
+        zTree.destroy();
+
+        $.ajax({
+            url: "__CONTROLLER__/getProjectTree",
+            type: "post",
+            async: false,
+            data :{openNodes:openNodes.join(','),search_name:$('#search_project_name').val()},
+            dataType: "json",
+            success: function (data) {
+                zNodes = data;
+            },
+            error: function () {
+                layer.alert('获取数据失败');
+            }
+        });
+        $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+    }
+    function getOpenNode(){
+        var resultZtree = $.fn.zTree.getZTreeObj("treeDemo");
+        var node =  resultZtree.getNodes();
+        var nodes = resultZtree.transformToArray(node);
+        var openNodes = [];
+        for(var i=1;i<nodes.length;i++){
+            if(nodes[i].open == true){
+                openNodes.push(nodes[i].id);
+            }
+        }
+        return openNodes;
+    }
+    var TableObj = {
+        oTableInit:function(){
+            $('#atpbiztable').bootstrapTable({
+                url: '__CONTROLLER__/getProjectData',         //请求后台的URL（*）
+                method: 'post',                      //请求方式（*）
+                toolbar: '#atpbiztoolbar',                //工具按钮用哪个容器
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                iconSize: 'outline',
+                sortable: true,                     //是否启用排序
+                sortName:"proj_planfinishtime",
+                sortOrder: "asc",                   //排序方式
+                queryParams:queryParams,
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 7,                       //每页的记录行数（*）
+                pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+//            strictSearch: true,
+                showColumns: false,                  //是否显示所有的列
+                showRefresh: false,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "proj_id",                     //每一行的唯一标识，一般为主键列
+                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                   //是否显示父子表
+                detailFormatter: "detailFormatter",
+                columns: [
+                    [
+                        {checkbox: true},
+                        {field: 'proj_name', title: '项目名称',sortable:true},
+                        {field: 'proj_code', title: '项目代号'},
+//                        {field: 'org_name', title: '部门',sortable:true},
+                        {field: 'proj_domain', title: '领域',sortable:true},
+//                        {field: 'proj_designstage', title: '设计阶段',sortable:true},
+//                        {field: 'proj_bankuai', title: '板块',width:130,sortable:true},
+                        {field: 'proj_level', title: '重要级别',sortable:true},
+                        {field: 'proj_status', title: '状态',sortable:true},
+                        {field: 'proj_secretlevel', title: '密级',sortable:true,formatter:function(value,row){
+                            var secretcode_isupdate = row['secretcode_isupdate'];
+                            if(secretcode_isupdate == '1'){
+                                return value+"<br><span style='color:red'>(被篡改)</span>";
+                            }else{
+                                return value;
+                            }
+                        }},
+                        {field: 'proj_starttime', title: '立项时间',sortable:true},
+                        {field: 'proj_planfinishtime', title: '计划完成时间',sortable:true},
+                        {field: 'proj_realfinishtime', title: '实际完成时间',sortable:true},
+                        {field: 'proj_id', title: '操作',formatter:function(value, row, index){
+                            var inp = "'"+  value +"'";
+                            var a = '';
+                            a += '<a style="width:90px;height:30px;line-height:30px;"   class="layui-btn " onclick="exportProject('+ inp +')">导出报告</a>';
+                            a += '<a style="width:60px;height:30px;line-height:30px;margin-top:3px;"   class="layui-btn layui-btn-danger" onclick="closeProject('+ inp +')">结束</a>';
+                            return a;
+                        }}
+                    ]
+                ]
+                , onDblClickRow: function (row) {
+                    layer.open({
+                        title: '项目编辑',
+                        type: 2,
+                        content: '__CONTROLLER__/add?proj_id='+row['proj_id'],
+                        maxmin: true,
+                        closeBtn:1,
+                        shadeClose:true,
+                        area: ['1000px', '640px']
+                    });
+                }
+            });
+        }
+    }
+    TableObj.oTableInit();
+    $('#back').click(function(){
+        history.go(-1)
+    })
+    $('#sys_refresh').on('click',function() {
+        $('#atpbiztable').bootstrapTable('destroy')
+        TableObj.oTableInit();
+    });
+    function queryParams(params){  //配置参数
+        var choosemenu = $('#choosemenu').val();
+        if(choosemenu == '' || choosemenu == undefined) choosemenu = '0';
+        return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            limit: params.limit,   //页面大小
+            offset: params.offset,  //页码
+            sort: params.sort,  //排序列名
+            order: params.order,//排位命令（desc，asc）
+            choosemenu :choosemenu,
+            name :$('#name').val(),
+            designstage :$('#designstage').val(),
+            domain :$('#domain').val(),
+            bankuai :$('#bankuai').val(),
+            level :$('#level').val(),
+            org :$('#org').val(),
+            mngmode :$('#mngmode').val()
+        };
+        return temp;
+    }; //传递参数（*）
+
+   
+    $("#sys_search").on("click",function(){
+        $('#atpbiztable').bootstrapTable("refresh");
+    });
+    $('#sys_add').on('click',function(){
+        var parentProject = $('#choosemenu').val();
+        layer.open({
+            title: '项目编辑',
+            type: 2,
+            content: '__CONTROLLER__/add?parentProject='+parentProject,
+            maxmin: true,
+            closeBtn:1,
+            shadeClose:true,
+            area: ['1000px', '640px']
+        });
+    });
+
+    $('#score_rule').click(function(){
+        var href = '__MODULE__/DomainDescribe/add';
+        layer.open({
+            title: '打分规则管理',
+            type: 2,
+            content:href,
+            maxmin: true,
+            closeBtn:1,
+            shadeClose:true,
+            area: ['80%', '80%']
+        });
+    })
+    $('#sys_updateproj').on('click',function(){
+        var tablerow = $('#atpbiztable').bootstrapTable('getSelections');
+        if(tablerow.length!=1)
+        {
+            layer.alert("您已多选或者少选，仅能对一条数据进行操作");
+        }
+        else {
+            layer.open({
+                title: '项目编辑',
+                type: 2,
+                content: '__CONTROLLER__/add?proj_id='+tablerow[0]['proj_id'],
+                maxmin: true,
+                closeBtn:1,
+                shadeClose:true,
+                area: ['1000px', '640px']
+            });
+        }
+    });
+
+    $('#sys_del').on('click',function() {
+        var tablerow = $('#atpbiztable').bootstrapTable('getSelections');
+        if (tablerow.length == 0) {
+            layer.alert("您尚未选择数据");
+        } else {
+
+            layer.confirm('确认删除' + tablerow.length + '条数据?' ,
+            {btn:['确定','取消']}
+            ,function(){
+                var ids = [];
+                $.each(tablerow, function () {
+                    ids.push(this['proj_id']);
+                });
+                $.ajax({
+                    type:'post',
+                    url:'__CONTROLLER__/delProject',
+                    data:{ids: ids.join(',')},
+                    dataType :'json',
+                    success:function(data){
+                        if(data.code > 0){
+                            layer.alert('操作成功');
+                        }else{
+                            layer.alert(data.message);
+                        }
+                        refreshZTree();
+                        $('#atpbiztable').bootstrapTable('refresh')
+                    }
+                })
+            })
+        }
+    });
+
+    function exportProject(id){
+        $('#loading').modal('show');
+        var t = "__MODULE__/Project/exportWord?proj_id="+id;
+        t = encodeURI(t);
+        $.ajax({
+            type:'get',
+            url: t,
+            dataType:'json',
+            success:function(data){
+                $('#loading').modal('hide');
+                if(data.code > 0){
+                    location.href = data.message;
+                }else{
+                    layer.msg('无数据');
+                }
+            }
+        })
+    }
+
+    function closeProject(id){
+        $.ajax({
+            type:'post',
+            url: '__MODULE__/Project/closeProject',
+            data :{id:id},
+            dataType:'json',
+            success:function(data){
+                if(data.code>0){
+                    layer.msg(data.message);
+                    refreshZTree();
+                    $('#atpbiztable').bootstrapTable('refresh')
+                }else{
+                    layer.msg(data.message);
+                }
+            }
+        })
+    }
+
+
+</script>
+</html>
+
+
+
+
+

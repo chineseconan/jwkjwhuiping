@@ -1,0 +1,1218 @@
+﻿<?php showViewsByPower(); ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="description" content="">
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.css">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/zTree_v3/css/zTreeStyle/zTreeStyle.css" type="text/css">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+    <title>风险管理</title>
+    <style>
+        body,html{
+            font-family: 微软雅黑;
+            width: 100%;
+            height: 100%;
+        }
+        .form-group >div{
+            margin-top: 3px;
+            margin-bottom: 3px;
+        }
+        .control-label:nth-of-type(even){
+            margin-left: 20px;
+        }
+        #search {
+            width: 50px;
+            border: 0;
+            height: 30px;
+            background-color: #009688;
+            line-height: 24px;
+            color: #fff;
+        }
+        .z-tab button{
+            margin: 10px 10px;
+        }
+        /*.main{*/
+            /*width:100%;*/
+            /*height:100%;*/
+            /*position:relative;*/
+        /*}*/
+        #treearea{
+            position: absolute;
+            left:5px;
+            top:0;
+            bottom:0;
+            width:300px;
+            height:auto;
+            overflow:auto;
+            border: 1px solid #E2E2E2;
+        }
+        #atp_wrapper{
+            position: absolute;
+            top:0;
+            left: 310px;
+            right: 0;
+            bottom:0;
+            width: auto;
+            height:auto;
+            overflow: hidden;
+            border: 1px solid #E2E2E2;
+        }
+        #atp_wrapper #top_nav{
+            position: absolute;
+            top:0;
+            left:5px;
+            right:0;
+            width:auto;
+            height:150px;
+        }
+        #atp_wrapper .content{
+            position: absolute;
+            left:5px;
+            top:150px;
+            bottom: 0;
+            height: auto;
+            width: 100%;
+            overflow: hidden;
+        }
+        .fixed-table-toolbar{
+            display: none;
+        }
+        .modal-body{
+            padding: 0!important;
+        }
+        .mainBox{
+            height: 100% ;
+            width: 100%;
+            overflow: auto;
+        }
+        iframe{
+            width: 100%;
+            height: 99%;
+            overflow-y: hidden;
+        }
+        .show_div{
+            height: 100%;
+            overflow-y: auto;
+        }
+        .mainBox{
+            min-width: 1268px;
+            width:100%;
+            height:100%;
+            margin:0 auto;
+            position:relative;
+        }
+        .arrow{
+            position: absolute;
+            top: 50%;
+            left: 292px;
+            margin-top: -15px;
+            display: block;
+            width: 18px;
+            height: 30px;
+            background: #009cd6;
+            z-index: 6666666;
+            text-align: center;
+        }
+        .arrow:hover{
+            background: #009688;
+        }
+        .arrow i{
+            display: inline-block;
+            line-height: 30px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div class="mainBox">
+    <!--treearea start-->
+    <div id="treearea">
+        <div class="content_wrap" style="overflow-x: hidden;">
+            <div class="zTreeDemoBackground left" style="float: left;">
+                <p  style="font-size: 15px;height: 30px;line-height: 30px;margin-bottom: 0px;margin-top: 10px;text-align: left;">&nbsp;&nbsp;项目列表</p>
+                <hr style="height: 1px;border: none;border-top: 3px solid #18a594;margin-top: 0;margin-bottom: 0;margin-left: 10px;">
+                <div style="margin-top: 4px;width: 100%;">
+                    <input  id="search_project_name" value=""  style="width: 190px;height: 30px;margin-left: 9px;"/>
+                    <input type="button" id="search" value="搜索" style=""/>
+                </div>
+                <ul id="treeDemo"  class="ztree" style="width: 290px;border:0;"></ul>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="choosemenu" id="choosemenu" value=""/>
+
+    <!--arrow start-->
+    <span class="arrow">
+        <i class="fa fa-angle-double-left" ></i>
+    </span>
+    <!--arrow end-->
+
+    <!--atp_wrapper start-->
+    <div id="atp_wrapper">
+    <div class=" main" >
+        <div class="" id="top_nav">
+                        <span class="z-tab " style="display: inline-block;padding: 10px 0 0 10px;">
+                            <button class="btn btn-info tab" style="width: 150px;color: #fff;background: #2e63c2" type="button"  >&nbsp;我创建</button>
+                            <button class="btn btn-info tab" style="width: 150px;color: black;background: #fff" type="button" >&nbsp;我负责</button>
+                            <button class="btn btn-info tab" style="width: 150px;color: black;background: #fff" type="button">&nbsp;历史风险</button>
+                        </span>
+                        <div class="searchContentBox">
+                            <div class="searchContent" style="margin-top: 10px;padding-left: 20px;box-sizing: border-box">
+                                <div table="mycreate" style="margin-left: 5px;" >
+                                    <label class=" control-label">风险名称：</label>
+                                    <input id="risk_name_mycreate"  class="form-control" value="" style="display: inline-block;width: 240px;" type="text"  >
+                                    <label class=" control-label" style="margin-left: 20px">风险阶段：</label>
+                                    <select id="risk_stage_mycreate" class="chosen-select2" >
+                                        <option value="">全部</option>
+                                        <?php foreach($riskStage as $key=>$value){ ?>
+                                        <option value="{$value.val}" >{$value.val}</option>
+                                        <?php } ?>
+                                    </select>
+                                    <button class="btn btn-info sys_refresh" id="mycreate_refresh" style="margin-left: 10px;margin-right: 10px" type="button" >&nbsp;查询</button>
+                                    <button class="btn btn-warning sys_add" style="" type="button" >&nbsp;添加</button>
+                                </div>
+                                <div table="mycreate"  style="margin-left: 5px;margin-top: 6px" >
+                                    <label class=" control-label">风险领域：</label>
+                                    <select id="risk_field_mycreate" class="chosen-select2" >
+                                        <option value="">全部</option>
+                                        <?php foreach($riskField as $key=>$value){ ?>
+                                        <option value="{$value.val}"  >{$value.val}</option>
+                                        <?php } ?>
+                                    </select>
+
+                                    <label class=" control-label" style="margin-left: 20px">风险状态：</label>
+                                    <select id="risk_status_mycreate" class="chosen-select2" >
+                                        <option value="">全部</option>
+                                        <?php foreach($riskStatus as $key=>$value){ ?>
+                                        <option value="{$value.val}"  >{$value.val}</option>
+                                        <?php } ?>
+                                    </select>
+                                    <button class="btn btn-warning sys_update" style="margin-left: 10px;margin-right: 10px" type="button"  >&nbsp;修改</button>
+                                    <button class="btn btn-error sys_del" style="" type="button" >&nbsp;删除</button>
+                                    <button class="btn btn-info" style="margin-left: 10px;background: #f8d802;border:1px #f8d802 solid" type="button" id="sys_export_create">&nbsp;导出</button>
+                                </div>
+                            </div>
+                            <div class="searchContent"  style="margin-top: 10px;padding-left: 20px;box-sizing: border-box;display: none" >
+                                <div style="margin-left: 5px;" table="myduty"  >
+                                    <label class=" control-label">风险名称：</label>
+                                    <input id="risk_name_myduty"  class="form-control" value="" style="display: inline-block;width: 240px;" type="text"  >
+                                    <label class=" control-label" style="margin-left: 20px">风险阶段：</label>
+                                    <select id="risk_stage_myduty" class="chosen-select2" >
+                                        <option value="">全部</option>
+                                        <?php foreach($riskStage as $key=>$value){ ?>
+                                        <option value="{$value.val}" >{$value.val}</option>
+                                        <?php } ?>
+                                    </select>
+                                    <button class="btn btn-info sys_refresh" id="myduty_refresh" style="margin: 0 10px 0 10px;" type="button" >&nbsp;查询</button>
+                                    <a class="btn btn-warning sys_add" style="" type="button"  >&nbsp;添加</a>
+                                </div>
+                                <div  style="margin-left: 5px;margin-top: 6px" table="myduty">
+                                    <label class=" control-label">风险领域：</label>
+                                    <select id="risk_field_myduty" class="chosen-select2" >
+                                        <option value="">全部</option>
+                                        <?php foreach($riskField as $key=>$value){ ?>
+                                        <option value="{$value.val}"  >{$value.val}</option>
+                                        <?php } ?>
+                                    </select>
+
+                                    <label class=" control-label" style="margin-left: 20px">风险状态：</label>
+                                    <select id="risk_status_myduty" class="chosen-select2" >
+                                        <option value="">全部</option>
+                                        <?php foreach($riskStatus as $key=>$value){ ?>
+                                        <option value="{$value.val}"  >{$value.val}</option>
+                                        <?php } ?>
+                                    </select>
+                                    <button class="btn btn-warning sys_update" style="margin: 0 10px 0 10px;" type="button" >&nbsp;修改</button>
+                                    <button class="btn btn-error sys_del" style=";" type="button" >&nbsp;删除</button>
+                                    <button class="btn btn-info" style="margin-left: 10px;background: #f8d802;border:1px #f8d802 solid" type="button" id="sys_export_duty">&nbsp;导出</button>
+                                </div>
+                            </div>
+                            <div class="searchContent"  style="margin-top: 10px;padding-left: 20px;box-sizing: border-box;display: none">
+                                    <div style="margin-left: 5px;" table="history">
+                                        <label class=" control-label">风险名称：</label>
+                                        <input id="risk_name_history"  class="form-control" value="" style="display: inline-block;width: 240px;" type="text"  >
+                                        <label class=" control-label" style="margin-left: 20px">风险阶段：</label>
+                                        <select id="risk_stage_history" class="chosen-select2" >
+                                            <option value="">全部</option>
+                                            <?php foreach($riskStage as $key=>$value){ ?>
+                                            <option value="{$value.val}" >{$value.val}</option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+                                    <div  style="margin-left: 5px;margin-top: 6px;margin-bottom: 10px" table="history">
+                                        <label class=" control-label">风险领域：</label>
+                                        <select id="risk_field_history" class="chosen-select2" >
+                                            <option value="">全部</option>
+                                            <?php foreach($riskField as $key=>$value){ ?>
+                                            <option value="{$value.val}"  >{$value.val}</option>
+                                            <?php } ?>
+                                        </select>
+
+                                        <label class=" control-label" style="margin-left: 20px">风险状态：</label>
+                                        <select id="risk_status_history" class="chosen-select2" >
+                                            <option value="">全部</option>
+                                            <?php foreach($riskStatus as $key=>$value){ ?>
+                                            <option value="{$value.val}"  >{$value.val}</option>
+                                            <?php } ?>
+                                        </select>
+                                        <button class="btn btn-info sys_refresh"  id="history_refresh" style="margin:0 10px 0 10px;" type="button" >&nbsp;查询</button>
+                                        <button class="btn btn-info" style="background: #f8d802;border:1px #f8d802 solid" type="button" id="sys_export_history">&nbsp;导出</button>
+
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" content" style="margin-top: 10px">
+                        <div class="show_div"  style="margin-top: 20px;height: 100%">
+                            <!--table-->
+                            <div style="margin: 0 auto;padding: 0 15px 15px;box-sizing: border-box;">
+                                <table id="mycreate" style="overflow: auto;"></table>
+                            </div>
+                           <!--table-->
+                        </div>
+                        <div class="show_div"  style="display: none;height: 100%;margin-top: 20px;">
+                            <div style="overflow: auto;margin: 0 auto;padding: 0 15px 12px;box-sizing: border-box;">
+                                <table id="myduty" style="overflow: auto;"></table>
+                            </div>
+                        </div>
+                        <div class="show_div"  style="display: none;height:100%;margin: 20px 0 0 0;">
+                            <div style="overflow: auto;margin: 0 auto;padding: 0 15px 12px;box-sizing: border-box;">
+                                <table id="history" style=""></table>
+                            </div>
+                        </div>
+                    </div>
+    </div>
+</div>
+</div>
+<div class="modal fade" id="loading" role="dialog" data-backdrop='static'>
+    <div class="modal-dialog" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">处理中</h4>
+            </div>
+            <div class="modal-body">
+                <img src="__PUBLIC__/img/loading/loading9.gif" style='display: block;margin: 0 auto'>
+                <div id="loadingText" style="text-align: center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="sort_create">
+<input type="hidden" id="sortOrder_create">
+<input type="hidden" id="sort_duty">
+<input type="hidden" id="sortOrder_duty">
+<input type="hidden" id="sort_history">
+<input type="hidden" id="sortOrder_history">
+</body>
+<script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/locale/bootstrap-table-zh-CN.js"></script>
+<script src="__PUBLIC__/vendor/zTree_v3/js/jquery.ztree.core.js"></script>
+<script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/vendor/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+<script src="__PUBLIC__/vendor/chosen-ajax-addition/chosen.ajaxaddition.jquery.js"></script>
+<script src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script src="__PUBLIC__/js/flex.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<script type="text/javascript">
+    layui.use('layer', function() {
+        layer = layui.layer;
+        $(".chosen-select2").chosen({disable_search_threshold: 0, search_contains: true, width: '240px'});
+        var total = $(window.parent.window).height();
+        colHeight = total-30;
+
+        var openNodes = [];
+        var setting = {
+            view: {
+                selectedMulti: false
+            },
+            data: {
+                simpleData: {
+                    enable: true,
+                    idKey: "id",
+                    pIdKey: "pid",
+                    rootPId: 1
+                }
+            },
+            callback: {
+                onClick:onClick
+            }
+        };
+        createIsLoad = false;
+        dutyIsLoad = false;
+        historyIsLoad = false;
+        function onClick(event, treeId, treeNode, clickFlag) {
+            var resultZtree = $.fn.zTree.getZTreeObj("treeDemo");
+            var node =  resultZtree.getSelectedNodes()[0];
+            var index = $('.show_div:visible').index();
+            $('#choosemenu').val(node.id);
+
+            if(index ==0){
+                $('#mycreate').bootstrapTable('refresh');
+            }else if (index == 1){
+                $('#myduty').bootstrapTable('refresh');
+            }else{
+                $('#history').bootstrapTable('refresh');
+            }
+        }
+        $(document).ready(function() {
+            $.ajax({
+                url: "__MODULE__/Project/createRiskProjectTree",
+                type: "post",
+                async: false,
+                data :{openNodes:openNodes.join(','),search_name:$('#search_project_name').val()},
+                dataType: "json",
+                success: function (data) {
+                    if(data.code == -1001){
+                        layer.alert('请先登录');
+                        location.href='__MODULE__/Index/index';
+                    }else{
+                        zNodes = data;
+                    }
+                },
+                error: function () {
+                    layer.alert('获取数据失败');
+                }
+            });
+            $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+        });
+
+        $('.tab').on('click',function(){
+            $(this).css('background', '#2e63c2');
+            $(this).css('color', '#fff');
+            $(this).siblings().css('background', '#fff');
+            $(this).siblings().css('color', 'black');
+            var index = $(this).index();
+            $('.searchContent').eq(index).show();
+            $('.searchContent').eq(index).siblings().hide();
+
+            $('.show_div').eq(index).show();
+            $('.show_div').eq(index).siblings().hide();
+            $('#choosemenu').val('');
+            switch(index){
+                case 0:
+                    refreshZTree('createRiskProjectTree');
+                    if(createIsLoad === true){
+                        $('#mycreate').bootstrapTable('destroy');
+                    }else{
+                        createIsLoad = true;
+                    }
+                    TableObj_mycreate.oTableInit();
+                    break;
+                case 1:
+                    refreshZTree('dutyRiskProjectTree');
+                    if(dutyIsLoad === true){
+                        $('#myduty').bootstrapTable('destroy');
+                    }else{
+                        dutyIsLoad = true;
+                    }
+                    TableObj_myduty.oTableInit();
+                    break;
+                case 2:
+                    refreshZTree('getHistoryRiskTree');
+                    if(historyIsLoad === true){
+                        $('#history').bootstrapTable('destroy');
+                    }else{
+                        historyIsLoad = true;
+                    }
+                    TableObj_history.oTableInit();
+                    break;
+            }
+        });
+        $('#search_risk_name').bind('keypress', function (event) {
+            if(event.keyCode == "13"){
+                var index = $('.show_div:visible').index();
+                switch(index){
+                    case 0:
+                        refreshZTree('createRiskProjectTree');
+                        break;
+                    case 1:
+                        refreshZTree('dutyRiskProjectTree');
+                        break;
+                    case 2:
+                        refreshZTree('getHistoryRiskTree');
+                        break;
+                }
+            }
+        })
+        $('#search').click(function(){
+            var index = $('.show_div:visible').index();
+            switch(index){
+                case 0:
+                    refreshZTree('createRiskProjectTree');
+                    break;
+                case 1:
+                    refreshZTree('dutyRiskProjectTree');
+                    break;
+                case 2:
+                    refreshZTree('getHistoryRiskTree');
+                    break;
+            }
+        })
+
+        function refreshZTree(param) {
+            openNodes = getOpenNode();
+            if(param){
+                url = "__MODULE__/Project/"+param;
+            }else{
+                url = "__MODULE__/Project/createRiskProjectTree";
+            }
+            $.ajax({
+                url: url,
+                type: "post",
+                async: false,
+                data :{openNodes:openNodes.join(','),search_name:$('#search_project_name').val()},
+                dataType: "json",
+                success: function (data) {
+                    if(data.code == -1001){
+                        layer.msg('请先登录');
+                        location.href='__MODULE__/Index/index';
+                    }else{
+                        zNodes = data;
+                    }
+                },
+                error: function () {
+                    layer.msg('获取数据失败');
+                }
+            });
+            $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+        }
+        function getOpenNode(){
+            var resultZtree = $.fn.zTree.getZTreeObj("treeDemo");
+            var node =  resultZtree.getNodes();
+            var nodes = resultZtree.transformToArray(node);
+            var openNodes = [];
+            for(var i=1;i<nodes.length;i++){
+                if(nodes[i].open == true){
+                    openNodes.push(nodes[i].id);
+                }
+            }
+            return openNodes;
+        }
+
+        var TableObj_mycreate = {
+            oTableInit:function(){
+                $('#mycreate').bootstrapTable({
+                     classes:'table',
+                    url: '__CONTROLLER__/myCreateRisk',         //请求后台的URL（*）
+                    method: 'post',                      //请求方式（*）
+                    toolbar: '#atpbiztoolbar',                //工具按钮用哪个容器
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: true,                   //是否显示分页（*）
+                    iconSize: 'outline',
+                    sortable: true,                     //是否启用排序
+                    sortName:"risk_tianbaotime",
+                    sortOrder: "desc",                   //排序方式
+                    queryParams:queryParam_mycreate,
+                    sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                    pageNumber: 1,                       //初始化加载第一页，默认第一页
+                    pageSize: 7,                       //每页的记录行数（*）
+                    pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                    search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+//            strictSearch: true,
+                    showColumns: false,                  //是否显示所有的列
+                    showRefresh: false,                  //是否显示刷新按钮
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                    uniqueId: "risk_id",                     //每一行的唯一标识，一般为主键列
+                    showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    detailView: false,                   //是否显示父子表
+                    detailFormatter: "detailFormatter",
+                    columns: [
+                        [
+                            {checkbox: true},
+                            {field: 'risk_name', title: '风险名称',sortable:true,formatter:function(value,row){
+                                var risk_id = "'"+  row['risk_id'] +"'";
+                                return '<a style="color:blue" onclick="riskDetail('+risk_id+')" >'+value+'</a>';
+                            }},
+                            {field: 'proj_code', title: '所属项目',sortable:true},
+                            {field: 'risk_type', title: '类型',sortable:true},
+                            {field: 'risk_status', title: '状态',sortable:true},
+                            {field: 'risk_stage', title: '阶段',sortable:true},
+                            {field: 'risk_domain', title: '领域',sortable:true},
+                            {field: 'risk_level', title: '风险等级',sortable:true,formatter:function(value){
+                                switch (value){
+                                    case '1':
+                                        return 'I';
+                                        break;
+                                    case '2':
+                                        return 'II';
+                                        break;
+                                    case '3':
+                                        return 'III';
+                                        break;
+                                    case '4':
+                                        return 'IV';
+                                        break;
+                                }
+                            }},
+                            {field: 'risk_secretlevel', title: '密级',width:70,sortable:true,formatter:function(value,row){
+                                var secretcode_isupdate = row['secretcode_isupdate'];
+                                if(secretcode_isupdate == '1'){
+                                    return value+"<br><span style='color:red'>(被篡改)</span>";
+                                }else{
+                                    return value;
+                                }
+                            }},
+                            {field: 'risk_tianbaotime', title: '风险填报时间',sortable:true},
+                            {field: 'risk_planclosetime', title: '预计关闭时间',sortable:true},
+                            {field: '', title: '风险瀑布',formatter: function (value,row) {
+                                var inp = "'"+  row['risk_id'] +"'";
+                                return '<a onclick="riskFall('+inp+')" style="cursor:pointer"><img src="__PUBLIC__/img/icon-bar.png"></a>';
+                            }},
+                            {field: 'risk_id', title: '操作', sortable: false,
+                                formatter: function (value, row, index) {
+                                    var inp = "'"+  value +"'";
+                                    var a ='';
+                                    if(row['risk_status'] == '计划'){
+                                        a += '<a style="width:60px;height:30px;line-height:30px;"   class="layui-btn " onclick="pubRisk('+ inp +')">发布</a>';
+                                    }else if(row['risk_status'] == '已发布'){
+                                        a += '<a  style="width:60px;height:30px;line-height:30px;" class="layui-btn layui-btn-danger " onclick="closeRisk('+ inp +')">关闭</a>';
+                                    }else if(row['risk_status'] == '关闭'){
+                                        a += '<a  style="width:60px;height:30px;line-height:30px;" class="layui-btn layui-btn-danger " onclick="restartRisk('+ inp +')">重启</a>';
+                                    }else if(row['risk_status'] == '关闭被退回'){
+                                        a += '<a  style="width:90px;height:30px;line-height:30px;" class="layui-btn layui-btn-danger layui-btn-normal" onclick="againCloseRisk('+ inp +')">重新关闭</a>';
+                                    }
+                                    return a;
+                                }
+                            }
+                        ]
+                    ],onDblClickRow: function (row) {
+                        parent.layer.open({
+                            title: '风险编辑',
+                            type: 2,
+                            content: '__CONTROLLER__/add?risk_id='+row['risk_id']+'&from=desk',
+                            maxmin: true,
+                            closeBtn:1,
+                            shadeClose:true,
+                            area: ['1000px', '600px']
+                        });
+                    },onLoadSuccess:function(rows){
+                        if(parseInt(rows.total) > 0) {
+                            var data = rows.rows;
+                            var tr = $('#mycreate tbody tr');
+                            var len = tr.length;
+                            for (var i = 0; i < len; i++) {
+                                var level = data[i].risk_level;
+                                switch (level) {
+                                    case '1':
+                                        tr.eq(i).children().eq(7).css('background', '#00ff00');
+                                        break;
+                                    case '2':
+                                        tr.eq(i).children().eq(7).css('background', '#ffff00');
+                                        break;
+                                    case '3':
+                                        tr.eq(i).children().eq(7).css('background', '#ff6600');
+                                        break;
+                                    case '4':
+                                        tr.eq(i).children().eq(7).css('background', '#ff0000');
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        TableObj_mycreate.oTableInit();
+
+
+        function queryParam_mycreate(params){  //配置参数
+            $('#sortOrder_create').val(params.order);
+            $('#sort_create').val(params.sort);
+            var choosemenu = $('#choosemenu').val();
+            return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                limit: params.limit,   //页面大小
+                offset: params.offset,  //页码
+                sort: params.sort,  //排序列名
+                order: params.order,//排位命令（desc，asc）
+                choosemenu :choosemenu,
+                risk_name :$('#risk_name_mycreate').val(),
+                risk_field :$('#risk_field_mycreate').val(),
+                risk_stage :$('#risk_stage_mycreate').val(),
+                risk_status :$('#risk_status_mycreate').val(),
+                search_name:$('#search_project_name').val()
+            };
+            return temp;
+        }; //传递参数（*）
+
+        $('#sys_export_create').click(function(){
+            $('#loading').modal('show');
+            var order = $('#sortOrder_create').val();
+            var sort = $('#sort_create').val();
+            var choosemenu = $('#choosemenu').val();
+            if(choosemenu == '' || choosemenu == undefined) choosemenu = '0';
+
+            var risk_name =$('#risk_name_mycreate').val();
+            var risk_field =$('#risk_field_mycreate').val();
+            var risk_stage =$('#risk_stage_mycreate').val();
+            var risk_status=$('#risk_status_mycreate').val();
+            var search_name = $('#search_project_name').val()
+            var t = "__CONTROLLER__/myCreateRiskWithExport?choosemenu="+choosemenu+"&sort="+sort+"&order="+order+"&risk_name="+risk_name+"&risk_field="+risk_field+"&risk_stage="+risk_stage+'&risk_status='+risk_status+'&search_name='+search_name;
+            t = encodeURI(t);
+            $.ajax({
+                type:'get',
+                url: t,
+                dataType:'json',
+                success:function(data){
+                    $('#loading').modal('hide');
+                    if(data.code > 0){
+                        location.href = data.message;
+                    }else{
+                        layer.msg(data.message);
+                    }
+                }
+            })
+        })
+        var TableObj_myduty = {
+            oTableInit:function(){
+                $('#myduty').bootstrapTable({
+                     classes:'table',
+                    url: '__CONTROLLER__/myDutyRisk',         //请求后台的URL（*）
+                    method: 'post',                      //请求方式（*）
+                    toolbar: '#atpbiztoolbar',                //工具按钮用哪个容器
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: true,                   //是否显示分页（*）
+                    iconSize: 'outline',
+                    sortable: true,                     //是否启用排序
+                    sortName:"risk_tianbaotime",
+                    sortOrder: "desc",                   //排序方式
+                    queryParams:queryParam_myduty,
+                    sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                    pageNumber: 1,                       //初始化加载第一页，默认第一页
+                    pageSize: 7,                       //每页的记录行数（*）
+                    pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                    search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+//            strictSearch: true,
+                    showColumns: false,                  //是否显示所有的列
+                    showRefresh: false,                  //是否显示刷新按钮
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                    uniqueId: "risk_id",                     //每一行的唯一标识，一般为主键列
+                    showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    detailView: false,                   //是否显示父子表
+                    detailFormatter: "detailFormatter",
+                    columns: [
+                        [
+                            {checkbox: true},
+                            {field: 'risk_name', title: '风险名称',sortable:true,formatter:function(value,row){
+                                var risk_id = "'"+  row['risk_id'] +"'";
+                                return '<a style="color:blue" onclick="riskDetail('+risk_id+')" >'+value+'</a>';
+                            }},
+                            {field: 'proj_code', title: '所属项目',sortable:true},
+                            {field: 'risk_type', title: '类型',sortable:true},
+                            {field: 'risk_status', title: '状态',sortable:true},
+                            {field: 'risk_stage', title: '阶段',sortable:true},
+                            {field: 'risk_domain', title: '领域',sortable:true},
+                            {field: 'risk_level', title: '风险等级',sortable:true,formatter:function(value){
+                                switch (value){
+                                    case '1':
+                                        return 'I';
+                                        break;
+                                    case '2':
+                                        return 'II';
+                                        break;
+                                    case '3':
+                                        return 'III';
+                                        break;
+                                    case '4':
+                                        return 'IV';
+                                        break;
+                                }
+                            }},
+                            {field: 'risk_secretlevel', title: '密级',width:70,sortable:true,formatter:function(value,row){
+                                var secretcode_isupdate = row['secretcode_isupdate'];
+                                if(secretcode_isupdate == '1'){
+                                    return value+"<br><span style='color:red'>(被篡改)</span>";
+                                }else{
+                                    return value;
+                                }
+                            }},
+                            {field: 'risk_tianbaotime', title: '风险填报时间',sortable:true},
+                            {field: 'risk_planclosetime', title: '预计关闭时间',sortable:true},
+                            {field: '', title: '风险瀑布',formatter: function (value,row) {
+                                var inp = "'"+  row['risk_id'] +"'";
+                                return '<a onclick="riskFall('+inp+')" style="cursor:pointer"><img src="__PUBLIC__/img/icon-bar.png"></a>';
+                            }},
+                            {field: 'risk_id', title: '操作', sortable: false,
+                                formatter: function (value, row, index) {
+                                    var inp = "'"+  value +"'";
+                                    var a ='';
+                                    if(row['risk_status'] == '计划'){
+                                        a += '<a style="width:60px;height:30px;line-height:30px;"   class="layui-btn " onclick="pubRisk('+ inp +')">发布</a>';
+                                    }else if(row['risk_status'] == '已发布'){
+                                        a += '<a  style="width:60px;height:30px;line-height:30px;" class="layui-btn layui-btn-danger " onclick="closeRisk('+ inp +')">关闭</a>';
+                                    }else if(row['risk_status'] == '关闭'){
+                                        a += '<a  style="width:60px;height:30px;line-height:30px;" class="layui-btn layui-btn-danger " onclick="restartRisk('+ inp +')">重启</a>';
+                                    }else if(row['risk_status'] == '关闭被退回'){
+                                        a += '<a  style="width:90px;height:30px;line-height:30px;" class="layui-btn layui-btn-danger layui-btn-normal" onclick="againCloseRisk('+ inp +')">重新关闭</a>';
+                                    }
+                                    return a;
+                                }
+                            }
+                        ]
+                    ], onDblClickRow: function (row) {
+                        parent.layer.open({
+                            title: '风险编辑',
+                            type: 2,
+                            content: '__CONTROLLER__/add?risk_id='+row['risk_id']+'&from=desk',
+                            maxmin: true,
+                            closeBtn:1,
+                            shadeClose:true,
+                            area: ['1000px', '530px']
+                        });
+                    },onLoadSuccess:function(rows){
+                        if(parseInt(rows.total) > 0){
+                            var data = rows.rows;
+                            var tr = $('#myduty tbody tr');
+                            var len = tr.length;
+                            for (var i = 0; i < len; i++) {
+                                var level = data[i].risk_level;
+                                switch (level){
+                                    case '1':
+                                        tr.eq(i).children().eq(7).css('background', '#00ff00');
+                                        break;
+                                    case '2':
+                                        tr.eq(i).children().eq(7).css('background', '#ffff00');
+                                        break;
+                                    case '3':
+                                        tr.eq(i).children().eq(7).css('background', '#ff6600');
+                                        break;
+                                    case '4':
+                                        tr.eq(i).children().eq(7).css('background', '#ff0000');
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+//        TableObj_myduty.oTableInit();
+
+
+        function queryParam_myduty(params){  //配置参数
+            var choosemenu = $('#choosemenu').val();
+            $('#sortOrder_duty').val(params.order);
+            $('#sort_duty').val(params.sort);
+            return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                limit: params.limit,   //页面大小
+                offset: params.offset,  //页码
+                sort: params.sort,  //排序列名
+                order: params.order,//排位命令（desc，asc）
+                choosemenu :choosemenu,
+                risk_name :$('#risk_name_myduty').val(),
+                risk_field :$('#risk_field_myduty').val(),
+                risk_stage :$('#risk_stage_myduty').val(),
+                risk_status :$('#risk_status_myduty').val(),
+                search_name:$('#search_project_name').val()
+            };
+            return temp;
+        }; //传递参数（*）
+        $('#sys_export_duty').click(function(){
+            $('#loading').modal('show');
+            var order = $('#sortOrder_duty').val();
+            var sort = $('#sort_duty').val();
+            var choosemenu = $('#choosemenu').val();
+            if(choosemenu == '' || choosemenu == undefined) choosemenu = '0';
+
+            var risk_name =$('#risk_name_myduty').val();
+            var risk_field =$('#risk_field_myduty').val();
+            var risk_stage =$('#risk_stage_myduty').val();
+            var risk_status=$('#risk_status_myduty').val();
+            var search_name = $('#search_project_name').val();
+            var t = "__CONTROLLER__/myDutyRiskWithExport?choosemenu="+choosemenu+"&sort="+sort+"&order="+order+"&risk_name="+risk_name+"&risk_field="+risk_field+"&risk_stage="+risk_stage+'&risk_status='+risk_status+'&search_name='+search_name;
+            t = encodeURI(t);
+            $.ajax({
+                type:'get',
+                url: t,
+                dataType:'json',
+                success:function(data){
+                    $('#loading').modal('hide');
+                    if(data.code > 0){
+                        location.href = data.message;
+                    }else{
+                        layer.msg(data.message);
+                    }
+                }
+            })
+        })
+        var TableObj_history = {
+            oTableInit:function(){
+                $('#history').bootstrapTable({
+                     classes:'table',
+                    url: '__CONTROLLER__/historyRisk',         //请求后台的URL（*）
+                    method: 'post',                      //请求方式（*）
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: true,                   //是否显示分页（*）
+                    iconSize: 'outline',
+                    sortable: true,                     //是否启用排序
+                    sortName:"risk_tianbaotime",
+                    sortOrder: "desc",                   //排序方式
+                    queryParams:queryParam_history,
+                    sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                    pageNumber: 1,                       //初始化加载第一页，默认第一页
+                    pageSize: 7,                       //每页的记录行数（*）
+                    pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                    search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+//            strictSearch: true,
+                    showColumns: false,                  //是否显示所有的列
+                    showRefresh: false,                  //是否显示刷新按钮
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                    uniqueId: "risk_id",                     //每一行的唯一标识，一般为主键列
+                    showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    detailView: false,                   //是否显示父子表
+                    detailFormatter: "detailFormatter",
+                    columns: [
+                        [
+                            {checkbox: true},
+                            {field: 'risk_name', title: '风险名称',sortable:true,formatter:function(value,row){
+                                var risk_id = "'"+  row['risk_id'] +"'";
+                                return '<a style="color:blue" onclick="riskHistoryDetail('+risk_id+')" >'+value+'</a>';
+                            }},
+                            {field: 'proj_code', title: '所属项目',sortable:true},
+                            {field: 'risk_type', title: '类型',sortable:true},
+                            {field: 'risk_status', title: '状态',sortable:true},
+                            {field: 'risk_stage', title: '阶段',sortable:true},
+                            {field: 'risk_domain', title: '领域',sortable:true},
+                            {field: 'risk_level', title: '风险等级',sortable:true,formatter:function(value){
+                                switch (value){
+                                    case '1':
+                                        return 'I';
+                                        break;
+                                    case '2':
+                                        return 'II';
+                                        break;
+                                    case '3':
+                                        return 'III';
+                                        break;
+                                    case '4':
+                                        return 'IV';
+                                        break;
+                                }
+                            }},
+                            {field: 'risk_secretlevel', title: '密级',width:70,sortable:true,formatter:function(value,row){
+                                var secretcode_isupdate = row['secretcode_isupdate'];
+                                if(secretcode_isupdate == '1'){
+                                    return value+"<br><span style='color:red'>(被篡改)</span>";
+                                }else{
+                                    return value;
+                                }
+                            }},
+                            {field: 'risk_tianbaotime', title: '风险填报时间',sortable:true},
+                            {field: 'risk_planclosetime', title: '预计关闭时间',sortable:true},
+                            {field: '', title: '风险瀑布',formatter: function (value,row) {
+                                var inp = "'"+  row['risk_id'] +"'";
+                                return '<a onclick="riskFall('+inp+')" style="cursor:pointer"><img src="__PUBLIC__/img/icon-bar.png"></a>';
+                            }},
+                        ]
+                    ], onDblClickRow: function (row) {
+                        parent.layer.open({
+                            title: '风险编辑',
+                            type: 2,
+                            content: '__CONTROLLER__/add?risk_id='+row['risk_id']+'&from=desk',
+                            maxmin: true,
+                            closeBtn:1,
+                            shadeClose:true,
+                            area: ['1000px', '530px'],
+                            offset:['5%', '10%']
+                        });
+                    },onLoadSuccess:function(rows){
+                        if(parseInt(rows.total) > 0) {
+                            var data = rows.rows;
+                            var tr = $('#history tbody tr');
+                            var len = tr.length;
+                            for (var i = 0; i < len; i++) {
+                                var level = data[i].risk_level;
+                                switch (level) {
+                                    case '1':
+                                        tr.eq(i).children().eq(7).css('background', '#00ff00');
+                                        break;
+                                    case '2':
+                                        tr.eq(i).children().eq(7).css('background', '#ffff00');
+                                        break;
+                                    case '3':
+                                        tr.eq(i).children().eq(7).css('background', '#ff6600');
+                                        break;
+                                    case '4':
+                                        tr.eq(i).children().eq(7).css('background', '#ff0000');
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+//        TableObj_history.oTableInit();
+
+
+        function queryParam_history(params){  //配置参数
+            var choosemenu = $('#choosemenu').val();
+            $('#sortOrder_history').val(params.order);
+            $('#sort_history').val(params.sort);
+            return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                limit: params.limit,   //页面大小
+                offset: params.offset,  //页码
+                sort: params.sort,  //排序列名
+                order: params.order,//排位命令（desc，asc）
+                choosemenu :choosemenu,
+                risk_name :$('#risk_name_history').val(),
+                risk_field :$('#risk_field_history').val(),
+                risk_stage :$('#risk_stage_history').val(),
+                risk_status :$('#risk_status_history').val(),
+                search_name:$('#search_project_name').val()
+            };
+            return temp;
+        }; //传递参数（*）
+
+        $('#sys_export_history').click(function(){
+            $('#loading').modal('show');
+            var order = $('#sortOrder_history').val();
+            var sort = $('#sort_history').val();
+            var choosemenu = $('#choosemenu').val();
+            if(choosemenu == '' || choosemenu == undefined) choosemenu = '0';
+
+            var risk_name =$('#risk_name_history').val();
+            var risk_field =$('#risk_field_history').val();
+            var risk_stage =$('#risk_stage_history').val();
+            var risk_status=$('#risk_status_history').val();
+            var search_name = $('#search_project_name').val()
+
+            var t = "__CONTROLLER__/historyRiskWithExport?choosemenu="+choosemenu+"&sort="+sort+"&order="+order+"&risk_name="+risk_name+"&risk_field="+risk_field+"&risk_stage="+risk_stage+'&risk_status='+risk_status+'&search_name='+search_name;
+            t = encodeURI(t);
+            $.ajax({
+                type:'get',
+                url: t,
+                dataType:'json',
+                success:function(data){
+                    $('#loading').modal('hide');
+                    if(data.code > 0){
+                        location.href = data.message;
+                    }else{
+                        layer.msg(data.message);
+                    }
+                }
+            })
+        })
+        $('.sys_refresh').on('click',function() {
+            var table = $(this).parent().attr('table');
+            $('#'+table).bootstrapTable('destroy');
+            switch (table){
+                case 'mycreate':
+                    TableObj_mycreate.oTableInit();
+                    break;
+                case 'myduty':
+                    TableObj_myduty.oTableInit();
+                    break;
+                case 'history':
+                    TableObj_history.oTableInit();
+                    break;
+            }
+        });
+        $('.sys_add').on('click',function(){
+            var addProject = $('#choosemenu').val();
+            parent.layer.open({
+                title: '风险编辑',
+                type: 2,
+                content: '__CONTROLLER__/add?project='+addProject+'&from=desk',
+                maxmin: true,
+                closeBtn:1,
+                shadeClose:true,
+                area: ['1000px', '530px']
+            });
+        });
+        $('.sys_update').on('click',function(){
+            var table = $(this).parent().attr('table');
+            var tablerow = $('#'+table).bootstrapTable('getSelections');
+            if(tablerow.length!=1) {
+                layer.alert("您已多选或者少选，仅能对一条数据进行操作");
+            } else {
+                parent.layer.open({
+                    title: '风险编辑',
+                    type: 2,
+                    content: '__CONTROLLER__/add?risk_id='+tablerow[0]['risk_id']+'&from=desk',
+                    maxmin: true,
+                    closeBtn:1,
+                    shadeClose:true,
+                    area: ['1000px', '530px']
+                });
+            }
+        });
+
+        $('.sys_del').on('click',function() {
+            var table = $(this).parent().attr('table');
+            var tablerow = $('#'+table).bootstrapTable('getSelections');
+            if (tablerow.length == 0) {
+                layer.msg("您尚未选择数据");
+            } else {
+                layer.confirm('确认删除' + tablerow.length + '条数据?' ,
+                {btn:['确定','取消']}
+                ,function(){
+                    var ids = [];
+                    $.each(tablerow, function () {
+                        ids.push(this['risk_id']);
+                    });
+                    $.ajax({
+                        type:'post',
+                        url:'__CONTROLLER__/delRisk',
+                        data:{ids: ids.join(',')},
+                        dataType :'json',
+                        success:function(data){
+                            if(data.code > 0){
+                                layer.msg('操作成功');
+                            }else{
+                                layer.msg(data.message);
+                            }
+                            refreshZTree();
+                        }
+                    })
+                })
+            }
+        });
+    })
+    function riskDetail(risk_id) {
+        layer.open({
+            title: '风险详情',
+            type: 2,
+            content: '__MODULE__/ProjRisk/riskDetail?risk_id='+risk_id+'&from=desk',
+            closeBtn:1,
+            shadeClose:true,
+            area: ['1000px', '630px']
+        });
+    }
+
+    function riskHistoryDetail(risk_id){
+        layer.open({
+            title: '风险编辑',
+            type: 2,
+            content: '__CONTROLLER__/riskDetailNoPower?risk_id='+risk_id+'&resource=history',
+            maxmin: true,
+            closeBtn:1,
+            shadeClose:true,
+            area: ['1000px', '600px']
+        });
+    }
+    function closeRisk(id){
+        parent.layer.open({
+            title: '风险总结',
+            type: 2,
+            content: '__MODULE__/ProjRisk/closeRiskSummary?risk_id='+id+'&from=desk',
+            closeBtn:1,
+            shadeClose:true,
+            area: ['500px', '300px']
+        });
+    }
+
+    function pubRisk(id){
+        layer.confirm('确认发布该风险?' ,
+        {btn:['确定','取消']}
+        ,function(){
+            $.ajax({
+                type:'post',
+                url:'__MODULE__/ProjRisk/pubRisk',
+                data:{id:id},
+                dataType :'json',
+                success:function(data){
+                    if(data.code > 0){
+                        layer.msg('操作成功');
+                    }else{
+                        layer.msg(data.message);
+                    }
+                    $('.sys_refresh').eq(0).click();
+                    $('.sys_refresh').eq(1).click();
+                }
+            })
+        })
+    }
+
+    /**
+     * 重启风险
+     */
+    function restartRisk(id){
+        layer.confirm('确认重启该风险?' ,
+        {btn:['确定','取消']}
+        ,function(){
+            $.ajax({
+                type:'post',
+                url:'__MODULE__/ProjRisk/restartRisk',
+                data:{id:id},
+                dataType :'json',
+                success:function(data){
+                    if(data.code > 0){
+                        layer.msg('操作成功');
+                    }else{
+                        layer.msg(data.message);
+                    }
+                    $('.sys_refresh').eq(0).click();
+                    $('.sys_refresh').eq(1).click();
+                }
+            })
+        })
+    }
+    /**
+     * 重新关闭风险
+     */
+    function againCloseRisk(id){
+        layer.confirm('确认再次申请关闭?' ,
+        {btn:['确定','取消']}
+        ,function(){
+            $.ajax({
+                type:'post',
+                url:'__MODULE__/ProjRisk/againCloseRisk',
+                data:{id:id},
+                dataType :'json',
+                success:function(data){
+                    if(data.code > 0){
+                        layer.msg('操作成功');
+                    }else{
+                        layer.msg(data.message);
+                    }
+                    $('.sys_refresh').eq(0).click();
+                    $('.sys_refresh').eq(1).click();
+                }
+            })
+        })
+    }
+
+    function riskFall(id){
+        parent.layer.open({
+            title: '风险瀑布',
+            type: 2,
+            content: '__MODULE__/ProjRisk/riskFall?risk_id='+id,
+            closeBtn:1,
+            shadeClose:true,
+            area: ['1000px', '80%']
+        });
+    }
+
+</script>
+</html>
+
+
+
+
+

@@ -1,0 +1,399 @@
+﻿<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.css">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+    <title>应对措施管理</title>
+    <style>
+        .control-label{
+            width:110px;
+        }
+        body{
+            margin: 0 auto;
+        }
+        /*::-webkit-scrollbar{*/
+            /*display: none;*/
+        /*}*/
+    </style>
+</head>
+<body>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="container" style="width: auto">
+        <div class="row row-lg" style="margin-top: 5px;">
+            <div class="col-sm-12">
+                <div style="margin-left: 5px;" >
+                    <label class=" control-label" style="width:75px;">措施名称：</label>
+                    <input id="measure_search_name" class="form-control" style="display:inline-block;width:250px;">
+
+                    <label class=" control-label" >措施状态：</label>
+                    <select id="search_status" class="chosen-select2" >
+                        <option value="">全部</option>
+                        <?php foreach($measureStatus as $key=>$value){ ?>
+                        <option value="{$value}" >{$value}</option>
+                        <?php } ?>
+                    </select>
+                    <button class="btn btn-info" style="margin-left: 5px;" type="button" id="sys_refresh_yingduicuoshi">&nbsp;查询</button>
+                    <button class="btn btn-warning " style="margin-left: 3px;" type="button" id="sys_add_yingduicuoshi" >&nbsp;添加</button>
+                </div>
+                <div style="margin-left: 5px;margin-top: 6px" >
+                    <label class=" control-label" style="width:75px;">责任人：</label>
+                    <select id="search_zrr"  class="chosen-select2 " >
+                        <option value="">全部</option>
+                        <?php foreach($riskField as $key=>$value){ ?>
+                        <option value="{$value.val}"  >{$value.val}</option>
+                        <?php } ?>
+                    </select>
+
+                    <label class=" control-label" style="">计划完成时间：</label>
+                    <input  id="plantime_from" type="text"  value="" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"  style="width:120px;display: inline-block" class="form-control">-
+                    <input  id="plantime_end" type="text"  value="" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"  style="width:120px;display: inline-block" class="form-control">
+
+                    <button class="btn btn-warning " style="margin-left: 2px;background: #9bc63e;border:1px #9bc63e solid" type="button" id="sys_update_yingduicuoshi" >&nbsp;修改</button>
+                    <button class="btn btn-error" style="margin-left: 3px;" type="button" id="sys_del_yingduicuoshi">&nbsp;删除</button>
+                    <button class="btn btn-info" style="margin-left: 3px;background: #f8d802;border:1px #f8d802 solid" type="button" id="sys_export">&nbsp;导出</button>
+                </div>
+                <div>
+                    <table id="yingduicuoshi" ></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="sort" >
+<input type="hidden" id="sortOrder" >
+<div class="modal fade" id="loading" role="dialog" data-backdrop='static'>
+    <div class="modal-dialog" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">处理中</h4>
+            </div>
+            <div class="modal-body">
+                <img src="__PUBLIC__/img/loading/loading9.gif" style='display: block;margin: 0 auto'>
+                <div id="loadingText" style="text-align: center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="choosemenu" id="choosemenu" value="<?php echo trim(I('get.proj_id')); ?>"/>
+</body>
+<script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/bootstrap-table.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap-table/bootstrap-table/src/locale/bootstrap-table-zh-CN.js"></script>
+<script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+<script src="__PUBLIC__/vendor/chosen-ajax-addition/chosen.ajaxaddition.jquery.js"></script>
+<script src="__PUBLIC__/vendor/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<script type="text/javascript">
+    $(".chosen-select2").chosen({disable_search_threshold: 0, search_contains: true, width: '250px'});
+    $('#search_zrr').ajaxChosen({
+        dataType: 'json',
+        type: 'POST',
+        url:'__MODULE__/User/getUserLists'
+    },{
+    });
+    layui.use('layer', function() {
+        layer = layui.layer;
+    })
+    //应对措施js
+    var TableObj_yingduicuoshi = {
+        oTableInit:function(){
+            $('#yingduicuoshi').bootstrapTable({
+                url: '__MODULE__/Measure/getMeasuresByProjectData',         //请求后台的URL（*）
+                method: 'post',                      //请求方式（*）
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                iconSize: 'outline',
+                sortable: true,                     //是否启用排序
+                sortName:"msr_planfinishtime",
+                sortOrder: "asc",                   //排序方式
+                queryParams:queryParams_yingduicuoshi,
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 7,                       //每页的记录行数（*）
+                pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+//            strictSearch: true,
+                showColumns: false,                  //是否显示所有的列
+                showRefresh: false,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "msr_id",                     //每一行的唯一标识，一般为主键列
+                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: true,                   //是否显示父子表
+                detailFormatter: "detailFormatter",
+                columns: [
+                    [
+                        {checkbox: true},
+                        {field: 'msr_name', title: '措施名称',width:170,sortable:true,formatter:function(value,row){
+                            var msr_id = "'"+  row['msr_id'] +"'";
+                            var risk_id = "'"+  row['msr_riskid'] +"'";
+                            return '<a style="color:blue" onclick="addMeasure('+msr_id+','+risk_id+')" >'+value+'</a>';
+                        }},
+                        {field: 'risk_name', title: '所属风险',sortable:true,formatter:function(value,row){
+                            var risk_id = "'"+  row['msr_riskid'] +"'";
+                            return '<a style="color:blue" onclick="riskDetail('+risk_id+')" >'+value+'</a>';
+                        }},
+                        {field: 'zrr', title: '责任人',sortable:true},
+                        {field: 'msr_status', title: '状态',sortable:true},
+                        {field: 'msr_planfinishtime', title: '计划完成时间',sortable:true},
+                        {field: 'msr_realfinishtime', title: '实际完成时间',sortable:true},
+                        {field: 'msr_planreducevalue', title: '计划/实际降低值',width:50,formatter:function(value,row){
+                            return row['msr_planreducevalue'] + '/' +row['msr_realreducevalue'];
+                        }},
+                        {field: 'msr_id', title: '操作', sortable: false,width:150,
+                            formatter: function (value, row, index) {
+                                var inp = "'"+  value +"'";
+                                var a ='';
+                                if(row['msr_status'] == '计划'){
+                                    a += '<a style="width:60px;height:30px;line-height:30px;"   class="layui-btn layui-btn-normal " onclick="pubMeasure('+ inp +')">发布</a>';
+                                }else if(row['msr_status'] == '已发布'){
+                                    a += '<a  style="width:60px;height:30px;line-height:30px;" class="layui-btn layui-btn-danger layui-btn-normal" onclick="closeMeasure('+ inp +')">关闭</a>';
+                                }
+                                return a;
+                            }
+                        }
+                    ]
+                ], onDblClickRow: function (row) {
+                    parent.layer.open({
+                        title: '应对措施编辑',
+                        type: 2,
+                        content: '__MODULE__/Measure/addMeasure?measure_id='+row['msr_id']+'&risk_id='+row['msr_riskid']+'&from=getmeasurebyproject',
+                        closeBtn:1,
+                        shadeClose:true,
+                        area: ['1000px', '580px']
+                    });
+                },onLoadSuccess:function(data){
+                    if(parseInt(data.total)>0){
+                        var data = data.rows;
+                        var tr = $('#yingduicuoshi tbody tr');
+                        var len = tr.length;
+                        for(var i=0;i<len;i++){
+                            tr.eq(i).children().eq(2).addClass('td-hover');
+                            tr.eq(i).children().eq(2).attr('fullName', data[i].msr_fullname);
+                            tr.eq(i).children().eq(2).attr('shortName', data[i].msr_name);
+
+                        }
+                    }
+                }
+            });
+        }
+    }
+    TableObj_yingduicuoshi.oTableInit();
+    function queryParams_yingduicuoshi(params){
+        var choosemenu = $('#choosemenu').val();
+        if(choosemenu == '' || choosemenu == undefined) choosemenu = '0';
+        return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            limit: params.limit,   //页面大小
+            offset: params.offset,  //页码
+            sort: params.sort,  //排序列名
+            order: params.order,//排位命令（desc，asc）
+            risk_id:$('#risk_id').val(),
+            choosemenu:choosemenu,
+            measure_name :$('#measure_search_name').val(),
+            search_zrr :$('#search_zrr').val(),
+            search_status :$('#search_status').val(),
+            plantime_from :$('#plantime_from').val(),
+            plantime_end :$('#plantime_end').val()
+        };
+        return temp;
+    };
+
+    
+    $('#sys_update_yingduicuoshi').on('click',function(){
+        var tablerow = $('#yingduicuoshi').bootstrapTable('getSelections');
+        if(tablerow.length!=1)
+        {
+            layer.alert("您已多选或者少选，仅能对一条数据进行操作");
+        }
+        else {
+            parent.layer.open({
+                title: '应对措施编辑',
+                type: 2,
+                content: '__MODULE__/Measure/addMeasure?measure_id='+tablerow[0]['msr_id']+'&from=getmeasurebyproject',
+                closeBtn:1,
+                shadeClose:true,
+                area: ['1100px', '700px']
+            });
+        }
+    });
+    $('#sys_refresh_yingduicuoshi').click(function(){
+        $('#yingduicuoshi').bootstrapTable('destroy')
+        TableObj_yingduicuoshi.oTableInit();
+    })
+
+
+    $('#sys_del_yingduicuoshi').on('click',function() {
+        var tablerow = $('#yingduicuoshi').bootstrapTable('getSelections');
+        if (tablerow.length == 0) {
+            layer.msg("您尚未选择数据");
+        } else {
+            layer.confirm('确认删除' + tablerow.length + '条数据?' ,
+            {btn:['确定','取消']}
+            ,function(){
+                var ids = [];
+                $.each(tablerow, function () {
+                    ids.push(this['msr_id']);
+                });
+                $.ajax({
+                    type:'post',
+                    url:'__MODULE__/Measure/delMeasure',
+                    data:{ids: ids.join(',')},
+                    dataType :'json',
+                    success:function(data){
+                        if(data.code > 0){
+                            layer.msg('操作成功');
+                        }else{
+                            layer.msg(data.message);
+                        }
+                        $('#yingduicuoshi').bootstrapTable('refresh')
+                    }
+                })
+
+            })
+        }
+    });
+
+    /**
+     * 添加应对措施
+     */
+    $('#sys_add_yingduicuoshi').click(function(){
+        parent.layer.open({
+            title: '应对措施编辑',
+            type: 2,
+            content: '__MODULE__/Measure/addMeasure?from=getmeasurebyproject',
+            closeBtn:1,
+            shadeClose:true,
+            area: ['1000px', '580px']
+        });
+    })
+
+    $('#sys_export').click(function(){
+        $('#loading').modal('show');
+        var sortOrder = $('#sortOrder').val();
+        var sort = $('#sort').val();
+        var choosemenu = $('#choosemenu').val();
+        if(choosemenu == '' || choosemenu == undefined) choosemenu = '0';
+        var measure_name = $('#measure_search_name').val();
+        var t = "__CONTROLLER__/getMeasuresByProjectDataWithExport?sort="+sort+"&sortOrder="+sortOrder+"&measure_name="+measure_name+'&choosemenu='+choosemenu;
+        t = encodeURI(t);
+        $.ajax({
+            type:'get',
+            url: t,
+            dataType:'json',
+            success:function(data){
+                $('#loading').modal('hide');
+                if(data.code > 0){
+                    location.href = data.message;
+                }else{
+                    layer.msg('无数据');
+                }
+            }
+        })
+    })
+    function addMeasure(msr_id,risk_id){
+        parent.layer.open({
+            title: '应对措施编辑',
+            type: 2,
+            content: '__MODULE__/Measure/processInfo?measure_id='+msr_id+'&risk_id='+risk_id+'&from=getmeasurebyproject',
+            closeBtn:1,
+            shadeClose:true,
+            area: ['1000px', '580px']
+        });
+    }
+    function closeMeasure(id){
+        layer.confirm('确认关闭该应对措施?' ,
+        {btn:['确定','取消']}
+        ,function(){
+            $.ajax({
+                type:'post',
+                url:'__MODULE__/Measure/closeMeasure',
+                data:{id:id},
+                dataType :'json',
+                success:function(data){
+                    if(data.code > 0){
+                        layer.msg('操作成功');
+                    }else{
+                        layer.msg(data.message);
+                    }
+                    $('#yingduicuoshi').bootstrapTable('refresh')
+                }
+            })
+        })
+    }
+
+    function pubMeasure(id){
+        layer.confirm('确认发布该应对措施?' ,
+        {btn:['确定','取消']}
+        ,function(){
+            $.ajax({
+                type:'post',
+                url:'__MODULE__/Measure/pubMeasure',
+                data:{id:id},
+                dataType :'json',
+                success:function(data){
+                    if(data.code > 0){
+                        layer.msg('操作成功');
+                    }else{
+                        layer.msg(data.message);
+                    }
+                    $('#yingduicuoshi').bootstrapTable('refresh')
+                }
+            })
+        })
+    }
+    function riskDetail(risk_id) {
+        parent.layer.open({
+            title: '风险编辑',
+            type: 2,
+            content: '__MODULE__/ProjRisk/riskDetail?risk_id='+risk_id,
+            maxmin: true,
+            closeBtn:1,
+            shadeClose:true,
+            area: ['1000px', '630px']
+        });
+    }
+
+    function detailFormatter(index, row){
+        return "<table class='table' style='word-break: break-all;' ><tr><td style='width:100px;'>应对措施描述</td><td>"+row['msr_description']+"</td></tr></table>";
+    }
+
+
+    $('body').on('mouseover','.td-hover',function(){
+        var fullname = $(this).attr('fullName');
+        var width = parseInt($(this).css('width'))+300;
+        $(this).css('width', width+'px');
+        $(this).children(':first').text(fullname);
+
+    })
+    $('body').on('mouseout','.td-hover',function(){
+        var shortName = $(this).attr('shortName');
+        var width = parseInt($(this).css('width'))-300;
+        $(this).css('width', width+'px')
+        $(this).children(':first').text(shortName);
+    })
+
+</script>
+</html>
+
+
+
+
+

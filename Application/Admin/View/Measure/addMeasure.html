@@ -1,0 +1,418 @@
+﻿<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+    <script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+    <script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+    <script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+    <script src="__PUBLIC__/vendor/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/jquery.form.js"></script>
+    <script src="__PUBLIC__/vendor/chosen-ajax-addition/chosen.ajaxaddition.jquery.js"></script>
+    <!--[if lte IE 9]>
+    <script src="__PUBLIC__/vendor/ie8/respond.min.js"></script>
+    <script src="__PUBLIC__/vendor/ie8/html5shiv.js"></script>
+    <![endif]-->
+    <title>应对措施管理</title>
+    <style>
+        .control-label{
+            width:140px!important;
+            font-size: 13.2px;
+        }
+        .form-group >div{
+            /*width: 48%!important;*/
+            margin-top: 3px;
+            margin-bottom: 3px;
+        }
+        .chosen-select2{
+            z-index: 222;
+        }
+        .layui-tab-content{
+            padding-bottom: 0!important;
+        }
+        .modal-body{
+            padding-bottom: 0!important;
+        }
+        input,textarea{
+            margin-bottom: 3px;
+        }
+        .form-control{
+            border-radius: 2px;
+        }
+        .chosen-choices{
+            margin-bottom: 6px;
+        }
+        html{
+            height: auto;
+        }
+        .layui-tab{
+            margin-bottom: 0!important;
+        }
+        #layui-title li{
+            width: 10%;
+        }
+        ::-webkit-scrollbar{
+            display: none;
+        }
+        .modal-body{
+            padding-left: 26px;
+            box-sizing: border-box;
+        }
+        .must_filter{
+            color:red;
+        }
+    </style>
+</head>
+<body >
+<div>
+    <div class="modal-body">
+        <div class="layui-tab layui-tab-brief" lay-filter="demo">
+            <div class="layui-tab-content" id="layui-content" style="overflow-x: hidden;">
+                <?php if(isset($data['msr_status'])){ ?>
+                <h3 style="text-align: center;margin-bottom: 25px;font-size: 18px;">
+                    应对措施状态:<span style="color:red;"><?php echo $data['msr_status'] ?></span>
+                </h3>
+                <?php } ?>
+                <form id="measureForm" class="form-horizontal" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <div style="width: 100%;float: left">
+                            <div class="row">
+                                <label class="control-label col-sm-3">措施名称 <span class="must_filter">*</span>：</label>
+                                <div class="col-sm-3">
+                                    <input  name="name" type="text"  value="{$data['msr_name']}" style="width:785px;display: inline-block;" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div style="width: 50%;float: left;">
+                            <div class="row">
+                                <label class=" control-label col-sm-3">所属风险 <span class="must_filter">*</span>：</label>
+                                <div class="col-sm-3">
+                                    <!--<input type="text" disabled value="{$riskName.risk_name}" class="form-control"  style="width:300px;display: inline-block">-->
+                                    <select name="risk_id" id="risk_id"  class="chosen-select2"  <?php if(!empty($data)){ echo 'disabled'; } ?> >
+                                    <option value="">&nbsp;</option>
+                                    <?php foreach($risks as $key=>$value){ ?>
+                                    <option value="{$value.risk_id}" <?php if($riskId == $value['risk_id']){echo 'selected';} ?>
+                                    <?php if(!empty($data['msr_riskid']) && $data['msr_riskid'] == $value['risk_id'])echo 'selected'; ?> >{$value.risk_name}</option>
+                                    <?php } ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width: 50%;float: left;">
+                            <div class="row">
+                                <label class="control-label col-sm-3">优先级 <span class="must_filter">*</span>：</label>
+                                <div class="col-sm-3">
+                                    <select name="msr_priority" id="msr_priority" class="chosen-select2" >
+                                        <option value="">&nbsp;</option>
+                                        <?php foreach($measurePriority as $key=>$value){ ?>
+                                        <option value="{$value.val}" <?php if(!empty($data['msr_priority']) && $data['msr_priority'] == $value['val'])echo 'selected'; ?> >{$value.val}</option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div style="width: 50%;float: left">
+                            <div class="row">
+                                <label class="control-label col-sm-3" style="width: 14">计划完成时间 <span class="must_filter">*</span>：</label>
+                                <div class="col-sm-3">
+                                    <input  name="msr_planfinishtime" type="text"  value="{$data.msr_planfinishtime}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"  style="width:300px;display: inline-block" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width: 50%;float: left">
+                            <div class="row">
+                                <label class="control-label col-sm-3">实际完成时间：</label>
+                                <div class="col-sm-3">
+                                    <input  name="msr_realfinishtime" type="text"  value="{$data.msr_realfinishtime}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"  style="width:300px;display: inline-block" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div style="width: 50%;float: left">
+                            <div class="row">
+                                <label class="control-label col-sm-3">计划降低值：</label>
+                                <div class="col-sm-3">
+                                    <input  name="msr_planreducevalue" type="text"  value="{$data.msr_planreducevalue}"   style="width:300px;display: inline-block" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width: 50%;float: left">
+                                    <div class="row">
+                                        <label class="control-label col-sm-3">实际降低值：</label>
+                                        <div class="col-sm-3">
+                                            <input  name="msr_realreducevalue" type="text"  value="{$data.msr_realreducevalue}"   style="width:300px;display: inline-block" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                    </div>
+                    <div class="form-group">
+                                <div style="width: 50%;float: left">
+                                    <div class="row">
+                                        <label class="control-label col-sm-3">措施描述 <span class="must_filter">*</span>：</label>
+                                        <div class="col-sm-3">
+                                            <textarea name="msr_description"  cols="10" rows="5" class="form-control" style="display:inline-block;width: 785px;height: 75px;">{$data.msr_description}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                    <div class="form-group">
+                                <div style="width: 50%;float: left">
+                                    <div class="row">
+                                        <label class="control-label col-sm-3">变更情况：</label>
+                                        <div class="col-sm-3">
+                                            <select name="msr_changesituation" id="msr_changesituation" class="chosen-select2" >
+                                                <option value="">&nbsp;</option>
+                                                <?php foreach($measureChange as $key=>$value){ ?>
+                                                <option value="{$value.val}" <?php if(!empty($data['msr_changesituation']) && $data['msr_changesituation'] == $value['val'])echo 'selected'; ?> >{$value.val}</option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="width: 50%;float: left">
+                                    <div class="row">
+                                        <label class="control-label col-sm-3">责任人 <span class="must_filter">*</span>：</label>
+                                        <div class="col-sm-3">
+                                            <select  name="person_liable"   id="person_liable" class="chosen-select2"  data-placeholder="请输入用户账号或姓名进行检索"   <?php if(isset($canUpMeasureDuty) && $canUpMeasureDuty == 0){ ?>disabled<?php } ?>>
+                                                <option value=""> </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    <div class="form-group">
+                                <div style="width: 50%;float: left">
+                                    <div class="row">
+                                        <label class=" col-sm-3 control-label">责任部门 <span class="must_filter">*</span>：</label>
+                                        <div class="col-sm-3" >
+                                            <select name="org" id="org" class="chosen-select2" >
+                                                <option value="">&nbsp;</option>
+                                                <?php foreach($org as $key=>$value){ ?>
+                                                <option value="{$value.id}" <?php if(!empty($data['zrbm']) && $data['zrbm'] == $value['id'])echo 'selected'; ?>  >{$value.org_name}</option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    <div class="form-group">
+                                <div style="width: 50%;float: left">
+                                    <div class="row">
+                                        <label class="control-label col-sm-3">当前进展：</label>
+                                        <div class="col-sm-3">
+                                            <textarea name="msr_curdescription"  cols="10" rows="5" class="form-control" style="display:inline-block;width: 301px;height: 75px;">{$data.msr_curdescription}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="width: 50%;float: left">
+                                    <div class="row">
+                                        <label class="control-label col-sm-3">完成情况：</label>
+                                        <div class="col-sm-3">
+                                            <select name="msr_execution" class="chosen-select2" >
+                                                <option value="">&nbsp;</option>
+                                                <?php foreach($measureFinish as $key=>$value){ ?>
+                                                <option value="{$value.val}" <?php if(!empty($data['msr_execution']) && $data['msr_execution'] == $value['val'])echo 'selected'; ?> >{$value.val}</option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    <div class="form-group" style="padding-bottom:16px;box-sizing:border-box;">
+                                <div style="width: 50%;float: left">
+                                    <div class="row">
+                                        <label class="control-label col-sm-3">是否自动发布 <span class="must_filter">*</span>：</label>
+                                        <div class="col-sm-3">
+                                            <select name="is_autopub" id="is_autopub" class="chosen-select2" >
+                                                <option <?php if( $data['msr_isautopub'] == '0')echo 'selected'; ?> value="0">否</option>
+                                                <option <?php if( $data['msr_isautopub'] == '1')echo 'selected'; ?> value="1">是</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="width: 50%;float: left;<?php if((isset($data) && $data['msr_isautopub'] != '1')||empty($data) ){echo 'display:none';} ?>" id="auto_pubtime_box" >
+                                    <div class="row">
+                                        <label class="control-label col-sm-3">自动发布时间：</label>
+                                        <div class="col-sm-3">
+                                            <div>
+                                                <select name="auto_pubtime" class="chosen-select2" >
+                                                    <option <?php if(isset($data) && $data['auto_pubtime'] == '发生前')echo 'selected'; ?> value="发生前">风险发生前</option>
+                                                    <option <?php if(isset($data) && $data['auto_pubtime'] == '发生后')echo 'selected'; ?> value="发生后">风险发生后</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    <div style="text-align: center;margin:10px 0 13px 72px;">
+                                <?php if(isset($canUpMeasure)  && $canUpMeasure){  ?>
+                                <input type="submit"  class="btn btn-success" value="保存" style="width:120px;margin-top:5px"  id="sys_dlg_submit">
+                                <?php } ?>
+                            </div>
+                    <input type="hidden" value="{$measureId}" name='measure_id'>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/validate/jquery.validate.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<script>
+    $(function () {
+        layui.use('layer', function() {
+            layer = layui.layer;
+        })
+        layui.use('element', function() {
+            var element = layui.element();
+            element.on('tab(demo)',function(data){});
+        })
+        $(".chosen-select2").chosen({disable_search_threshold: 0, search_contains: true, width: '300px'});
+        var measure_user = "<?php echo $data['measure_user']; ?>";
+        if(measure_user != ''){
+            $('#person_liable').append('<option value="<?php echo $data[measure_user_id] ?>" selected  >'+measure_user+'</option>');
+            $('#person_liable').trigger("chosen:updated");
+        }
+        $('#is_autopub').change(function(){
+            var val = $(this).val();
+            if(val == 1){
+                $('#auto_pubtime_box').show();
+            }else{
+                $('#auto_pubtime_box').hide();
+            }
+        })
+        $(".js-switch").each(function(){
+            new Switchery(this, {color: '#1AB394'});
+        });
+        $('#person_liable').ajaxChosen({
+            dataType: 'json',
+            type: 'POST',
+            url:'__MODULE__/User/getUserLists'
+        },{
+        });
+        $.validator.setDefaults({
+            highlight:function(element){
+                $(element).parent().remove('has-success').addClass('has-error');
+            },
+            errorPlacement:function(error,element){
+                if(element.is(":radio") || element.is(":checkbox")){
+                    error.appendTo(element.parent());
+                }else{
+                    error.appendTo(element.parent());
+                }
+            },
+            errorClass:"help-block m-b-none",
+            validClass:"help-block m-b-none"
+        });
+        var from = "<?php echo I('get.from'); ?>";
+
+        $('#measureForm').validate({
+            onclick:false,
+            onfocusout:false,
+            onkeyup:false,
+            rules:{
+                name:'required',
+                msr_planfinishtime:'required',
+                msr_planreducevalue:{
+                    number:true
+                },
+                msr_realreducevalue:{
+                    number:true
+                },
+                msr_description:'required',
+                msr_status:'required',
+                msr_priority:'required',
+                is_autopub:'required',
+                msr_changesituation:'required',
+                person_liable:'required'
+            },
+            messages:{
+                name:'必填项',
+                msr_planfinishtime:'必填项',
+                msr_planreducevalue:{
+                    number:'数字不合法'
+                },
+                msr_realreducevalue:{
+                    number:'数字不合法'
+                },
+                msr_description:'必填项',
+                msr_status:'必填项',
+                msr_priority:'必填项',
+                is_autopub:'必填项',
+                msr_changesituation:'必填项',
+                person_liable:'必填项'
+            },submitHandler:function(){
+                layui.use('layer', function() {
+                    layer = layui.layer;
+                })
+                var result = checkForm(['risk_id','msr_priority','person_liable','org'],['所属风险','优先级', '责任人', '责任部门']);
+                if(!result) return false;
+                var formbody = $("#measureForm");
+                var risk_id = $('#risk_id').val();
+                $.ajax({
+                    type:'post',
+                    url:'__CONTROLLER__/addMeasureData',
+                    data:formbody.serialize(),
+                    dataType :'json',
+                    success:function(data){
+                        if(data.code > 0){
+                            layer.msg('操作成功');
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                            switch(from){
+                                case 'desk':
+                                    parent.$('#sys_refresh_create').click();
+                                    parent.$('#sys_refresh_duty').click();
+                                    break;
+                                case 'riskdetail':
+                                    parent.$('#sys_refresh_yingduicuoshi').click();
+                                    break;
+                                case 'getmeasurebyproject':
+                                    parent.$('#measure_box').contents().find('#sys_refresh_yingduicuoshi').click();
+                                    break;
+                            }
+                        }else{
+                            layer.alert(data.message);
+                        }
+                    }
+                })
+            }
+        })
+    });
+    function checkForm(objArr, messageArr){
+        var len = objArr.length;
+        for(var i=0;i<len;i++){
+            var obj = objArr[i];
+            var val = $('#'+obj).val();
+            if(!val){
+                layer.msg('请选择'+messageArr[i]);
+                $('#'+obj).trigger('chosen:open');
+                return false;
+            }
+        }
+        return true;
+    }
+</script>

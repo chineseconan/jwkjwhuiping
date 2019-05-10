@@ -1,0 +1,122 @@
+<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/css/public.css">
+
+    <script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+    <!--[if lte IE 9]>
+    <script src="__PUBLIC__/vendor/ie8/respond.min.js"></script>
+    <script src="__PUBLIC__/vendor/ie8/html5shiv.js"></script>
+    <![endif]-->
+    <title>应对措施管理</title>
+</head>
+<body>
+<div id="main" style="width: 90%;height: 500px;margin: 0 auto;overflow: auto"></div>
+</body>
+<script src="__PUBLIC__/vendor/echart/echarts-all.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<script>
+    var data = '<?php echo $data; ?>';
+    data = JSON.parse(data);
+    var myChart = echarts.init(document.getElementById('main'));
+    option = {
+        title : {
+            text : ''
+        },
+        tooltip : {
+            trigger: 'item',
+            formatter : function (params) {
+                var date = new Date(params.value[0]);
+                data = date.getFullYear() + '-'
+                        + (date.getMonth() + 1) + '-'
+                        + date.getDate()
+
+                return data + '<br/>'
+                        + params.value[1];
+            }
+        },
+        grid:{
+            x:100,
+            x2:50,
+            y2:50
+        },
+        xAxis : [
+            {
+                type : 'time',
+                splitNumber:10
+            }
+        ],
+        yAxis : [
+            {
+                type : 'value'
+            }
+        ],
+        series : [
+            {
+                name: '风险值',
+                type: 'line',
+                showAllSymbol: true,
+                data: (function () {
+                    var d = [];
+                    var length = data.length;
+                    for(var i=0;i<length;i++){
+                        var time = data[i]['time'];
+                        var time1 = parseISO8601(time);
+                        d.push([
+                            time1,
+                            data[i]['value']
+                        ]);
+                    }
+                    return d;
+                })()
+            }
+        ]
+    };
+    myChart.setOption(option);
+    var ecConfig = echarts.config;
+    function eConsole(param) {
+        if (typeof param.seriesIndex != 'undefined') {
+        }
+    }
+    myChart.on(ecConfig.EVENT.CLICK, eConsole);
+    myChart.on(ecConfig.EVENT.DBLCLICK, eConsole);
+    myChart.on(ecConfig.EVENT.HOVER, eConsole);
+    myChart.on(ecConfig.EVENT.DATA_ZOOM, eConsole);
+    myChart.on(ecConfig.EVENT.LEGEND_SELECTED, eConsole);
+    myChart.on(ecConfig.EVENT.MAGIC_TYPE_CHANGED, eConsole);
+    myChart.on(ecConfig.EVENT.DATA_VIEW_CHANGED, eConsole);
+
+
+//    function parseISO8601(dateStringInRange){
+//        var isoExp = /^\s*(\d{4})-(\d\d)-(\d\d)\s*$/,
+//                date = new Date(NaN),
+//                month,
+//                parts = isoExp.exec(dateStringInRange);
+//        if(parts){
+//            month = +parts[2];
+//            date.setFullYear(parts[1],month - 1, parts[3]);
+//            if(month != date.getMonth() + 1){
+//                date.setTime(NaN);
+//            }
+//        }
+//
+//        return date;
+//    }
+
+    function parseISO8601(dateStringInRange){
+        return new Date((dateStringInRange).replace(/-/g, '/'));
+    }
+
+</script>
+</html>

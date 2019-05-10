@@ -1,0 +1,82 @@
+﻿<?php showViewsByPower() ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="__PUBLIC__/vendor/ie8/es5-shim.min.js"></script>
+    <![endif]-->
+
+    <link href="__PUBLIC__/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    
+    <link href="__PUBLIC__/vendor/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/css/tablepublic.css" rel="stylesheet">
+    <link rel="stylesheet" href="__PUBLIC__/vendor/layui/css/layui.css" media="all" />
+    <title>字典编辑</title>
+</head>
+<body style="margin: 0 auto">
+    <div class="tab-content">
+        <div class="panel-body">
+            <div class="form-group">
+                <label class=" control-label">风险总结：</label>
+                <div class="col-sm-4 " style="text-align: center">
+                    <textarea id="risk_summary"  cols="10" rows="5" class="form-control" style="width: 439px;height: 75px;margin-top: 10px;">{$data.risk_summary}</textarea>
+                    <input type="button" class="btn btn-success" value="保存" style="width:120px;margin-top: 16px;"  id="risk_close">
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <input id="risk_id" type="hidden" value="{$risk_id}" class="form-control">
+</body>
+
+<script src="__PUBLIC__/vendor/jquery/jquery1.11.1.js"></script>
+<script src="__PUBLIC__/vendor/bootstrap/js/bootstrap.js"></script>
+<script src="__PUBLIC__/vendor/chosen/chosen.jquery.js"></script>
+<script type="text/javascript" src="__PUBLIC__/vendor/layui/layui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/banBackSpace.js"></script>
+
+<script>
+    layui.use('layer', function() {
+        layer = layui.layer;
+    })
+    var from  = "<?php echo I('get.from'); ?>";
+    $('#risk_close').click(function(){
+        layer.confirm('确认关闭该风险?' ,
+        {btn:['确定','取消']}
+        ,function(){
+            var risk_id = $('#risk_id').val();
+            var risk_summary = $('#risk_summary').val();
+            $.ajax({
+                type:'post',
+                url:'__MODULE__/ProjRisk/closeRisk',
+                data:{id: risk_id,risk_summary:risk_summary},
+                dataType :'json',
+                success:function(data){
+                    if(data.code > 0){
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                        switch (from){
+                            case 'riskManage':
+                                layer.msg('操作成功');
+                                parent.$('#risk_box').contents().find('#sys_refresh').click();
+                                break;
+                            case 'desk':
+                                parent.$('#box1').contents().find('#mycreate_refresh').click();
+                                parent.$('#box1').contents().find('#myduty_refresh').click();
+                                parent.$('#box1').contents().find('#history_refresh').click();
+                                break;
+                        }
+
+                    }else{
+                        layer.msg(data.message);
+                    }
+                }
+            })
+        })
+    })
+
+</script>
