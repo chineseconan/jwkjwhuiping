@@ -10,7 +10,7 @@ namespace Admin\Controller;
 use Think\Controller;
 use Think\Exception;
 
-class XMController extends Controller
+class ZQXMController extends Controller
 {
     public function index()
     {
@@ -99,7 +99,7 @@ class XMController extends Controller
                     $relationModel->add($item);
                 }
                 $count = $Model
-                    ->where("xm_class='".$param['xm_class']."' and xm_status!='删除' and xm_ordernum='".$param['xm_ordernum']."' and xm_type = '".$param['xm_type']."' and xm_group = '".$param['xm_group']."'")
+                    ->where("xm_class='".$param['xm_class']."' and xm_status!='删除' and xm_ordernum='".$param['xm_ordernum']."'")
                     ->count();
                 $isSame = 0;
                 if($count>1) $isSame = 1;
@@ -118,7 +118,7 @@ class XMController extends Controller
             $xm_class = $XM->where("xm_id='".$param['xm_id']."'")->getField("xm_class");
             $re = $XM->where("xm_id='".$param['xm_id']."'")->save($param);
             $count = $Model
-                ->where("xm_class='".$param['xm_class']."' and xm_status!='删除' and xm_ordernum='".$param['xm_ordernum']."' and xm_type = '".$param['xm_type']."' and xm_group = '".$param['xm_group']."'")
+                ->where("xm_class='".$param['xm_class']."' and xm_status!='删除' and xm_ordernum='".$param['xm_ordernum']."'")
                 ->count();
             $isSame = 0;
             if($count>1) $isSame = 1;
@@ -272,7 +272,7 @@ class XMController extends Controller
             $path = "./Public/".$file['message'];
             $import = excelImport($path);
 
-             $column = Array("项目编号","项目名称","依托单位","申请人","分组","类别","技术方向","推荐方式","答辩顺序","初审分组","初审得分","初审排名");
+            $column = Array("项目编号","项目名称","依托单位","申请人","分组","课题类型","推荐方式","答辩顺序");
             $len = count($column);
             for($i=0;$i<$len;$i++){
                 if($column[$i]!=$import['column'][$i]){
@@ -297,12 +297,8 @@ class XMController extends Controller
                             $data['xm_createuser'] = $val['D'];
                             $data['xm_class'] = $val['E'];
                             $data['xm_type'] = $val['F'];
-                            $data['xm_group'] = $val['G'];
-                            $data['xm_tmfs'] = $val['H'];
-                            $data['xm_ordernum'] = $val['I'];
-                            $data['xm_oldfenzu'] = $val['J'];
-                            $data['xm_oldscore'] = $val['K'];
-                            $data['xm_oldrank'] = $val['L'];
+                            $data['xm_tmfs'] = $val['G'];
+                            $data['xm_ordernum'] = $val['H'];
                             $data['xm_year'] = date("Y",time());
                             $data['xm_status'] = "正常";
                             $Model->add($data);
@@ -339,14 +335,15 @@ class XMController extends Controller
     public function export(){
         $map['xm_status'] = Array("eq","正常");
         $Model = D("xmps_xm");
-        $data = $Model->field("xm_name,xm_code,xm_class,xm_type,xm_group,xm_company")->where($map)->select();
+        $data = $Model->field("xm_code,xm_name,xm_company,xm_createuser,xm_class,xm_type,xm_tmfs")->where($map)->order("xm_ordernum asc")->select();
         $column = Array(
-            "项目名称",
             "项目编号",
-            "项目分组",
-            "项目类别",
-            "项目技术方向",
+            "项目名称",
             "依托单位",
+            "申请人",
+            "分组",
+            "课题分类",
+            "推荐方式"
         );
         $width = Array("10","40","20",'15','15','15','15');
         echo excelExport($column,$data,true,$width);
@@ -364,21 +361,74 @@ class XMController extends Controller
         }
     }
 	
+	public function listindex(){
+		$xm_id=I("get.id");
+        $model = M('xmps_xm');
+        $xmdata=$model->where("xm_id='".$xm_id."'")->find();
+        $xm_code=$xmdata["xm_code"];
+
+        //$path = './Public/'. C("xmfilepath")."/".$xm_code;
+        $path = './Public/'. C("xmfilepath");
+
+        $file = scandir($path);
+        $menu=array();
+        $relativePath = $_SERVER['SCRIPT_NAME'];
+        array_multisort($file);
+        $jianyishu=array();
+        $other=array();
+        $defname=$xmdata["xm_createuser"]."_".strtolower(C("defaultfilename"));
+        foreach($file as $key=>$val){
+            if($val!='.' && $val!='..') {
+                $encode = mb_detect_encoding($val, array("UTF-8", "GB2312"));
+                if ($encode != "UTF-8") {
+                    $val = iconv('gb2312', 'utf-8', $val);
+                }
+                if(strtolower($val)==$defname){
+                    array_push($jianyishu,$val);
+                    unset($file[$key]);
+                }else{
+                    array_push($other,$val);
+                }
+            }else{
+                unset($file[$key]);
+            }
+        }
+        $file=array_merge($jianyishu,$other);
+        foreach($file as $val) {
+            $temparr = explode(".", $val);
+            if($temparr[0] == $xmdata['xm_name'] && $temparr[1] == 'pdf'){
+                $houzhui = $temparr[count($temparr) - 1];
+                $title = str_replace('.' . $houzhui, '', $val);
+                $child = array(
+                    'title' => $title, //标题
+                    'icon' => '&#xe63c;',//图标
+                    'href' => '.' . $path . "/" . $val,//链接
+                );
+                array_push($menu, $child);
+            }
+        }
+		//dump($menu);die;
+        $this->assign('relativePath',$relativePath);
+        $this->assign('ds_menu', json_encode($menu));
+        $this->assign('showlable', $xmdata["xm_createuser"]."(".$xmdata["xm_company"].")".$xmdata["xm_code"]."_".$xmdata["xm_name"]);
+        $this->display();
+	}
 	
-    public function listindex()
+    public function listindexold()
     {
         $xm_id=I("get.id");
         $model = M('xmps_xm');
         $xmdata=$model->where("xm_id='".$xm_id."'")->find();
         $path = './Public/'. C("xmfilepath")."/".$xmdata["xm_code"];
-
         $file = scandir($path);
-
         $filesort = [];
         foreach($file as $fileSortName){
             if($fileSortName == '.' || $fileSortName == '..'){
                 $filesort[] = $fileSortName;
             }else{
+//                if(!@rename('测试编码.txt',  '测试编码修改.txt') && !@rename('测试编码修改.txt',  '测试编码.txt')){
+//                    $fileSortName = iconv('gbk','UTF-8',$fileSortName);
+//                }
                 if(strpos($fileSortName,'_') !== false){
                     $fileSortNames = explode('_',$fileSortName);
                     preg_match('/[0-9]+/',$fileSortNames[0],$fileSortNum);
@@ -391,7 +441,6 @@ class XMController extends Controller
                     $filesort[] = $fileSortName;
                 }
             }
-
         }
 
 
@@ -407,6 +456,9 @@ class XMController extends Controller
                 if ($encode != "UTF-8") {
                     $val = iconv('gb2312', 'utf-8', $val);
                 }
+//                if(!@rename('测试编码.txt',  '测试编码修改.txt') && !@rename('测试编码修改.txt',  '测试编码.txt')){
+//                    $val = iconv('gbk','UTF-8',$val);
+//                }
                 if(strtolower($val)==$defname){
                     array_push($jianyishu,$val);
                     unset($file[$key]);
@@ -429,6 +481,7 @@ class XMController extends Controller
             );
             array_push($menu, $child);
         }
+
         $this->assign('relativePath',$relativePath);
         $this->assign('ds_menu', json_encode($menu));
         $this->assign('showlable', $xmdata["xm_createuser"]."(".$xmdata["xm_company"].")".$xmdata["xm_code"]."_".$xmdata["xm_name"]);

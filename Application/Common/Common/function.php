@@ -172,13 +172,12 @@ function pieChart($data = array())
  * @author baijingqi
  * @return array file
  */
-function excelExport($tableHeader = array(), $result = array(), $isAjaxDown = true,
-                     $width = Array(),$is_landscape=false,$is_center=true,$footer=false,$title='',$title2='',$repeat=array(),$name="")
+function excelExport($tableHeader = array(), $result = array(), $isAjaxDown = true, $width = Array(),$is_landscape=false,$is_center=true,$footer=false,$title='',$title2="",$repeat=array(),$name="")
 {
 
     if (empty($tableHeader)) return json_encode(array('code' => -1, 'message' => '缺少表头'));
     if (empty($result)) return json_encode(array('code' => -2, 'message' => '数据为空'));
-    if ($tableHeader[0] != '序号') array_unshift($tableHeader, '序号');
+    if ($tableHeader[0] != '序号' && $tableHeader[0] != '项目序号') array_unshift($tableHeader, '序号');
     $headerLength = count($tableHeader);
     if ($headerLength > 52) return json_encode(array('code' => -3, 'message' => '最多支持导出52列'));
     $letter = getEnglishLetter(); //获取excel列名
@@ -193,6 +192,7 @@ function excelExport($tableHeader = array(), $result = array(), $isAjaxDown = tr
 
     vendor("PHPExcel.PHPExcel");
     $excel = new \PHPExcel();
+
     $styleArray = array(
         'borders'=>array(
             'allborders'=>array(
@@ -278,7 +278,7 @@ function excelExport($tableHeader = array(), $result = array(), $isAjaxDown = tr
             $excel->getSheet()->getStyle($letter[$j].$i)->getAlignment()->setWrapText(true);
             $excel->getActiveSheet()->setCellValue("$letter[$j]$i", "$value");
             $excel->getActiveSheet()->getStyle("$letter[$j]$i", "$value")->applyFromArray($styleArray);
-            if($tableHeader[$key]=="项目编号"||$tableHeader[$key]=="项目名称"||$tableHeader[$key]=="单位"||$tableHeader[$key]=="评审意见"){
+            if($tableHeader[$key]=="项目编号"||$tableHeader[$key]=="项目名称"||$tableHeader[$key]=="单位"||$tableHeader[$key]=="评审意见"||$tableHeader[$key]=="其他意见"){
                 $excel->getActiveSheet()->getStyle($letter[$j].$i)->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_JUSTIFY);
             }
             $j++;
@@ -287,18 +287,13 @@ function excelExport($tableHeader = array(), $result = array(), $isAjaxDown = tr
     if($footer){
         //设置页脚
         $excel->getActiveSheet()->getHeaderFooter()->setOddFooter("专家签字：                                                        日期：&R &P")->setAlignWithMargins(true);
-
+        $excel->getActiveSheet()->getPageMargins()->setFooter("0.5");
     }
     if(!empty($repeat)) {//跨页 重复显示  固定头用
         $excel->getActiveSheet()->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd($repeat[0], $repeat[1]);
     }
-    $zhuanma=true;
     if($name!=""){
-        $filename = iconv('utf-8','gb2312',$name);
-        if(!json_encode($filename)) {
-            $zhuanma=false;
-            $filename = $name;
-        }
+        $filename = $name;
     }else{
         $filename = date('Ymd') . time() . rand(0, 1000);
     }
@@ -308,14 +303,12 @@ function excelExport($tableHeader = array(), $result = array(), $isAjaxDown = tr
         $savePath = 'Public/upload/excel/' . date('Y-m-d');
         if (!is_dir($savePath)) mkdir($savePath, 0777, true);
         $filePath = $savePath . '/' . $filename;
+        if(!@rename('测试编码.txt',  '测试编码修改.txt') && !@rename('测试编码修改.txt',  '测试编码.txt')){
+            $filePath = iconv('UTF-8','gbk',$filePath);
+        }
         $write->save($filePath);
         $fileRootPath = getWebsiteRootPath();
-        if($zhuanma){
-            $filenamenew = iconv('gb2312','utf-8',$filename);
-        }else{
-            $filenamenew = $filename;
-        }
-        $filePath = $savePath . '/' . $filenamenew;
+        $filePath = $savePath . '/' . $filename;
         exit(json_encode(array('code' => 1, 'message' => $fileRootPath . $filePath)));
     } else {
         header("Pragma: public");

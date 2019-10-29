@@ -70,18 +70,14 @@
                                 <option value="{$val.xm_id}" >{$val.xm_name}</option>
                             </foreach>
                         </select>
-                        <label class="control-label" style="margin-left:15px;">分&nbsp;&nbsp;组：</label>
 
-                        <input class="form-control"  type="text" id="xm_class" name="xm_class" style="margin-left:10px;width: 120px;display: inline-block" >
-
-                        <label class="control-label" style="margin-left:15px;">类别:</label>
-                        <select class="chosen-select" id="xm_type" style="width: 120px;height: 32px;display: inline-block">
-                            <option></option>
-                            <option>军队</option>
-                            <option>地方</option>
+                        <label class="control-label" style="margin-left:15px;">课题分类：</label>
+                        <select id="xm_type" class="chosen-select">
+                            <option value="">&nbsp;</option>
+                            <foreach name="xmTypes" item="item">
+                                <option value="{$item.xm_type}"<?php if(count($xmTypes) == 1) echo "selected";?>>{$item.xm_type}</option>
+                            </foreach>
                         </select>
-                        <label class="control-label" style="margin-left:15px;">技术方向:</label>
-                        <input  class="form-control" type="text" id="xm_group" style="width: 120px;height: 32px;display: inline-block">
 
                         <label class="control-label" style="margin-left:15px;">专&nbsp;&nbsp;家：</label>
                         <select id="xm_user" class="chosen-select" >
@@ -122,31 +118,25 @@
     })
     $(".chosen-select").chosen({disable_search_threshold: 0, search_contains: true, width: '170px'});
     $('#atpbiztable').bootstrapTable({
-            url: '__CONTROLLER__/getData',         //请求后台的URL（*）
-            method: 'post',                      //请求方式（*）
-            toolbar: '#atpbiztoolbar',                //工具按钮用哪个容器
-            striped: true,                      //是否显示行间隔色
-            cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
-            pagination: true,                   //是否显示分页（*）
+            url: '__CONTROLLER__/getData',
+            method: 'post',
+            toolbar: '#atpbiztoolbar',
+            striped: true,
+            cache: false,
+            pagination: true,
             iconSize: 'outline',
-            sortable: true,                     //是否启用排序
+            sortable: true,
             sortName:"xm_code",
-            sortOrder: "asc",                   //排序方式
-            queryParams: queryParams,//传递参数（*）
-            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
-            pageNumber: 1,                       //初始化加载第一页，默认第一页
-            pageSize: 15,                       //每页的记录行数（*）
-            pageList: [5,15, 25, 50, 100],        //可供选择的每页的行数（*）
-//            strictSearch: true,
-//            showColumns: true,                  //是否显示所有的列
-//            showRefresh: true,                  //是否显示刷新按钮
-            minimumCountColumns: 2,             //最少允许的列数
-            clickToSelect: true,                //是否启用点击选中行
-//            height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
-            uniqueId: "xr_id",                     //每一行的唯一标识，一般为主键列
-//            showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
-//            cardView: true,                    //是否显示详细视图
-            detailView: false,                   //是否显示父子表
+            sortOrder: "asc",
+            queryParams: queryParams,
+            sidePagination: "server",
+            pageNumber: 1,
+            pageSize: 15,
+            pageList: [5,15, 25, 50, 100],
+            minimumCountColumns: 2,
+            clickToSelect: true,
+            uniqueId: "xr_id",
+            detailView: false,
             rowStyle:function(row,index){
                 return style = {
                     css:{
@@ -154,100 +144,118 @@
                     }
                 }
             },
-            columns: [
-                {title: '序号', width: 40,
-                    formatter: function (value, row, index)
-                    {
-                        var option =  $('#atpbiztable').bootstrapTable("getOptions");
-                        return option.pageSize * (option.pageNumber - 1) + index + 1;
-                    }
-                },
-                {field: 'xm_code', title: '项目编号', sortable: true,width:60,align:'center'},
-                {field: 'xm_name', title: '项目名称', sortable: true,width:100,align:'center'},
-                {field: 'xm_class', title: '分组', sortable: true,width:80,align:'center'},
-                {field: 'user_realusername', title: '评审专家', sortable: true,width:80,align:'center'},
-                {field: 'ps_total', title: '总分', sortable: true,width:30},
-
-            <?php if(!empty($markOption)){
-                foreach($markOption as $key=>$val){
-            ?>
-                {field: '{$val.field}', title: '{$val.brief}', sortable: true,width:30},
-        <?php }
-    }?>
-//                {field: 'ps_ql', title: '潜力', sortable: true,width:30},
-//                {field: 'ps_jz', title: '价值', sortable: true,width:30},
-//                {field: 'ps_cx', title: '创新', sortable: true,width:30},
-                {field: 'vote4', title: '与战斗力<br/>关联程度', sortable: true,align:'center',width:30,visible:false},
-                {field: 'xr_status', title: '打分状态', sortable: true,width:30,align:'center'},
-                {field: 'vote1', title: '第1轮</br>投票', sortable: true,width:30,align:'center',
-                    formatter:function(value, row, index){
-
-                        if(value == '-1'){
-                            return '回避';
-                        }else if(value == '1') {
-                            return '支持';
-                        } else if(value == '0') {
-                            return '不支持';
-                        }
-                        else if(value == '-2') {
-                            return '不参与本轮投票';
-                        }
-                        else
-                        {
-                            return value;
-                        }
-                    }},
-               {field: 'vote1status', title: '第1轮</br>状态', sortable: true,width:30,align:'center'},
-                {field: 'vote2', title: '第2轮</br>投票', sortable: true,width:30,align:'center',
-                    formatter:function(value, row, index){
-
-                        if(value == '-1'){
-                            return '回避';
-                        }else if(value == '1') {
-                            return '支持';
-                        } else if(value == '0') {
-                            return '不支持';
-                        }
-                        else if(value == '-2') {
-                            return '不参与本轮投票';
-                        }
-                        else
-                        {
-                            return value;
-                        }
-                    }},
-               {field: 'vote2status', title: '第2轮</br>状态', sortable: true,width:30,align:'center'},
-                {field: 'vote3', title: '第3轮</br>投票', sortable: true,width:30,align:'center',
-                    formatter:function(value, row, index){
-
-                        if(value == '-1'){
-                            return '回避';
-                        }else if(value == '1') {
-                            return '支持';
-                        } else if(value == '0') {
-                            return '不支持';
-                        }
-                        else if(value == '-2') {
-                            return '不参与本轮投票';
-                        }
-                        else
-                        {
-                            return value;
-                        }
-                    }},
-               {field: 'vote3status', title: '第3轮</br>状态', sortable: true,width:30,align:'center'}
-            ],
+            columns: tableColumn(),
             onLoadSuccess:function(){
                 // 表格内部文字垂直居中
                 $('#atpbiztable th').css('vertical-align','middle');
-                if("{$Think.config.isZD}" == 1){
-                    $('#atpbiztable').bootstrapTable('showColumn','vote4');
-                }
             }
         });
     $('#sys_refresh').on('click',function() {
         $('#atpbiztable').bootstrapTable('refresh')
     });
+    function tableColumn(){
+        var column = [
+            {title: '序号', width: 40,
+                formatter: function (value, row, index)
+                {
+                    var option =  $('#atpbiztable').bootstrapTable("getOptions");
+                    return option.pageSize * (option.pageNumber - 1) + index + 1;
+                }
+            },
+            {
+                field: 'xm_code',
+                title: '项目编号',
+                sortable: true,
+                width:60,
+                align:'center'
+            },
+            {
+                field: 'xm_name',
+                title: '项目名称',
+                sortable: true,
+                width:100,
+                align:'center'
+            },
+            {
+                field: 'xm_class',
+                title: '分组',
+                sortable: true,
+                width:80,
+                align:'center'
+            },
+            {
+                field: 'xm_type',
+                title: '课题分类',
+                sortable: true,
+                width:80,
+                align:'center'
+            },
+            {
+                field: 'user_realusername',
+                title: '评审专家',
+                sortable: true,
+                width:80,
+                align:'center'
+            },
+            {
+                field: 'ps_total',
+                title: '总分',
+                sortable: true,
+                width:30,
+                formatter:function(value, row, index){
+                    if(row.ishuibi == 1){
+                        return '回避'
+                    }else{
+                        return value;
+                    }
+                }
+            },
+            <?php if(!empty($markOption)){
+                foreach($markOption as $key=>$val){
+                    ?>
+                    {
+                        field: '{$val}',
+                        title: '评审指标<?php echo $key+1;?>',
+                        sortable: true,width:30,
+                        formatter:function(value, row, index){
+                            if(row.ishuibi == 1){
+                                return '回避'
+                            }else{
+                                return value;
+                            }
+                        }
+                    },
+                <?php }
+            }?>
+        <?php
+        if(C('isZD') == '1'){?>
+            {
+                field: 'vote4',
+                title: '与战斗力<br/>关联程度',
+                sortable: true,
+                align:'center',
+                width:30,
+                formatter:function(value, row, index){
+                    if(row.ishuibi == 1){
+                        return '回避'
+                    }else{
+                        return value;
+                    }
+                }
+            },
+    <?php     }
+        ?>
+            {
+                field: 'xr_status',
+                title: '打分状态',
+                sortable: true,
+                width:20,
+                align:'center'
+            }
+        ];
+        return column;
+
+    }
     function queryParams(params) {  //配置参数
         var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
             limit: params.limit,   //页面大小
@@ -264,6 +272,11 @@
         return temp;
     }
     $('#sys_export').on('click',function() {
+        var xm_type = $("#xm_type").val();
+        if(xm_type == ''){
+            layer.alert("请选择课题分类");
+            return false;
+        }
         var data = {
             xm_code: $("#xm_code").val(),//排位命令（desc，asc）
             xm_id:$("#xm_id").val(),

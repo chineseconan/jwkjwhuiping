@@ -18,6 +18,8 @@ class JdQueryController extends BaseController
         $where['xm_status'] = ['neq', '删除'];
         $data = $model->field('xm_id,xm_name,xm_code')->order("xm_code asc")->where($where)->select();
         $this->assign("xmdata", $data);
+        $xmTypes =M('xmps_xm')->field('distinct xm_type')->select();
+        $this->assign("xmTypes", $xmTypes);
         $this->display();
     }
 
@@ -46,7 +48,7 @@ class JdQueryController extends BaseController
             $where['xm_code'] = ['eq', $queryParam['xm_code']];
         }
         $model = M('xmps_xm');
-        $data = $model->field('xm_id,xm_code,xm_tmfs,xm_name,xm_company,xm_createuser,xm_class,xm_year,case when wanchengcount is null then 0 else wanchengcount end wanchengcount,
+        $data = $model->field('xm_id,xm_code,xm_tmfs,xm_name,xm_company,xm_createuser,xm_class,xm_year,xm_type,case when wanchengcount is null then 0 else wanchengcount end wanchengcount,
         case when allcount is null then 0 else allcount end allcount,num,ps_detail')
             ->join("left join (select xr_xm_id,count(xr_id) wanchengcount,max(avgvalue) as num,max(ps_detail) ps_detail from xmps_xmrelation a,sysuser b where b.user_id=a.xr_user_id and user_isdelete='0' and xr_status='完成' group by xr_xm_id) a on xmps_xm.xm_id=a.xr_xm_id")
             ->join("left join (select xr_xm_id,count(xr_id) allcount  from xmps_xmrelation a,sysuser b where b.user_id=a.xr_user_id and user_isdelete='0' group by xr_xm_id) b on xmps_xm.xm_id=b.xr_xm_id")
@@ -159,8 +161,12 @@ class JdQueryController extends BaseController
     public function getpingshen()
     {
         $queryParam = I('get.');
+        $xmType = M('xmps_xm')->where("xm_id = '%s'",$queryParam["xm_id"])->getField('xm_type');
         $this->assign('xm_id', $queryParam["xm_id"]);
         $this->assign('status', $queryParam["status"]);
+
+        $markOption = C('mark.REMARK_OPTION')[$xmType]['评价内容'];
+        $this->assign('markOption',$markOption);
         $this->display("pingshendetail");
     }
 
@@ -174,7 +180,7 @@ class JdQueryController extends BaseController
             $where['xr_status'] = ['eq', '完成'];
         }
         $model = M('xmps_xmrelation');
-        $data = $model->field('user_realusername,xr_id,ps_ql,ps_jz,ps_cx,ps_zz,ps_detail,ps_total,xr_status,ishuibi,vote4')
+        $data = $model->field('user_realusername,xr_id,ps_cj,ps_ql,ps_jz,ps_cx,ps_zz,ps_detail,ps_total,xr_status,ishuibi,vote4')
             ->join("sysuser on user_id=xmps_xmrelation.xr_user_id and user_isdelete='0'")
             ->where($where)
             ->select();
@@ -191,6 +197,8 @@ class JdQueryController extends BaseController
         $where['user_issystem'] = ['eq', '否'];
         $data = $userModel->field('user_id,user_name,user_realusername')->where($where)->order("user_class asc")->select();
         $this->assign("user", $data);
+        $xmTypes =M('xmps_xm')->field('distinct xm_type')->select();
+        $this->assign("xmTypes", $xmTypes);
         $this->display();
     }
     public function getClass()
@@ -206,9 +214,10 @@ class JdQueryController extends BaseController
     {
         $user_id  = I("post.user_id");
         $classid  = I("post.classid");
+        $xmType   = I("post.xmType");
         $model = M('xmps_xmrelation');
         try {
-            $relationdata = $model->where("xr_user_id='" . $user_id . "' and xr_xm_id in (select xm_id from xmps_xm where xm_class='".$classid."') and xr_status='完成'")->select();
+            $relationdata = $model->where("xr_user_id='" . $user_id . "' and xr_xm_id in (select xm_id from xmps_xm where xm_class='".$classid."' and xm_type = '$xmType') and xr_status='完成'")->select();
             $data = array();
             foreach ($relationdata as $rd) {
                 $data["xr_status"] = "进行中";
@@ -304,18 +313,30 @@ class JdQueryController extends BaseController
         $queryParam =I("get.");
         if (!empty($queryParam['xm_class'])) {
             $where['xm_status'] = ['neq', '删除'];
-            $where['xm_year'] = ['eq', date("Y", time())];
-            $where['xm_class'] = ['eq', $queryParam["xm_class"]];
+            $where['xm_year']   = ['eq', date("Y", time())];
+            $where['xm_class']  = ['eq', $queryParam["xm_class"]];
+            $where['xm_type']   = ['eq', $queryParam["xm_type"]];
             $model = M('xmps_xm');
-            $data = $model->field('xm_code,xm_name,xm_company,xm_createuser,num')
-                ->join("left join (select xr_xm_id,max(avgvalue) as num from xmps_xmrelation where xr_status='完成' group by xr_xm_id) a on xmps_xm.xm_id=a.xr_xm_id")
+            $data = $model->field('xm_code,xm_name,xm_company,xm_createuser,avgvalue')
+                ->join("left join (select xr_xm_id,max(avgvalue) as avgvalue from xmps_xmrelation where xr_status='完成' group by xr_xm_id) a on xmps_xm.xm_id=a.xr_xm_id")
+//                ->join("left join (select xr_xm_id,max(avgvalue2) as avgvalue2 from xmps_xmrelation_r2 where xr_status='完成' group by xr_xm_id) b on xmps_xm.xm_id=b.xr_xm_id")
                 ->where($where)
-                ->order('num desc')
+//                ->order('avgvalue desc,avgvalue2 desc')
+                ->order('avgvalue desc')
                 ->select();
+            $avgvalues = removeArrKey($data,'avgvalue');
+            $avgvalues = array_count_values($avgvalues);
+            $avgvalueRepeat = [];
+            foreach($avgvalues as $values=>$countNum){
+                if($countNum>1) $avgvalueRepeat[] = $values;
+            }
+//            dump($avgvalueRepeat);die;
+//            echo $model->_sql();die;
             vendor("PHPExcel.PHPExcel");
             $excel = new \PHPExcel();
             $zhuanma = true;
-            $name = "青托基金" . date("Y", time()) . "年度项目会评结果统计表";
+            $titleForExport = C('mark.REMARK_OPTION')[$queryParam["xm_type"]]['title'];
+            $name = date("Y", time()) . "年度".$titleForExport."评审结果统计表";
 //            $filename = iconv('utf-8', 'gb2312', $name);
             //        if(!json_encode($filename)) {
 //            $zhuanma=false;
@@ -358,11 +379,11 @@ class JdQueryController extends BaseController
                 )
             );
             $letter = getEnglishLetter(); //获取excel列名
-            $excel->getActiveSheet()->setCellValue('A1', $name)->mergeCells('A1:F1');
-            $excel->getActiveSheet()->getStyle('A1:F1')->applyFromArray($titleStyle);
-            $excel->getActiveSheet()->getStyle('A1:F1')->getFont()->setName("黑体")->setSize(16)->setBold(true);
+            $excel->getActiveSheet()->setCellValue('A1', $name)->mergeCells('A1:G1');
+            $excel->getActiveSheet()->getStyle('A1:G1')->applyFromArray($titleStyle);
+            $excel->getActiveSheet()->getStyle('A1:G1')->getFont()->setName("黑体")->setSize(16)->setBold(true);
             $excel->getActiveSheet()->getRowDimension(1)->setRowHeight(40);
-            $width = array(7, 15, 30, 40, 15, 15);
+            $width = array(7, 15, 25, 30, 15, 15, 15);
             $index = 0;
             for ($index; $index < 8; $index++) {
                 $excel->getActiveSheet()->getStyle($letter[$index])->getAlignment()->setWrapText(true);
@@ -375,19 +396,20 @@ class JdQueryController extends BaseController
             $excel->getActiveSheet()->setCellValue('D2', "本组项目数：" . count($data) . "个");
             $excel->getActiveSheet()->getStyle('D2')->applyFromArray($titleStyle);
             $excel->getActiveSheet()->getStyle('D2')->getFont()->setName("楷体")->setSize(13);
-            $excel->getActiveSheet()->setCellValue('E2', "日期：" . date("Y-m-d", time()))->mergeCells('E2:F2');
-            $excel->getActiveSheet()->getStyle('E2:F2')->applyFromArray($titleStyle);
-            $excel->getActiveSheet()->getStyle('E2:F2')->getFont()->setName("楷体")->setSize(13);
+            $excel->getActiveSheet()->setCellValue('E2', "日期：" . date("Y-m-d", time()))->mergeCells('E2:G2');
+            $excel->getActiveSheet()->getStyle('E2:G2')->applyFromArray($titleStyle);
+            $excel->getActiveSheet()->getStyle('E2:G2')->getFont()->setName("楷体")->setSize(13);
             $index = 0;
-            $title = array("序号", "项目编号", "项目名称", "依托单位", "申请人", "平均分");
+//            $title = array("序号", "项目编号", "项目名称", "依托单位", "申请人", "一轮平均分", "二轮平均分");
+            $title = array("序号", "项目编号", "项目名称", "依托单位", "申请人", "平均分", "备注");
             $index = 0;
-            for ($index; $index < 6; $index++) {
+            for ($index; $index < 7; $index++) {
                 $excel->getActiveSheet()->setCellValue($letter[$index] . '3', $title[$index]);
                 $excel->getActiveSheet()->getStyle($letter[$index] . '3')->applyFromArray($styleArray);
                 $excel->getActiveSheet()->getStyle($letter[$index] . '3')->getFont()->setBold(true);
             }
             $key = 4;
-            $column = array('xm_code', 'xm_name', 'xm_company', 'xm_createuser', 'num');
+            $column = array('xm_code', 'xm_name', 'xm_company', 'xm_createuser', 'avgvalue','avgvalue2');
             $titlecount = count($title);
             foreach ($data as $d) {
                 if ($d["num"] == null)
@@ -397,20 +419,28 @@ class JdQueryController extends BaseController
             
                 $excel->getActiveSheet()->setCellValue($letter[0] . $key, $key - 3);
                 $excel->getActiveSheet()->getStyle($letter[0] . $key)->applyFromArray($styleArray);
+                if(in_array($d['avgvalue'],$avgvalueRepeat)){
+                    $excel->getActiveSheet()->getStyle($letter[0] . $key)->getFont()->setBold(true);
+                }
                 $index = 1;
                 for ($index; $index < $titlecount; $index++) {
-//                    echo $letter[$index];
+//                    echo $d['avgvalue']."---<br/>";
                     $excel->getActiveSheet()->setCellValue($letter[$index] . $key, $d[$column[$index - 1]]);
                     if($letter[$index] == 'C' || $letter[$index] == 'D'){
                         $excel->getActiveSheet()->getStyle($letter[$index] . $key)->applyFromArray($styleArrayLeft);
                     }else{
                         $excel->getActiveSheet()->getStyle($letter[$index] . $key)->applyFromArray($styleArray);
                     }
+                    if(in_array($d['avgvalue'],$avgvalueRepeat)){
+                        $excel->getActiveSheet()->getStyle($letter[$index] . $key)->getFont()->setBold(true);
+//                        $excel->getActiveSheet()->getStyle('A1:G1')->getFont()->setName("黑体")->setSize(16)->setBold(true);
+                    }
                 }
                 $key++;
             }
-            $excel->getActiveSheet()->getHeaderFooter()->setOddFooter("专家组组长签字：&R &P")->setAlignWithMargins(true);
-            $excel->getActiveSheet()->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1, 4);
+            $excel->getActiveSheet()->getHeaderFooter()->setOddFooter("专家组组长签字：&R第&P页/共&N页")->setAlignWithMargins(true);
+            $excel->getActiveSheet()->getPageMargins()->setFooter("0.5");
+            $excel->getActiveSheet()->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1, 3);
             $write = new \PHPExcel_Writer_Excel2007($excel);
             $filename = $filename . '.xlsx';
             $savePath = '../Public/upload/excel/' . date('Y-m-d');
@@ -432,6 +462,9 @@ class JdQueryController extends BaseController
     {
         $data =M()->query("select distinct xm_class from xmps_xm");
         $this->assign("classdata", $data);
+        $xmTypes =M()->query("select distinct xm_type from xmps_xm");
+//        dump($xmTypes);die;
+        $this->assign("xmTypes", $xmTypes);
         $this->display();
     }
 
@@ -440,12 +473,16 @@ class JdQueryController extends BaseController
      **/
     public function checkResultExportFinish(){
         $xm_class = I('post.xm_class');
+        $xm_type  = I('post.xm_type');
         if(!$xm_class) exit(makeStandResult('1','参数缺失，请重试！'));
+        if(!$xm_type) exit(makeStandResult('1','参数缺失，请重试！'));
         $where = [];
         $where['xm_class']  = $xm_class;
+        $where['xm_type']   = $xm_type;
         $where['xr_status'] = '进行中';
         $where['xm_status'] = ['neq','删除'];
-        $Sum = M('xmps_xmrelation r')->join('left join xmps_xm x on x.xm_id=r.xr_xm_id')->where($where)->count();
+        $where['u.user_isdelete'] = ['neq','1'];
+        $Sum = M('xmps_xmrelation r')->join('left join xmps_xm x on x.xm_id=r.xr_xm_id')->join("sysuser u on r.xr_user_id = u.user_id")->where($where)->count();
         if($Sum>0){
             exit(makeStandResult('2','当前分组下有未提交打分的专家,请等专家提交后再导出结果表！'));
         }else{

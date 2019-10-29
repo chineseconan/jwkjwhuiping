@@ -66,14 +66,6 @@
 
                     <label>分组:</label>
                     <input type="text" id="class" style="width: 120px;height: 32px;display: inline-block">
-                    <label>类别:</label>
-                    <select id="type" style="width: 120px;height: 32px;display: inline-block">
-                        <option></option>
-                        <option>军队</option>
-                        <option>地方</option>
-                    </select>
-                    <label>技术方向:</label>
-                    <input type="text" id="group" style="width: 120px;height: 32px;display: inline-block">
                     <label>申请人:</label>
                     <input type="text" id="createuser" style="width: 120px;height: 32px;display: inline-block">
                     <label>依托单位:</label>
@@ -83,7 +75,6 @@
                     <button class="btn btn-error" style="margin-left: 10px;" type="button" id="sys_del"><i class="fa fa-trash-o"></i>删除</button>
                     <button class="btn btn-danger"  id="export" style="margin-left: 10px;"><i class="fa fa-download"></i>导出</button>
                     <button class="btn btn-danger"  id="import" style="margin-left: 10px;"><i class="fa fa-upload"></i>导入</button>
-                    <input type="hidden" id="xm_type" name="xm_type" value="{$xmType}"/>
                 </div>
                 <table id="information"></table>
             </div>
@@ -112,12 +103,6 @@
             $('#information').bootstrapTable("refresh");
         });
         $("#company").on("keyup",function(){
-            $('#information').bootstrapTable("refresh");
-        });
-        $("#type").on("change",function(){
-            $('#information').bootstrapTable("refresh");
-        });
-        $("#group").on("keyup",function(){
             $('#information').bootstrapTable("refresh");
         });
        $('#information').bootstrapTable({
@@ -169,8 +154,7 @@
                             {field: 'xm_company', title: '依托单位', width:200,sortable: true},
                             {field: 'xm_createuser', title: '申请人', width:70},
                             {field: 'xm_class', title: '分组', width:50,sortable: true},
-                            {field: 'xm_type', title: '类别', width:50,sortable: true},
-                            {field: 'xm_group', title: '技术方向', width:50,sortable: true},
+                            {field: 'xm_type', title: '课题分类', width:50,sortable: true},
                             {field: 'xm_tmfs', title: '推荐方式', width:50,sortable: true},
 
                             {field: 'xm_id', title: '操作', width: 120,
@@ -178,10 +162,10 @@
                                     var inp     = "'" + value + "'";
                                     var classes = "'" + row.xm_class + "'";
                                     var a = '';
-                                    a += '<a style="height:30px;line-height:30px;margin-left:10px;" class="btn btn-info btn-xs" onclick="pubTask(' + inp + ')">编辑</a>';
-                                    a += '<a style="height:30px;line-height:30px;margin-left:10px;" class="btn btn-info btn-xs" onclick="sortByClass(' + classes + ')">分组排序</a>';
+                                    a += '<a style="height:30px;line-height:30px;margin-left:5px;" class="btn btn-info btn-xs" onclick="pubTask(' + inp + ')">编辑</a>';
+                                    a += '<a style="height:30px;line-height:30px;margin-left:5px;" class="btn btn-info btn-xs" onclick="sortByClass(' + classes + ')">分组排序</a>';
 //                                    a += '<a style="height:30px;line-height:30px;margin-left:10px;" class="btn btn-info btn-xs" onclick="setExt(' + inp + ')">选择评委</a>';
-//								    a += '<a style="height:30px;line-height:30px;margin-left:10px;" class="btn btn-info btn-xs" onclick="XMlook(' + inp + ')">项目预览</a>';
+								    a += '<a style="height:30px;line-height:30px;margin-left:5px;" class="btn btn-info btn-xs" onclick="XMlook(' + inp + ')">项目预览</a>';
                                     return a;
                                 }
                             }
@@ -198,9 +182,7 @@
                 name: $("#name").val(),
                 code:$("#code").val(),
                 'createuser':$("#createuser").val(),
-                'company':$("#company").val(),
-                'type':$("#type option:selected").val(),
-                'group':$("#group").val()
+                'company':$("#company").val()
             };
         }
 
@@ -224,7 +206,7 @@
                 type: 2,
                 shadeClose:false,
                 content:'__CONTROLLER__/remote',
-                area: ['900px', '600px']
+                area: ['900px', '450px']
             });
         });
 
@@ -313,7 +295,7 @@
                 type: 2,
                 shadeClose:false,
                 content:'__CONTROLLER__/remote?id=' + id,
-                area: ['900px', '650px']
+                area: ['900px', '450px']
             });
         }
 
@@ -330,7 +312,7 @@
 
 		
 	   function  XMlook(id){
-            window.open('__CONTROLLER__/listindex?xm_id=' + id);
+            window.open('__CONTROLLER__/listindex?id=' + id);
         }
 
         function setExt(id){

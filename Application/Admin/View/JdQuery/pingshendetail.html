@@ -102,31 +102,45 @@
                     }
                 }
                 },
-                {field: 'ps_ql', title: '潜力分数', sortable: true,formatter:function(value,row){
-                    var ishuibi = row.ishuibi;
-                    if(ishuibi == '1'){
-                        return '回避';
-                    }else {
-                        return value;
-                    }
-                },width:80},
-                {field: 'ps_jz', title: '价值分数', sortable: true,formatter:function(value,row){
-                    var ishuibi = row.ishuibi;
-                    if(ishuibi == '1'){
-                        return '回避';
-                    }else {
-                        return value;
-                    }
-                },width:80},
-                {field: 'ps_cx', title: '托举实力', sortable: true,formatter:function(value,row){
-                    var ishuibi = row.ishuibi;
-                    if(ishuibi == '1'){
-                        return '回避';
-                    }else {
-                        return value;
-                    }
-                },width:80},
-                {field: 'vote4', title: '与战斗力关联程度', sortable: true,formatter:function(value,row){
+            <?php if(!empty($markOption)){
+                foreach($markOption as $key=>$val){
+            ?>
+                {field: '{$val.field}', title: '{$val.title}', sortable: true,
+                    formatter:function(value,row){
+                        var ishuibi = row.ishuibi;
+                        if(ishuibi == '1'){
+                            return '回避';
+                        }else {
+                            return value;
+                        }
+                    },width:80},
+            <?php }
+             }?>
+//                {field: 'ps_ql', title: '潜力分数', sortable: true,formatter:function(value,row){
+//                    var ishuibi = row.ishuibi;
+//                    if(ishuibi == '1'){
+//                        return '回避';
+//                    }else {
+//                        return value;
+//                    }
+//                },width:80},
+//                {field: 'ps_jz', title: '价值分数', sortable: true,formatter:function(value,row){
+//                    var ishuibi = row.ishuibi;
+//                    if(ishuibi == '1'){
+//                        return '回避';
+//                    }else {
+//                        return value;
+//                    }
+//                },width:80},
+//                {field: 'ps_cx', title: '托举实力', sortable: true,formatter:function(value,row){
+//                    var ishuibi = row.ishuibi;
+//                    if(ishuibi == '1'){
+//                        return '回避';
+//                    }else {
+//                        return value;
+//                    }
+//                },width:80},
+                {field: 'vote4', title: '与战斗力关联程度', sortable: true,visible:false,formatter:function(value,row){
                     var ishuibi = row.ishuibi;
                     if(ishuibi == '1'){
                         return '回避';
@@ -134,7 +148,12 @@
                         return value;
                     }
                 },width:80}
-                ]
+            ],
+            onLoadSuccess:function(){ 
+                if("{$Think.config.isZD}" == 1){
+                    $('#detailtable').bootstrapTable('showColumn','vote4');
+                }
+            }
         });
     function queryParams(params) {  //配置参数
         var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的

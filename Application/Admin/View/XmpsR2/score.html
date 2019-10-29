@@ -53,7 +53,7 @@
              margin-top: 0px;
         }
         table thead{
-            background: #4096C7;
+            background: #23b2ab;
             font-size: 16px;
             color: #fff;
         }
@@ -86,18 +86,11 @@
             color: #2f4050;
         }
         .btn-hanping{
-            background-color: #ea9d49;
-			height: 30px;
-			line-height: 19px;
-			padding: 6px;
-			border-color: #cac3bb;
-			color: #ffffff;
-			font-size: 14px;
-			background-color: #5fb878;
+            height: 21px;
+            background-color: #A8D0A8;
+            border-color: #055605;
+            color: #055605;
         }
-		.btn-hanping:hover{
-			color: #ffffff;
-		}
         .chosen-container-single .chosen-single {
             min-height: inherit;
              height: 37px!important;
@@ -106,33 +99,19 @@
         .active-result,.chosen-single{
             text-align: left;
         }
-	.ibox {
-    		margin-bottom: 0px;
-	}
-	.orange>td{
-		background-color:#F7C15F!important;
-	}
-    /*.fixed-table-container thead th .th-inner{
-        padding:2px 8px!important;
-    }*/
-    #sys_wancheng{
-         background-color: cornflowerblue;
-         border-color: cornflowerblue;
-     }
-    #sys_refresh{
-         background-color: #5ab85a;
-         border-color: #5ab85a;
-     }
-    .btn-green{
-         background-color: #5ab85a!important;
-         border-color: #5ab85a!important;
-     }
-    table{
-        /*table-layout: auto!important;*/
-    }
-	.nopadding>.th-inner {
-		padding:8px 0px!important;
-	}
+        .ibox {
+                margin-bottom: 0px;
+        }
+        .orange>td{
+            background-color:#F7C15F!important;
+        }
+        /*.fixed-table-container thead th .th-inner{
+            padding:2px 8px!important;
+        }*/
+        #sys_saveall{
+            background-color: cornflowerblue;
+            border-color: cornflowerblue;
+        }
     </style>
 </head>
 <body class="gray-bg" style="font-family: 微软雅黑;" >
@@ -151,13 +130,12 @@
                                 {$markRule}
                             </div>
 
-                            <div style="width: 11.5%;float: left;">
+                            <div style="width: 11.5%;float: left;margin-top: 50px;">
                                 <input type="hidden" name="xr_status" id="xr_status" value="进行中"/>
-                                <button class="btn btn-success" style="margin-left: 12px;display:block;" type="button" id="sys_refresh"><i class="fa fa-refresh"></i>&nbsp;刷新</button>
-                                <button class="btn btn-warning" style="margin-left: 12px;display:block;" type="button" id="sys_wancheng"><i class="fa fa-check"></i>&nbsp;提交</button>
-                                <button class="btn btn-warning" style="margin-left: 12px;display:block;" type="button" id="sys_saveall"><i class="fa fa-save"></i>&nbsp;全部保存</button>
-                                <input type="hidden" id="xm_type" name="xm_type" value="{$xmType}"/>
-                            </div>
+                                <button class="btn btn-warning" style="margin-right: 62px;float:right;" type="button" id="sys_saveall"><i class="fa fa-save"></i>&nbsp;全部保存</button>
+                                <button class="btn btn-warning" style="margin-right: 10px;float:right;" type="button" id="sys_wancheng"><i class="fa fa-check"></i>&nbsp;提交</button>
+                                <button class="btn btn-info" style="margin-right: 10px;float:right;" type="button" id="sys_refresh"><i class="fa fa-refresh"></i>&nbsp;刷新</button>
+                                </div>
                         </div>
                         <table id="atpbiztable" style="font-size:15px;" data-height=''></table>
                     </div>
@@ -181,38 +159,38 @@
     offset="{$offset}"?"{$offset}":1;
     limit="{$limit}"?"{$limit}":10;
     $('#atpbiztable').bootstrapTable({
-        url: '__CONTROLLER__/getData',
-        method: 'post',
-        toolbar: '#atpbiztoolbar',
-        striped: true,
-        cache: false,
-        pagination: false,
+        url: '__CONTROLLER__/getData',         //请求后台的URL（*）
+        method: 'post',                      //请求方式（*）
+        toolbar: '#atpbiztoolbar',                //工具按钮用哪个容器
+        striped: true,                      //是否显示行间隔色
+        cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+        pagination: false,                   //是否显示分页（*）
         iconSize: 'outline',
         sortable: false,
 		sortName:"xm_ordernum",
         sortOrder: "asc", 
-        queryParams: queryParams,
-        sidePagination: "server",
-        pageNumber: eval(offset),
-        pageSize: eval(limit),
-        pageList: [10, 25, 50, 100],
-        minimumCountColumns: 2,
-        clickToSelect: true,
-        uniqueId: "xr_id",
-        detailView: false,
-        detailFormatter: "detailFormatter",
+        queryParams: queryParams,//传递参数（*）
+        sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+        pageNumber: eval(offset),                       //初始化加载第一页，默认第一页
+        pageSize: eval(limit),                       //每页的记录行数（*）
+        pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+        minimumCountColumns: 2,             //最少允许的列数
+        clickToSelect: true,                //是否启用点击选中行
+        uniqueId: "xr_id",                     //每一行的唯一标识，一般为主键列
+        detailView: false,                   //是否显示父子表
+        detailFormatter: "detailFormatter",                   //是否显示父子表
         rowStyle:function(row,index){
-	        var style = {
-                css:{
-                    'font-size':'15px'
-                }
+            var style = {
+                    css:{
+                        'font-size':'15px'
+                    }
             };
-	        if(row.notsave == 1){
-		        style = {
-		            css:{
-                    	'font-size':'15px'
+            if(row.notsave == 1){
+                style = {
+                    css:{
+                        'font-size':'15px',
                     },
-		        classes:'orange'
+                    classes:'orange'
                 }
             }
             return style;
@@ -235,6 +213,7 @@
                    });
             },
         onPostBody: function (tableValue) {
+//            $('#atpbiztable').bootstrapTable("hideColumn",'0');
             var table  = $('#atpbiztable tbody tr');
             var len    = tableValue.length;
             for(var i=0;i<len;i++){
@@ -249,57 +228,42 @@
                     $(ps_jz).editable('disable');
                     var ps_cx = $(table).eq(i).find('a[data-name="ps_cx"]');
                     $(ps_cx).editable('disable');
-                    var vote4 = $(table).eq(i).find('a[data-name="vote4"]');
-                    $(vote4).editable('disable');
                     var ps_total = $(table).eq(i).find('a[data-name="ps_total"]');
                     $(ps_total).editable('disable');
                 }
             }
         },
         onLoadSuccess:function(){
-            if("{$Think.config.isZD}" == 1){
-                $('#atpbiztable').bootstrapTable('showColumn','vote4');
-            }
-        },
-        onEditableShown: function(field, row, $el, editable){
-            setTimeout(function(){
-                editable.input.$input.select();
-                var widthprt = $el.parent("td").css('width');
-                var width = widthprt.substr(0,widthprt.length-2);
-                width = fomatFloat(fomatInt(width)*0.8);
-                editable.input.$input.css('width',width);
-                $el.parent("td").css('width',widthprt);
-            },50);
+
         }
     });
 
     function tableColumn(){
         var column = [
-            {field: 'xm_ordernum',title: '答辩<br/>顺序', width: 50,sortable:true,
-                /*,
-                 formatter: function (value, row, index)
-                 {
-                 var option =  $('#atpbiztable').bootstrapTable("getOptions");
-                 return option.pageSize * (option.pageNumber - 1) + index + 1;
-                 }*/
+            {title: '序号', width: 40,
+                formatter: function (value, row, index)
+                {
+                    var option =  $('#atpbiztable').bootstrapTable("getOptions");
+                    return option.pageSize * (option.pageNumber - 1) + index + 1;
+                }
             },
+            {field: 'xm_ordernum', title: '答辩序号', sortable: true,width:70},
             {field: 'xm_code', title: '项目编号', sortable: true,width:80},
             {field: 'xm_name', title: '项目名称', sortable: true,width:80,align:'left'},
             {field: 'xm_company', title: '依托单位', sortable: true,width:80,align:'left'},
+//            {field: 'xm_type', title: '类别',width:50,align:'center'},
+//            {field: 'xm_group', title: '技术方向',width:70,align:'center'},
             {field: 'xm_createuser', title: '申请人', sortable: true,width:50},
-//            {field: 'xm_id', title: '初审成绩', sortable: false,visible:true,width:80,
-//                formatter: function (value, row, index) {
-//                    var a = '<a  class="btn btn-hanping btn-xs detail-icon">初审成绩</a>';
-//                    return a;
-//                }
-//            },
+            {field: 'xm_id', title: '初审成绩', sortable: false,visible:true,width:80,
+                formatter: function (value, row, index) {
+                    var a = '<a  class="btn btn-hanping btn-xs detail-icon">初审成绩</a>';
+                    return a;
+                }
+            },
             <?php if(!empty($markOption)){
                 foreach($markOption as $key=>$val){
         ?>
                 {field: '{$val.field}', title: '{$val.title}<br/>({$val.minVal}-{$val.maxVal})', sortable: true,width:80,
-				<?php if(!empty($val['nopadding'])){
-					echo "class:'nopadding',";
-					}?>
                     formatter:function(value, row, index){
                         var ishuibi = row.ishuibi;
                         if(ishuibi == '1'){
@@ -311,51 +275,26 @@
                         }
                     },
                     editable: {
-                        type:'text',
+                        type:'select',
                         title:'{$val.title}',
                         emptytext:'请打分',
                         showbuttons:false,
                         mode:'inline',
                         onblur:"submit",
-                        validate:function(v){
-                            if(isNaN(v)){
-                                return '{$val.title}'+'必须为数字';
-                            }else if(v>{$val.maxVal}){
-                                return '{$val.title}'+'分数不能超过'+'{$val.maxVal}';
-                            }else if(v<{$val.minVal}){
-                                return '{$val.title}'+'分数不能小于'+'{$val.minVal}';
+                        source:
+                        <?php
+                            $minVal = $val['minVal'];
+                            $maxVal = $val['maxVal'];
+                            $tmp = [];
+                            for($i = $minVal;$i<=$maxVal;$i++){
+                                $tmp[] = $i;
                             }
-                        }
+                            echo "[".implode(",",$tmp)."]";
+                        ?>
                     }
                 },
             <?php }
     }?>
-            {field: 'vote4', title: '与战斗力<br/>关联程度', sortable: true,width:80,visible:false,
-                formatter:function(value, row, index){
-                    var ishuibi = row.ishuibi;
-                    if(ishuibi == '1'){
-                        return '回避';
-                    }else if(value !== null) {
-                        return value;
-                    }else if(value == null){
-                        return '';
-                    }
-                },
-                editable: {
-                    type:'select',
-                    title:'与战斗力关联程度',
-                    showbuttons:false,
-                    mode:'inline',
-                    onblur:"submit",
-                    emptytext:'请选择',
-                    source:[
-                        {value:'A',text:'A'},
-                        {value:'B',text:'B'},
-                        {value:'C',text:'C'},
-                        {value:'D',text:'D'}
-                    ]
-                }
-            },
             {field: 'ps_total', title: '总分', sortable: true,width:50,
                 formatter:function(value, row, index){
                     var ishuibi = row.ishuibi;
@@ -366,17 +305,18 @@
                     }
                 }
             },
+            {field: 'avgvalue', title: '平均分<br/>(第一轮)', sortable: true,width:70},
             {field: 'xr_id', title: '操作', sortable: false,width:120,
                 formatter: function (value, row, index) {
                     var inp = "'" + value + "'";
                     var a = "";
                     if(row['ishuibi']!='1') {
                         if (row["xr_status"] != "完成") {
-                            a += '<a  class="btn btn-warning btn-xs" onclick="updateInRow(' + inp + ','+index+')">保存</a>&nbsp;';
-                            a += '<a  class="btn btn-danger btn-xs" onclick="huibi(' + inp + ',' + index + ')">回避</a>&nbsp;';
+                            a += '<a  class="btn btn-info btn-xs" onclick="updateInRow(' + inp + ','+index+')">保存</a>&nbsp;';
+                            a += '<a  class="btn btn-info btn-xs" onclick="huibi(' + inp + ',' + index + ')">回避</a>&nbsp;';
                         }
                     }else{
-                        a += '<a  class="btn btn-info btn-green btn-xs" onclick="quxiaohuibi(' + inp + ',' + index + ')">取消回避</a>&nbsp;';
+                        a += '<a  class="btn btn-info btn-xs" onclick="quxiaohuibi(' + inp + ',' + index + ')">取消回避</a>&nbsp;';
                     }
                     a += '<a  class="btn btn-info btn-xs" onclick="XMlook(' + "'" + row.xm_id + "'" + ')">查看材料</a>';
                     return a;
@@ -391,8 +331,7 @@
             offset: params.offset,  //页码
             sort: params.sort,  //排序列名
             sortOrder: params.order,//排位命令（desc，asc）
-            xr_status:$("#xr_status").val(),
-            xm_type:$("#xm_type").val()
+            xr_status:$("#xr_status").val()
         };
         return temp;
     }
@@ -445,21 +384,13 @@
                     }
                 }
             }
-            if('{$Think.config.isZD}' == '1'){
-                if(data['vote4']=='' || data['vote4']==null){
-                    layer.alert('请选择与战斗力关联程度');
-                    return false;
-                }
-
-            }
             data['ishuibi'] = 0;
 	        data['notsave'] = null;
             $.ajax({
                 type:'post',
                 url:'__CONTROLLER__/saveScore',
                 data:{
-                    data:data,
-                    xmType:'{$xmType}'
+                    data:data
                 },
                 success:function(rep){
                     if(rep.code=='0'){
@@ -475,60 +406,47 @@
     }
 
     function huibi(id,index){
-		layer.confirm("确定要回避该项目吗？",{title:'温馨提示'},function(index){	
-			var data = $('#atpbiztable').bootstrapTable("getRowByUniqueId",id);
-			data['ps_cj']='-1';
-			data['ps_ql']='-1';
-			data['ps_jz']='-1';
-			data['ps_cx']='-1';
-			data['ps_total']='-1';
+        var data = $('#atpbiztable').bootstrapTable("getRowByUniqueId",id);
+        data['ps_cj']='-1';
+        data['ps_ql']='-1';
+        data['ps_jz']='-1';
+        data['ps_cx']='-1';
+        data['ps_total']='-1';
 
-			data['ishuibi'] = 1;
-			data['vote1']   = -1;
-			data['vote2']   = -1;
-			data['vote3']   = -1;
-			data['vote4']   = -1;
-			data['notsave'] = null;
-			$.post('__CONTROLLER__/saveScore',{data:data,xmType:'{$xmType}'},function(rep){
-				if(rep.code !='0'){
-					layer.alert('保存失败，请重试');
-				}else{
-					var data = $('#atpbiztable').bootstrapTable("updateRow",{
-						index:index,
-						row:data
-					});
-				}
-			},'json');
-			layer.close(index);
-		})
+        data['ishuibi'] = 1;
+	    data['notsave'] = null;
+        $.post('__CONTROLLER__/saveScore',{data:data},function(rep){
+            if(rep.code !='0'){
+                layer.alert('保存失败，请重试');
+            }else{
+                var data = $('#atpbiztable').bootstrapTable("updateRow",{
+                    index:index,
+                    row:data
+                });
+            }
+        },'json');
     }
 
     function quxiaohuibi(id,index){
-		layer.confirm("确定要取消回避该项目吗？",{title:'温馨提示'},function(index){
-			var data = $('#atpbiztable').bootstrapTable("getRowByUniqueId",id);
-			data['ps_cj']=null;
-			data['ps_ql']=null;
-			data['ps_jz']=null;
-			data['ps_cx']=null;
-			data['vote4']=null;
-			data['ps_total']='0';
-			data['ishuibi'] = 0;
-			data['vote1']   = '';
-			data['vote2']   = '';
-			data['vote3']   = '';
-			data['notsave'] = null;
-			$.post('__CONTROLLER__/saveScore',{data:data, xmType:'{$xmType}'},function(rep){
-				if(rep.code !='0'){
-					layer.alert(rep.message);
-				}else{
-					var data = $('#atpbiztable').bootstrapTable("updateRow",{
-						index:index,
-						row:data
-					});
-				}
-			},'json');
-			layer.close(index);
-		})
+        var data = $('#atpbiztable').bootstrapTable("getRowByUniqueId",id);
+        data['ps_cj']=null;
+        data['ps_ql']=null;
+        data['ps_jz']=null;
+        data['ps_cx']=null;
+        data['ps_total']='0';
+        data['ishuibi'] = 0;
+	    data['notsave'] = null;
+        console.log(data);
+        $.post('__CONTROLLER__/saveScore',{data:data},function(rep){
+            if(rep.code !='0'){
+                layer.alert(rep.message);
+            }else{
+                var data = $('#atpbiztable').bootstrapTable("updateRow",{
+                    index:index,
+                    row:data
+                });
+            }
+        },'json');
     }
 
     $('#sys_refresh').on('click',function() {
@@ -550,7 +468,6 @@
             submitScore();
         }
     });
-
     // 全部保存
     $('#sys_saveall').on('click',function() {
         var notClose  = $('#atpbiztable tbody tr').find('.editable-open');
@@ -572,7 +489,6 @@
     function saveAllScore(){
         var data = $('#atpbiztable').bootstrapTable("getData");
         var len  = data.length;
-        var updateData = [];
         if(len>0){
             var errorMsg  = [];
             for(var i=0;i<len;i++){
@@ -591,52 +507,37 @@
                 if(errorSign !== false){
                     continue;
                 }
-                data[i]['notsave'] = null;
-                $('#atpbiztable').bootstrapTable("updateRow",data[i]);
-                updateData.push(data[i]);
-            }
-//            console.log(errorMsg);
-//            if(errorMsg.length != 0) {
-//                layer.alert(errorMsg.join("<br/>"));
-//                return false;
-//            }else{
-//                console.log(updateData);
-//                ler.aymsg("全部保存成功");
-//            }
-            if(updateData.length != 0) {
-                var updateDataJson = JSON.stringify(updateData);
+//                data[i]['ishuibi'] = 0;
                 $.ajax({
                     type:'post',
-                    url:'__CONTROLLER__/saveScoreAll',
+                    url:'__CONTROLLER__/saveScore',
                     async:false,
                     data:{
-                        updateData:updateData,
-                        xmType:'{$xmType}'
+                        data:data[i]
                     },
                     success:function(rep){
-//                        console.log(rep);return ;
                         if(rep.code!='0'){
                             errorSign = true;
-                            layer.alert(rep.message);
+                            errorMsg.push(rep.message);
                             return false;
                         }else{
-                            if(errorMsg.length != 0) {
-//                                layer.alert(errorMsg.join("<br/>"));
-//                                return false;
-                            }else{
-                                layer.msg("全部保存成功");
-                            }
+                            data[i]['notsave'] = null;
+                            $('#atpbiztable').bootstrapTable("updateRow",data[i]);
                         }
                     },
                     dataType:'json'
                 });
+            }
+            if(errorMsg.length != 0) {
+                layer.alert(errorMsg.join("<br/>"));
+            }else{
+                layer.msg("全部保存成功");
             }
         }
     }
     function submitScore(){
         var data = $('#atpbiztable').bootstrapTable("getData");
         var len  = data.length;
-        var updateData = [];
         if(len>0){
             var errorMsg  = [];
             for(var i=0;i<len;i++){
@@ -655,70 +556,66 @@
                 if(errorSign !== false){
                     continue;
                 }
-                data[i]['notsave'] = null;
-                $('#atpbiztable').bootstrapTable("updateRow",data[i]);
-                updateData.push(data[i]);
-            }
-            if(updateData.length != 0) {
-                var updateDataJson = JSON.stringify(updateData);
+//                data[i]['ishuibi'] = 0;
                 $.ajax({
                     type:'post',
-                    url:'__CONTROLLER__/saveScoreAll',
+                    url:'__CONTROLLER__/saveScore',
                     async:false,
                     data:{
-                        updateData:updateData,
-                        xmType:'{$xmType}'
+                        data:data[i]
                     },
                     success:function(rep){
-//                        console.log(rep);return ;
                         if(rep.code!='0'){
                             errorSign = true;
-                            layer.alert(rep.message);
+                            errorMsg.push(rep.message);
                             return false;
                         }else{
-                            if(errorMsg.length != 0) {
-                                layer.alert(errorMsg.join("<br/>"),{title:'温馨提示',area:'500px'});
-                                return false;
-                            }else{
-                                $.post('__CONTROLLER__/panduanpswancheng',{xmType:'{$xmType}'}, function (rep, status) {
-                                    if (rep == "ok") {
-                                        layer.confirm("提交后不可更改，确认提交吗？",{btn:['确定','取消']},function(){
-                                            $.post('__CONTROLLER__/savepswancheng',{xmType:'{$xmType}'}, function (rep, status) {
-                                                if (rep == "ok") {
-                                                    layer.msg("提交成功");
-                                                    setTimeout(function(){
-                                                        location.reload();
-                                                    },2000);
-                                                }else{
-                                                    layer.alert("提交失败，请稍候重试！");
-                                                }
-                                            });
-                                        });
-                                    }else{
-                                        layer.open({
-                                            type:1,
-                                            content:"<div style='padding: 5px 15px 5px 15px;font-size:20px;word-break:break-all;'>"+rep+"</div>",
-                                            skin:'layer-ext-moon',
-                                            area:["800px","500px"],
-                                            btn:["确定"]
-                                        });
-                                    }
-                                });
-                            }
+                            data[i]['notsave'] = null;
+                            $('#atpbiztable').bootstrapTable("updateRow",data[i]);
                         }
                     },
                     dataType:'json'
                 });
+            }
+            if(errorMsg.length != 0) {
+                layer.alert(errorMsg.join("<br/>"));
+            }else{
+                $.post(
+                    '__CONTROLLER__/panduanpswancheng', function (rep, status) {
+                        if (rep == "ok") {
+                            layer.confirm("提交后不可更改，确认提交吗？",{btn:['确定','取消']},function(){
+                                $.post('__CONTROLLER__/savepswancheng', function (rep, status) {
+                                    if (rep == "ok") {
+                                        layer.msg("提交成功");
+                                        setTimeout(function(){
+                                            location.reload();
+                                        },2000);
+                                        //                            $('#atpbiztable').bootstrapTable('refresh');
+                                    }else{
+                                        layer.alert("提交失败，请稍候重试！");
+                                    }
+                                });
+                            });
+                        }else{
+                            layer.open({
+                                type:1,
+                                content:"<div style='padding: 5px 15px 5px 15px;font-size:20px;word-break:break-all;'>"+rep+"</div>",
+                                skin:'layer-ext-moon',
+                                area:["800px","500px"],
+                                btn:["确定"]
+                            });
+                        }
+                    });
             }
         }
     }
     function detailFormatter(index, row) {
         var html = [];
         html.push("<div class='ibox-content'>");
-        html.push("<table class='table'border='1' style='border:1px solid rgb(221, 221, 221) !important;color:white'>");
+        html.push("<table class='table' border='1' style='border:1px solid rgb(221, 221, 221) !important;background-color: #A8D0A8;'>");
         html.push("<tbody><tr>");
-        html.push("<td style='background-color: #16B5A5;'><b>初审分组</b></td><td style='background-color: #d1ead1;color:#000000;'>" + row['xm_oldfenzu'] + "</td>");//<td><b>推荐方式</b></td><td>"+row['xm_tmfs']+"</td>
-        html.push("<td style='background-color: #16B5A5;'><b>初审小组排名</b></td><td style='background-color: #d1ead1;color:#000000;'>" + row['xm_oldrank'] + "</td><td style='background-color: #16B5A5;'><b>初审平均分</b></td><td style='background-color: #d1ead1;color:#000000;'>" + row['xm_oldscore'] + "</td>");
+        html.push("<td><b>初审分组</b></td><td>" + row['xm_oldfenzu'] + "</td>");// <td><b>推荐方式</b></td><td>"+row['xm_tmfs']+"</td>
+        html.push("<td><b>初审小组排名</b></td><td>" + row['xm_oldrank'] + "</td><td><b>初审平均分</b></td><td>" + row['xm_oldscore'] + "</td>");
         // html.push("<td><b>资助意见</b></td><td>" + row['xm_oldcommand'] + "</td>");
         html.push("</tr></tbody>");
         html.push("</table>");

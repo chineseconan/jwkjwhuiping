@@ -165,14 +165,14 @@
                     cache: false,
                     pagination: false,
                     iconSize: 'outline',
-                    sortable: false,
+                    sortable: true,
+                    sortName:"avgvalue",
+                    sortOrder: "desc",
                     queryParams: queryParams,
                     sidePagination: "server",
                     minimumCountColumns: 2,
                     clickToSelect: true,
                     uniqueId: "xm_id",
-//                    detailView: true,
-//                    detailFormatter: "detailFormatter",
                     columns: tableColumn(),
                     onEditableSave:function(field,row,oldValue,$el) {
                         var res = checkVote();
@@ -240,6 +240,9 @@
                     onLoadSuccess:function(){
                         // 表格内部文字垂直居中
                         $('#votetable th').css('vertical-align','middle');
+                        if("{$Think.config.isZD}" == 1){
+                            $('#votetable').bootstrapTable('showColumn','ps_detail');
+                        }
                     }
                 });
             }
@@ -247,6 +250,8 @@
         TableObj.oTableInit();
         function queryParams(params) {  //配置参数
             var temp = {
+                sort: params.sort,  //排序列名
+                sortOrder: params.order,//排位命令（desc，asc）
                 xmtype:$("#xm_type").val()
             };
             return temp;
@@ -258,57 +263,86 @@
         function tableColumn(){
             var column = [
                 [
-                    {title: '序号', width: 50, rowspan:2,
-                        formatter: function (value, row, index)
-                        {
-                            var option =  $('#votetable').bootstrapTable("getOptions");
-                            return option.pageSize * (option.pageNumber - 1) + index + 1;
-                        }
+//                    {title: '序号', width: 50, rowspan:2,
+//                        formatter: function (value, row, index)
+//                        {
+//                            var option =  $('#votetable').bootstrapTable("getOptions");
+//                            return option.pageSize * (option.pageNumber - 1) + index + 1;
+//                        }
+//                    },
+                    {
+                        field:"xm_ordernum",
+                        title:'答辩序号',
+                        width:80,
+                        sortable:true,
+                        rowspan:2
                     },
                     {
                         field:"xm_code",
                         title:'项目编号',
+                        sortable:true,
                         width:80,
                         rowspan:2
                     },
                     {
                         field:"xm_name",
                         title:'项目名称',
+                        sortable:true,
                         width:200,
                         rowspan:2
                     },
                     {
                         field:"xm_company",
                         title:'依托单位',
+                        sortable:true,
                         width:100,
                         rowspan:2
                     },
                     {
+                        field:"ps_total",
+                        title:'本人打分',
+                        sortable:true,
+                        width:60,
+                        rowspan:2,
+                        formatter:function(value, row, index){
+                            if(value == '-1'){
+                                return '回避';
+                            }else{
+                                return Math.round(value);
+                            }
+                        },
+                    },
+                    {
                         field:"avgvalue",
                         title:'平均分',
+                        sortable:true,
                         width:50,
                         rowspan:2
                     },
                     {
                         field:"ps_detail",
+                        visible:false,
                         title:'与战斗力<br/>关联程度',
+                        sortable:true,
                         width:90,
                         formatter:function(value, row, index){
-                            var len = value.length;
-                            if(len<6){
-                                return value;
-                            }else if(len<11){
-                                var res = value.substring(0,5);
-                                res += '<br/>';
-                                res += value.substring(5,len);
-                                return res;
-                            }else{
-                                var res = value.substring(0,5);
-                                res += '<br/>';
-                                res += value.substring(5,10);
-                                res += '<br/>';
-                                res += value.substring(10,len);
-                                return res;
+                            if(value != null && value != ''){
+                                var len = value.length;
+                                if(len<6){
+                                    return value;
+                                }else if(len<11){
+                                    var res = value.substring(0,5);
+                                    res += '<br/>';
+                                    res += value.substring(5,len);
+                                    return res;
+                                }else{
+                                    var res = value.substring(0,5);
+                                    res += '<br/>';
+                                    res += value.substring(5,10);
+                                    res += '<br/>';
+                                    res += value.substring(10,len);
+                                    return res;
+                                }
                             }
                         },
                         rowspan:2

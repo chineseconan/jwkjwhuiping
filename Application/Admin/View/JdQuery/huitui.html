@@ -102,12 +102,13 @@
                                         </foreach>
                                     </select>
                                 </div>
-                                <div class="fl" style="width: 400px;text-align:center;">
-                                    <label class="control-label">类别：</label>
+                                <div class="fl" style="width: 376px;text-align:center;">
+                                    <label class="control-label">课题分类：</label>
                                     <select id="xm_type" class="chosen-select">
                                         <option value="">&nbsp;</option>
-                                        <option>军队</option>
-                                        <option>地方</option>
+                                        <foreach name="xmTypes" item="item">
+                                            <option value="{$item.xm_type}"<?php if(count($xmTypes) == 1) echo "selected";?>>{$item.xm_type}</option>
+                                        </foreach>
                                     </select>
                                 </div>
                             </div>
@@ -117,10 +118,10 @@
                     </div>
                 </div>
                 <div class="tc" style="height:50px;margin-top: 20px">
-                    <a class="btn btn-success" id="sys_dlg_submit">打分回退</a>
-                    <a class="btn btn-success" id="sys_dlg_submit1">第一轮投票回退</a>
-                    <a class="btn btn-success" id="sys_dlg_submit2">第二轮投票回退</a>
-                    <a class="btn btn-success" id="sys_dlg_submit3">第三轮投票回退</a>
+                    <a class="btn btn-success" id="sys_dlg_submit">第一轮打分回退</a>
+                    <!--<a class="btn btn-success" id="sys_dlg_submit1">第一轮投票回退</a>-->
+                    <!--<a class="btn btn-success" id="sys_dlg_submit2">第二轮投票回退</a>-->
+                    <!--<a class="btn btn-success" id="sys_dlg_submit3">第三轮投票回退</a>-->
                 </div>
             </div>
         </div>
@@ -160,8 +161,13 @@
                 alert("请选择专家");
                 return false;
             }
+            var xmType = $("#xm_type").val();
+            if (xmType == "") {
+                alert("请选择课题分类");
+                return false;
+            }
             var classid = $("input[name='classid']:checked").val();
-            $.post("__CONTROLLER__/huituiSubmit", {user_id: name,classid:classid}, function (rep) {
+            $.post("__CONTROLLER__/huituiSubmit", {user_id: name,classid:classid,xmType:xmType}, function (rep) {
                 if (rep == 'ok') {
                     alert("操作成功！");
                 } else {

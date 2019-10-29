@@ -95,7 +95,7 @@ class UserAuthController extends BaseController
         $userAuthModel = M('userauth');
         foreach ($data as &$value) {
             $id = $value['user_id'];
-            $roles = $userAuthModel->field('role_name')->where("ua_userid = '$id' and r and role_name!='安全管理员' and role_name!='审计管理员' and role_isdefault!='是'")->join('sysrole on  userauth.ua_roleid = sysrole.role_id')->select();
+            $roles = $userAuthModel->field('role_name')->where("ua_userid = '$id' and role_name!='安全管理员' and role_name!='审计管理员' and role_isdefault!='是'")->join('sysrole on  userauth.ua_roleid = sysrole.role_id')->select();
             $roles = implode(',', removeArrKey($roles, 'role_name'));
             $value['roles'] = $roles;
         }

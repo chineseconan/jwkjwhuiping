@@ -102,6 +102,16 @@
                                         </foreach>
                                     </select>
                                 </div>
+                            <div class="cb" style="margin-top: 20px;">
+                                <div class="fl" style="width: 376px;text-align:center;">
+                                    <label class="control-label">课题分类：</label>
+                                    <select id="xm_type" class="chosen-select">
+                                        <option value="">&nbsp;</option>
+                                        <foreach name="xmTypes" item="item">
+                                            <option value="{$item.xm_type}"<?php if(count($xmTypes) == 1) echo "selected";?>>{$item.xm_type}</option>
+                                        </foreach>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-group clearfix" style="margin-top: 25px;margin-left: 90px" id="class">
                             </div>
@@ -134,12 +144,18 @@
                 alert("请选择分组");
                 return false;
             }
+            var xmType = $("#xm_type").val();
+            if (xmType == "") {
+                alert("请选择课题分类");
+                return false;
+            }
             // 若当前选择的分组下是否有未提交的专家则不许导出
             $.ajax({
                 type:'post',
                 url:'__CONTROLLER__/checkResultExportFinish',
                 data:{
-                    xm_class:name
+                    xm_class:name,
+                    xm_type:xmType
                 },
                 success:function(res){
 //                    console.log(res);return ;
@@ -147,7 +163,7 @@
                         alert(res.message);
                         return true;
                     }else{
-                        window.open('__CONTROLLER__/resultexport?xm_class='+name);
+                        window.open('__CONTROLLER__/resultexport?xm_class='+name+'&xm_type='+xmType);
                         var index = parent.layer.getFrameIndex(window.name);
                         parent.layer.close(index);
                     }

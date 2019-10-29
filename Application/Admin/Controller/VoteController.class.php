@@ -175,9 +175,9 @@ class VoteController extends BaseController
         $data = $model->field('xm_id,xm_ordernum,xm_tmfs,xm_code,ishuibi,xm_name,ps_ql,ps_jz,ps_cx,ps_detail,xm_company,xm_createuser,xm_class,xm_year,xm_oldfenzu,xm_oldrank,xm_oldscore,xm_oldcommand,xr_id,xr_status,ps_zz,ps_total,`vote1`,`vote2`,`vote3`,vote4,vote1option,vote2option,vote3option,vote4option,vote1status,vote2status,vote3status,vote4status,avgvalue')
             ->join('xmps_xmrelation r on r.xr_xm_id=x.xm_id')
             ->where($where)
-            ->order("avgvalue desc,xm_ordernum asc")
+            ->order($queryParam['sort'] . " " . $queryParam['sortOrder'])
+//            ->order("avgvalue desc,xm_ordernum asc")
             ->select();
-       // echo $model->_sql();die;
 //        if($data){
 //            foreach($data as $key=>$val){
 //                $info = '项目编号：'.$val['xm_code']."<br/>";

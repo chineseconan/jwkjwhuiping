@@ -1,7 +1,7 @@
 <?php
 namespace Admin\Controller;
 use Think\Controller;
-class MxQueryController extends BaseController
+class ZQMxQueryController extends BaseController
 {
 
     /**
@@ -29,7 +29,10 @@ class MxQueryController extends BaseController
         $data = $userModel->field('user_id,user_realusername')->where($where)->select();
         $this->assign("user", $data);
 
-        $markOption = C('mark.REMARK_OPTION');
+        $xmTypes =M('xmps_xm')->field('distinct xm_type')->select();
+        $this->assign("xmTypes", $xmTypes);
+
+        $markOption = C('mark.ALL_REMARK_FIELD');
         $this->assign('markOption',$markOption);
         $this->display();
     }
@@ -56,21 +59,22 @@ class MxQueryController extends BaseController
             $where['xm_group'] = ['like', '%'.$queryParam['xm_group'].'%'];
         }
         if (!empty($queryParam['xm_user'])) {
-            $where['xr_user_id'] = ['eq', $queryParam['xm_user']];
+            $where['xmps_xmrelation.xr_user_id'] = ['eq', $queryParam['xm_user']];
         }
         if (!empty($queryParam['xm_code'])) {
             $where['xm_code'] = ['eq', $queryParam['xm_code']];
         }
         $model = M('xmps_xm');
-        $data = $model->field("xm_id,xm_code,xm_name,xm_company,xm_createuser,xm_class,xm_year,
-        xr_id,xr_status,ps_cj,ps_ql,ps_jz,ps_cx,ps_zz,ps_detail,ps_total,user_realusername,vote1,vote2,vote3,vote4,
-        vote1status,vote2status,vote3status")
+        $data = $model->field("xm_id,xm_code,xm_name,xm_company,xm_createuser,xm_class,xm_year,xm_type,
+        xmps_xmrelation.xr_id,xmps_xmrelation.xr_status,xmps_xmrelation.ps_cj,xmps_xmrelation.ps_ql,xmps_xmrelation.ps_jz,xmps_xmrelation.ps_cx,xmps_xmrelation.ps_detail,xmps_xmrelation.ps_total,user_realusername,xmps_xmrelation.vote4,xmps_xmrelation.ishuibi,r2.xr_status r2_xr_status,r2.ps_cj r2_ps_cj,r2.ps_ql r2_ps_ql,r2.ps_jz r2_ps_jz,r2.ps_cx r2_ps_cx,r2.ps_total r2_ps_total,r2.ishuibi r2_ishuibi")
             ->join('xmps_xmrelation on xr_xm_id=xmps_xm.xm_id')
+            ->join('left join xmps_xmrelation_r2 r2 on r2.xr_id=xmps_xmrelation.xr_id')
             ->join("sysuser on user_id=xmps_xmrelation.xr_user_id and user_isdelete='0'")
             ->where($where)
             ->order($queryParam['sort'] . " " . $queryParam['sortOrder'])
             ->limit($queryParam['offset'], $queryParam['limit'])
             ->select();
+//        echo $model->_sql();die;
         $count = $model->join('xmps_xmrelation on xr_xm_id=xmps_xm.xm_id')
             ->join("sysuser on user_id=xmps_xmrelation.xr_user_id and user_isdelete='0'")->where($where)->count();
         echo json_encode(array('total' => $count, 'rows' => $data));
@@ -101,18 +105,32 @@ class MxQueryController extends BaseController
             $where['xm_group'] = ['like', '%'.$queryParam['xm_group'].'%'];
         }
         $model = M('xmps_xm');
-        $data = $model->field("xm_code,xm_name,xm_class,user_realusername,ps_total,ps_ql,ps_jz,ps_cx,vote4,xr_status,
-        case vote1 when '-1' then '回避' when '0' then '不支持' when '1' then '支持' when '-2' then '不参与本轮投票' else vote1 end vote1,vote1status,
-        case vote2 when '-1' then '回避' when '0' then '不支持' when '1' then '支持' when '-2' then '不参与本轮投票' else vote2 end vote2,vote2status,
-        case vote3 when '-1' then '回避' when '0' then '不支持' when '1' then '支持' when '-2' then '不参与本轮投票' else vote3 end vote3,vote3status")
+        $isZD      = C('isZD');
+        $markInfo  = C('mark.REMARK_OPTION')[$queryParam['xm_type']]['评价内容'];
+        $markTitle = removeArrKey($markInfo,'brief');
+        $markField = array_keys($markInfo);
+        $field = ['xm_code','xm_name','xm_class','user_realusername','ps_total'];
+        $field = array_merge($field,$markField);
+        if($isZD == 1) array_push($field,'vote4');
+        array_push($field,'xr_status');
+        $data = $model->field($field)
             ->join('xmps_xmrelation on xr_xm_id=xmps_xm.xm_id')
             ->join("sysuser on user_id=xmps_xmrelation.xr_user_id and user_isdelete='0'")
             ->where($where)
             ->order("xm_class,xm_code,user_realusername")
             ->select();
-        $header = array('项目编号','项目名称',"分组",'评审专家','总分','潜力',"价值","创新","与战斗力关联程度","打分状态","第1轮投票","第1轮状态","第2轮投票","第2轮状态","第3轮投票","第3轮状态");
-        $width = Array("5","10","20","10","15","8",'8',"8","8","10",'15',"8","8",'8',"8","8",'8');
-        $title = "国防科技卓越青年科学基金项目专家评审汇总表";
+        $header = ['项目编号','项目名称',"分组",'评审专家','总分'];
+        $width = ["5","10","20","10","15","8"];
+        $header = array_merge($header,$markTitle);
+        $width  = array_merge($width,array_fill(count($width),count($markTitle),'14'));
+        if($isZD == 1) {
+            array_push($header, '与战斗力关联程度');
+            array_push($width, '10');
+        }
+        array_push($header,'打分状态');
+        array_push($width,'15');
+//        dump($width);die;
+        $title = C('mark.REMARK_OPTION')[$queryParam['xm_type']]['title']."专家评审汇总表";
 
         echo excelExport($header, $data, true,$width,true,true,true,$title);
     }
